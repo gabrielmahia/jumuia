@@ -1,0 +1,16 @@
+date,donor_name,amount,currency,allocation,is_recurring,frequency,notes
+2024-02-01,Maria,50.00,KES,General Fund,No,,Weekly donation
+2024-02-01,Tom Family,100.00,KES,Food Pantry,Yes,Monthly,Supporting meals program
+2024-02-02,Anonymous,200.00,KES,General Fund,No,,In memory of loved one
+2024-02-03,Sofia & Luis,500.00,KES,Building Fund,No,,Wedding gift to parish
+2024-02-04,Justice Team Collection,347.00,KES,Justice Work,No,,Advocacy campaign
+2024-02-05,Youth Group,67.00,KES,Youth Formation,No,,Pizza sale fundraiser
+2024-02-08,Grace,75.00,KES,Pastoral Care,Yes,Biweekly,Supporting grief ministry
+2024-02-10,David,30.00,KES,Formation,No,,Supporting catechesis
+2024-02-12,Robert,125.00,KES,General Fund,Yes,Monthly,Commitment to parish
+2024-02-15,Patricia,50.00,KES,Food Pantry,Yes,Monthly,Supporting meals
+2024-02-18,Michael,200.00,KES,Justice Work,No,,Living wage campaign
+2024-02-20,Anonymous,150.00,KES,Building Fund,No,,Roof repair campaign
+2024-02-22,Joseph,40.00,KES,Formation,No,,Supporting RCIA
+2024-02-25,Mentorship Circle,156.00,KES,Youth Formation,No,,Collective giving
+2024-02-28,Monthly Pledges,1100.00,KES,Mixed,Yes,Monthly,12 recurring donors
