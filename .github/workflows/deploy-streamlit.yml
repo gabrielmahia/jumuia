@@ -1,0 +1,91 @@
+name: Auto-Deploy to Streamlit Cloud
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11']
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest
+    
+    - name: Verify Streamlit app
+      run: |
+        echo "Checking main app file..."
+        test -f app/01_Home.py && echo "✓ Main app found" || exit 1
+        
+        echo "Checking app pages..."
+        test -f app/pages/02_Sacraments.py && echo "✓ Sacraments app found" || exit 1
+        test -f app/pages/03_Pastoral_Care.py && echo "✓ Pastoral Care app found" || exit 1
+        test -f app/pages/04_Justice.py && echo "✓ Justice app found" || exit 1
+        test -f app/pages/05_Formation.py && echo "✓ Formation app found" || exit 1
+        test -f app/pages/06_Stewardship.py && echo "✓ Stewardship app found" || exit 1
+        test -f app/pages/07_Admin.py && echo "✓ Admin app found" || exit 1
+        
+        echo "Checking configuration..."
+        test -f .streamlit/config.toml && echo "✓ Streamlit config found" || exit 1
+        test -f requirements.txt && echo "✓ Requirements found" || exit 1
+    
+    - name: Lint with ruff
+      run: |
+        pip install ruff
+        ruff check app/ --select=E9,F63,F7,F82 --show-source
+    
+    - name: Test imports
+      run: |
+        python -c "import streamlit; print('✓ Streamlit imported')"
+        python -c "import pandas; print('✓ Pandas imported')"
+        python -c "import plotly; print('✓ Plotly imported')"
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Notify Deployment
+      run: |
+        echo "🚀 Deployment triggered for Streamlit Cloud"
+        echo "Repository: gabrielmahia/catholic-network-tools"
+        echo "Branch: main"
+        echo "Main file: app/01_Home.py"
+        echo ""
+        echo "App will be available at:"
+        echo "https://gabrielmahia-catholic-network-tools.streamlit.app"
+        echo ""
+        echo "Note: Streamlit Cloud auto-deploys on GitHub push."
+        echo "If connected, your app should update in 1-2 minutes."
+
+  notify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Deployment Status
+      run: |
+        echo "✅ CI/CD Pipeline Complete"
+        echo ""
+        echo "Status: ${{ job.status }}"
+        echo "Commit: ${{ github.sha }}"
+        echo "Branch: ${{ github.ref }}"
