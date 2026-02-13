@@ -20,6 +20,7 @@ from src.spiritual_os.liturgical_calendar import (
     LiturgicalColor,
     LiturgicalSeason
 )
+from src.spiritual_os.mass_readings import MassReadingsAPI, ReadingType
 
 # Page config
 st.set_page_config(
@@ -119,6 +120,79 @@ if today:
     
 else:
     st.warning("Unable to retrieve liturgical data. Please check your internet connection.")
+
+st.divider()
+
+# ============================================================================
+# TODAY'S MASS READINGS
+# ============================================================================
+
+st.header("📖 Today's Mass Readings")
+
+st.markdown("""
+The Word of God proclaimed at Mass. Listen, reflect, and respond to God's call in Scripture.
+""")
+
+mass_readings = MassReadingsAPI.get_today()
+
+if mass_readings:
+    # Display liturgical context
+    st.info(f"**{mass_readings.liturgical_title}** | Cycle {mass_readings.liturgical_cycle.value}")
+    
+    # First Reading
+    with st.expander("📜 First Reading", expanded=True):
+        st.markdown(f"### {mass_readings.first_reading.citation}")
+        st.markdown(mass_readings.first_reading.text)
+    
+    # Responsorial Psalm
+    with st.expander("🎵 Responsorial Psalm"):
+        st.markdown(f"### {mass_readings.psalm.citation}")
+        st.markdown(mass_readings.psalm.text)
+    
+    # Second Reading (if Sunday/Solemnity)
+    if mass_readings.second_reading:
+        with st.expander("📜 Second Reading"):
+            st.markdown(f"### {mass_readings.second_reading.citation}")
+            st.markdown(mass_readings.second_reading.text)
+    
+    # Gospel
+    with st.expander("✝️ Gospel", expanded=True):
+        st.markdown(f"### {mass_readings.gospel.citation}")
+        st.markdown(mass_readings.gospel.text)
+        
+        # Gospel reflection prompts
+        if mass_readings.reflections:
+            st.markdown("---")
+            st.markdown("**Reflection Questions:**")
+            for reflection in mass_readings.reflections:
+                st.write(f"💭 {reflection}")
+    
+    # Alleluia
+    if mass_readings.alleluia:
+        st.success(f"**Alleluia!** {mass_readings.alleluia.text}")
+    
+    # Saint of the day
+    if mass_readings.saint_of_day:
+        st.info(f"**Saint of the Day**: {mass_readings.saint_of_day}")
+    
+    # Actions
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown("**[Listen on USCCB →](https://bible.usccb.org/daily-bible-reading)**")
+    
+    with col2:
+        st.markdown("**[Print for Bulletin →](#)**")
+    
+    with col3:
+        st.markdown("**[Share Readings →](#)**")
+
+else:
+    st.warning("""
+    Unable to retrieve Mass readings. Please check your internet connection or visit:
+    - **USCCB Daily Readings**: https://bible.usccb.org/daily-bible-reading
+    - **Universalis**: https://universalis.com
+    """)
 
 st.divider()
 
