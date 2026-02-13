@@ -23,7 +23,7 @@ with col4:
 
 st.markdown("---")
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["Mass Schedule", "Volunteer Assignments", "Facility Calendar", "Safety & Compliance", "Directory"])
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["Mass Schedule", "Volunteer Assignments", "Facility Calendar", "Safety & Compliance", "Directory", "Data Management"])
 
 with tab1:
     st.markdown("## Sunday Mass Schedule")
@@ -217,6 +217,71 @@ with tab5:
         - Sent weekly on Wednesday
         - Includes Mass schedule, announcements, prayer intentions
         """)
+
+
+with tab6:
+    st.markdown("## 📊 Data Management")
+    
+    st.markdown("""
+    Import existing data, export for backups, and maintain data ownership.
+    
+    **Your data belongs to you.** Export anytime, no vendor lock-in.
+    """)
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("### 📥 Import Data")
+        
+        import_type = st.selectbox(
+            "What do you want to import?",
+            ["Parish Members", "Small Christian Communities (SCCs)", "Catechists", "Giving Records"]
+        )
+        
+        st.markdown("""
+        **Step 1**: Download template CSV
+        """)
+        
+        st.download_button(
+            label="📄 Download Template CSV",
+            data="first_name,last_name,email,phone\n",
+            file_name="member_import_template.csv",
+            mime="text/csv"
+        )
+        
+        st.markdown("""
+        **Step 2**: Upload filled CSV
+        """)
+        
+        uploaded_file = st.file_uploader(
+            "Choose CSV file",
+            type=['csv']
+        )
+        
+        if uploaded_file:
+            st.success("File uploaded! Review and confirm below. (Demo)")
+    
+    with col2:
+        st.markdown("### 📤 Export Data")
+        
+        export_type = st.selectbox(
+            "What to export?",
+            ["Complete Backup", "Members", "SCCs", "Catechists"]
+        )
+        
+        export_format = st.radio(
+            "Format",
+            ["CSV", "JSON"],
+            horizontal=True
+        )
+        
+        if st.button("Generate Export", type="primary"):
+            st.download_button(
+                label="Download Export",
+                data="Sample export data",
+                file_name=f"export_{datetime.now().strftime('%Y%m%d')}.csv",
+                mime="text/csv"
+            )
 
 st.markdown("---")
 
