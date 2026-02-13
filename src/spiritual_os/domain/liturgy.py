@@ -2,6 +2,7 @@
 Liturgy Module - Liturgical season awareness and feast day tracking
 """
 
+from dataclasses import dataclass
 from datetime import datetime, date
 from enum import Enum
 from typing import Optional, List
@@ -118,6 +119,3 @@ def season_description() -> str:
         LiturgicalSeason.ORDINARY: "Living out discipleship in ordinary time"
     }
     return descriptions.get(season, "")
-
-
-from dataclasses import dataclass
