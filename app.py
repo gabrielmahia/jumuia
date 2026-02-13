@@ -17,6 +17,10 @@ from src.spiritual_os.models import (
     UserRole, PermissionContext
 )
 from src.spiritual_os.aggregation import AggregationEngine, QueryBuilder
+from src.spiritual_os.ui.mobile_css import inject_mobile_css
+
+# Inject mobile-responsive CSS
+inject_mobile_css()
 
 # Configure page
 st.set_page_config(
