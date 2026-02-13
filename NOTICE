@@ -1,0 +1,32 @@
+# Copyright and Attribution
+
+## Project
+
+Catholic Network Tools
+Repository: https://github.com/gabrielmahia/catholic-network-tools
+Licensed under: Creative Commons Attribution–NonCommercial–NoDerivatives 4.0 International (CC BY-NC-ND 4.0)
+
+## Contributors
+
+See CONTRIBUTORS.md for a list of all contributors and their contributions.
+
+## Contributing Parishes
+
+This tool is built in service to Catholic parishes across Kenya. Contributing parishes and organizations are invited to be listed in PARISHES.md (with permission).
+
+## Third-Party Dependencies
+
+This project depends on open-source libraries. See requirements.txt and pyproject.toml for a complete list.
+
+## License
+
+This work is licensed under CC BY-NC-ND 4.0. See LICENSE file for full text.
+
+## Community
+
+This is community-owned infrastructure stewarded by its contributors and adopting parishes. No commercial entity owns or controls this project.
+
+---
+
+For questions about attribution, contribution rights, or data ownership, email: contact@aikungfu.dev
+
