@@ -1,0 +1,141 @@
+name: 🚀 Push to GitHub & Deploy to Streamlit
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_message:
+        description: 'Commit message'
+        required: false
+        default: 'chore: sync from local build'
+
+jobs:
+  push-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    
+    - name: 📊 Show repository status
+      run: |
+        echo "📦 REPOSITORY STATUS"
+        echo "==================="
+        git log --oneline | head -10
+        echo ""
+        echo "Total commits: $(git log --oneline | wc -l)"
+        echo "Repository size: $(du -sh . | cut -f1)"
+        echo ""
+        find . -type f \( -name "*.py" -o -name "*.md" \) | grep -v '.git' | wc -l | xargs echo "Total Python + MD files:"
+    
+    - name: ✅ Verify structure
+      run: |
+        echo "🔍 Verifying repository structure..."
+        
+        # Check required files
+        files=(
+          "app/01_Home.py"
+          "app/pages/02_Sacraments.py"
+          "app/pages/03_Pastoral_Care.py"
+          "app/pages/04_Justice.py"
+          "app/pages/05_Formation.py"
+          "app/pages/06_Stewardship.py"
+          "app/pages/07_Admin.py"
+          "requirements.txt"
+          ".streamlit/config.toml"
+          "README_GLOBAL.md"
+        )
+        
+        for file in "${files[@]}"; do
+          if [ -f "$file" ]; then
+            echo "✓ $file"
+          else
+            echo "✗ MISSING: $file"
+            exit 1
+          fi
+        done
+        
+        echo ""
+        echo "✅ All required files present!"
+    
+    - name: 🔐 Configure Git
+      run: |
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "GitHub Actions Bot"
+    
+    - name: 📤 Push to GitHub
+      run: |
+        # Check if there are unpushed commits
+        UNPUSHED=$(git rev-list --count @{u}..HEAD 2>/dev/null || echo "0")
+        
+        if [ "$UNPUSHED" -gt 0 ]; then
+          echo "📤 Pushing $UNPUSHED commits to GitHub..."
+          git push origin main
+          echo "✅ Pushed successfully"
+        else
+          echo "✅ Already up to date with GitHub"
+        fi
+    
+    - name: 📋 Generate deployment report
+      run: |
+        cat > /tmp/deployment-report.txt << 'EOF'
+        🚀 DEPLOYMENT REPORT
+        ====================
+        
+        ✅ Repository Status
+        - Branch: main
+        - Commits: $(git log --oneline | wc -l)
+        - Size: $(du -sh . | cut -f1)
+        
+        ✅ Application Files
+        - Home dashboard: app/01_Home.py
+        - Sacraments: app/pages/02_Sacraments.py
+        - Pastoral Care: app/pages/03_Pastoral_Care.py
+        - Justice: app/pages/04_Justice.py
+        - Formation: app/pages/05_Formation.py
+        - Stewardship: app/pages/06_Stewardship.py
+        - Admin: app/pages/07_Admin.py
+        
+        ✅ Configuration
+        - Streamlit config: .streamlit/config.toml
+        - Python deps: requirements.txt
+        - GitHub Actions: .github/workflows/
+        
+        ✅ Documentation
+        - README_GLOBAL.md
+        - QUICKSTART.md
+        - AUTOMATED_DEPLOYMENT.md
+        - FIX_STREAMLIT_FORM.md
+        
+        🎉 READY FOR STREAMLIT DEPLOYMENT
+        ==================================
+        
+        Next steps:
+        1. Go to: https://share.streamlit.io/deploy
+        2. Authorize GitHub
+        3. Select: gabrielmahia/catholic-network-tools
+        4. Branch: main
+        5. Main file: app/01_Home.py
+        6. Click Deploy
+        
+        Your app will be live at:
+        https://gabrielmahia-catholic-network-tools.streamlit.app
+        EOF
+        
+        cat /tmp/deployment-report.txt
+    
+    - name: 📤 Upload deployment report
+      uses: actions/upload-artifact@v3
+      with:
+        name: deployment-report
+        path: /tmp/deployment-report.txt
+    
+    - name: 💬 Summary
+      run: |
+        echo "✅ PUSH TO GITHUB COMPLETE"
+        echo ""
+        echo "Repository: https://github.com/gabrielmahia/catholic-network-tools"
+        echo "Status: Ready for Streamlit deployment"
+        echo ""
+        echo "🎯 Next: Go to https://share.streamlit.io/deploy"
