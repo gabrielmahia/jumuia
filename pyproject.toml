@@ -1,0 +1,114 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "catholic-network-tools"
+version = "0.0.1"
+description = "Community coordination and resilience toolkit for Catholic parishes across Kenya"
+readme = "README.md"
+license = {text = "CC BY-NC-ND 4.0"}
+requires-python = ">=3.11"
+authors = [
+    {name = "Catholic Network Tools Contributors", email = "contact@aikungfu.dev"}
+]
+keywords = [
+    "catholic", "community", "coordination", "kenya", "offline-first",
+    "resilience", "stewardship", "civic-tech"
+]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "License :: Other/Proprietary License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+dependencies = [
+    "fastapi>=0.100.0",
+    "uvicorn[standard]>=0.23.0",
+    "sqlalchemy>=2.0.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "cryptography>=41.0.0",
+    "requests>=2.31.0",
+    "python-multipart>=0.0.5",
+    "aiosqlite>=0.19.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.5.0",
+    "pre-commit>=3.3.0",
+    "isort>=5.12.0",
+]
+
+offline = [
+    "yjs-sync>=0.1.0",
+    "crdt>=0.1.0",
+]
+
+sms = [
+    "africas-talking>=1.0.0",
+    "twilio>=8.10.0",
+]
+
+postgres = [
+    "psycopg2-binary>=2.9.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/gabrielmahia/catholic-network-tools"
+Repository = "https://github.com/gabrielmahia/catholic-network-tools.git"
+"Issue Tracker" = "https://github.com/gabrielmahia/catholic-network-tools/issues"
+Documentation = "https://github.com/gabrielmahia/catholic-network-tools/tree/main/Docs"
+
+[tool.setuptools]
+packages = ["catholic_network_tools"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "S", "B", "A", "C4", "SIM"]
+ignore = ["E501", "E203", "W503"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "--cov=catholic_network_tools --cov-report=html --cov-report=term-missing"
+
+[tool.isort]
+profile = "black"
+line_length = 100
+multi_line_mode = 3
+include_trailing_comma = true
+
