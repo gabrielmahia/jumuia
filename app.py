@@ -53,6 +53,19 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ============================================================================
+# DEMO MODE WARNING
+# ============================================================================
+
+st.warning("""
+⚠️ **DEMO MODE ACTIVE** — All data is synthetic for demonstration purposes only.
+
+This application uses sample data to showcase features. No real parish information is stored or processed. 
+Not connected to actual parish systems. Do not enter real member data.
+
+[Learn more about production readiness →](https://github.com/gabrielmahia/catholic-network-tools#-demo-vs-real)
+""", icon="⚠️")
+
+# ============================================================================
 # SESSION STATE INITIALIZATION
 # ============================================================================
 
@@ -529,6 +542,11 @@ def main():
     
     # Sidebar: User & Role Selection
     with st.sidebar:
+        # Data mode indicator
+        st.info("📊 **Data Mode**: DEMO", icon="ℹ️")
+        st.caption("All data is synthetic for testing")
+        st.divider()
+        
         st.markdown("## 👤 User")
         
         role_choice = st.radio(
