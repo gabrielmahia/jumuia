@@ -20,6 +20,7 @@ from src.spiritual_os.liturgical_calendar import (
     LiturgicalColor,
     LiturgicalSeason
 )
+from src.spiritual_os.mass_readings import MassReadingsAPI, MassReadings
 
 # Page config
 st.set_page_config(
@@ -92,6 +93,66 @@ if today:
     # Color meaning
     st.markdown("### Liturgical Color Meaning")
     st.info(LiturgicalCalendar.get_color_description(today.color))
+    
+    st.divider()
+    
+    # ============================================================================
+    # TODAY'S MASS READINGS
+    # ============================================================================
+    
+    st.header("📖 Today's Mass Readings")
+    
+    mass_readings = MassReadingsAPI.get_today()
+    
+    if mass_readings and mass_readings.gospel.text != "[Gospel unavailable - please check internet connection]":
+        
+        # Gospel (most prominent)
+        st.subheader("🕊️ Gospel")
+        st.markdown(f"**{mass_readings.gospel.citation}**")
+        
+        with st.expander("Read Gospel", expanded=True):
+            st.markdown(mass_readings.gospel.text)
+            
+            # Reflection prompt
+            st.info("💭 **Lectio Divina**: Read slowly. What word or phrase speaks to you today?")
+        
+        st.divider()
+        
+        # Other readings
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("### First Reading")
+            st.write(f"**{mass_readings.first_reading.citation}**")
+            with st.expander("Read First Reading"):
+                st.markdown(mass_readings.first_reading.text)
+        
+        with col2:
+            st.markdown("### Responsorial Psalm")
+            st.write(f"**{mass_readings.responsorial_psalm.citation}**")
+            with st.expander("Read Psalm"):
+                st.markdown(mass_readings.responsorial_psalm.text)
+        
+        if mass_readings.second_reading:
+            st.markdown("### Second Reading")
+            st.write(f"**{mass_readings.second_reading.citation}**")
+            with st.expander("Read Second Reading"):
+                st.markdown(mass_readings.second_reading.text)
+        
+        # Bulletin format
+        st.divider()
+        
+        with st.expander("📋 Copy for Parish Bulletin"):
+            bulletin_text = MassReadingsAPI.format_for_bulletin(mass_readings)
+            st.code(bulletin_text, language="markdown")
+            
+    elif mass_readings:
+        st.warning("⚠️ Mass readings unavailable. Please check your internet connection.")
+        st.info("The Catholic Readings API provides daily Mass readings. When offline, readings are cached for 30 days.")
+    else:
+        st.error("Unable to retrieve Mass readings.")
+    
+    st.divider()
     
     # All celebrations for today
     if len(today.celebrations) > 1:
