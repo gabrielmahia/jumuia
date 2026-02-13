@@ -58,6 +58,44 @@ def test_readme_contains_trust_sections():
         assert section in readme, f"README missing section: {section}"
 
 
+def test_new_features_exist():
+    """Verify new Catholic features are implemented."""
+    root = Path(__file__).parent.parent.parent
+    
+    # Liturgical calendar module
+    assert (root / "src/spiritual_os/liturgical_calendar.py").exists(), \
+        "Missing liturgical calendar module"
+    
+    # SCC module
+    assert (root / "src/spiritual_os/domain/scc.py").exists(), \
+        "Missing SCC domain module"
+    
+    # Catechist certification module
+    assert (root / "src/spiritual_os/domain/catechist.py").exists(), \
+        "Missing catechist certification module"
+    
+    # UI pages
+    assert (root / "app/pages/09_Liturgy_of_the_Day.py").exists(), \
+        "Missing Liturgy of the Day page"
+    assert (root / "app/pages/10_Small_Christian_Communities.py").exists(), \
+        "Missing SCC page"
+    assert (root / "app/pages/11_Catechist_Certification.py").exists(), \
+        "Missing catechist certification page"
+
+
+def test_system_documentation_exists():
+    """Verify system documentation is complete."""
+    root = Path(__file__).parent.parent.parent
+    
+    required_docs = [
+        "Docs/architecture/SYSTEM_OVERVIEW.md",
+        "Docs/architecture/SCALING_BOUNDARIES.md",
+    ]
+    
+    for doc in required_docs:
+        assert (root / doc).exists(), f"Missing documentation: {doc}"
+
+
 def test_security_contact_configured():
     """Verify security contact is configured."""
     root = Path(__file__).parent.parent.parent
