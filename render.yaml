@@ -1,0 +1,47 @@
+# render.yaml — Webhook companion service deployment
+# Deploy at: render.com → New Web Service → Connect repo
+#
+# This deploys the FastAPI webhook service that handles:
+#   - WhatsApp inbound messages (AT or Twilio)
+#   - M-Pesa STK Push callbacks
+#
+# The Streamlit app (main CNT interface) deploys separately on Streamlit Cloud.
+
+services:
+  - type: web
+    name: cnt-whatsapp-webhook
+    env: python
+    region: oregon  # or frankfurt for EU/Africa proximity
+    plan: free
+    buildCommand: pip install -r requirements-webhook.txt
+    startCommand: uvicorn webhook_app:app --host 0.0.0.0 --port $PORT
+
+    envVars:
+      # Set these in Render dashboard → Environment
+      - key: ANTHROPIC_API_KEY
+        sync: false  # secret — set manually
+      - key: AFRICASTALKING_API_KEY
+        sync: false
+      - key: AFRICASTALKING_USERNAME
+        value: sandbox  # change to live username for production
+      - key: WHATSAPP_PROVIDER
+        value: africas_talking
+      - key: MPESA_ENV
+        value: sandbox  # change to live for production
+      - key: MPESA_CONSUMER_KEY
+        sync: false
+      - key: MPESA_CONSUMER_SECRET
+        sync: false
+      - key: MPESA_SHORTCODE
+        value: "174379"  # Daraja sandbox default
+      - key: MPESA_PASSKEY
+        sync: false
+      - key: CNT_DB_PATH
+        value: /tmp/cnt_webhook.db  # ephemeral on free tier; use persistent disk for prod
+
+    # Add a persistent disk for production (paid plan):
+    # disk:
+    #   name: cnt-data
+    #   mountPath: /data
+    #   sizeGB: 1
+    # Then set CNT_DB_PATH=/data/cnt.db

@@ -1,0 +1,10 @@
+# requirements-webhook.txt — Webhook companion service dependencies
+# Install separately for FastAPI webhook deployment (not needed for Streamlit app)
+# pip install -r requirements-webhook.txt
+
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+anthropic>=0.30.0
+requests>=2.31.0
+africastalking>=1.2.6
+# twilio>=8.0.0  # uncomment if using Twilio
