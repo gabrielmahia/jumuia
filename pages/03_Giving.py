@@ -1,0 +1,130 @@
+"""Parish Giving — M-Pesa STK Push (Sandbox Active / Live Rails)"""
+import streamlit as st
+import sys
+sys.path.insert(0, ".")
+
+from services.mpesa_service import (
+    init_giving_db,
+    initiate_stk_push,
+    get_giving_summary,
+    live_activation_checklist,
+    MPESA_ENV,
+)
+
+st.set_page_config(page_title="Parish Giving — CNT", page_icon="🤝", layout="centered")
+
+init_giving_db()
+
+st.title("🤝 Parish Giving")
+
+is_sandbox = MPESA_ENV == "sandbox"
+if is_sandbox:
+    st.warning(
+        "**[SANDBOX MODE]** — No real transactions are processed. "
+        "Using Safaricom Daraja sandbox. Safe to test freely.",
+        icon="🧪",
+    )
+else:
+    st.success("**[LIVE MODE]** — Real M-Pesa transactions are enabled.", icon="✅")
+
+st.divider()
+
+# ─────────────────────────────────────────────
+# GIVING FORM
+# ─────────────────────────────────────────────
+st.subheader("Make a Contribution")
+
+giving_purposes = [
+    "General Parish Fund",
+    "Building & Maintenance",
+    "Youth Ministry",
+    "Outreach & Charitable Works",
+    "AMECEA / Diocesan Levy",
+    "Liturgical Supplies",
+    "Other",
+]
+
+col1, col2 = st.columns(2)
+with col1:
+    phone = st.text_input(
+        "M-Pesa Phone Number",
+        placeholder="2547XXXXXXXX",
+        help="Format: 2547XXXXXXXX (no + or spaces)",
+    )
+    amount = st.number_input(
+        "Amount (KES)",
+        min_value=10,
+        max_value=150000,
+        value=100,
+        step=50,
+    )
+
+with col2:
+    purpose = st.selectbox("Giving purpose", giving_purposes)
+    donor_name = st.text_input("Name (optional)", placeholder="For receipt reference")
+
+description = f"Parish Giving: {purpose}"
+if donor_name:
+    description += f" — {donor_name}"
+
+st.info(
+    f"📱 An M-Pesa prompt will appear on **{phone or 'your phone'}** for **KES {amount:,}**.",
+    icon="📲",
+)
+
+if st.button("Send M-Pesa Prompt", type="primary", use_container_width=True):
+    if not phone or len(phone) < 10:
+        st.error("Please enter a valid phone number (2547XXXXXXXX format)")
+    else:
+        with st.spinner("Sending STK push…"):
+            result = initiate_stk_push(
+                phone_number=phone,
+                amount=int(amount),
+                account_ref=purpose[:12].replace(" ", ""),
+                description=description[:50],
+            )
+
+        if result["success"]:
+            st.success(result["message"])
+            if is_sandbox:
+                st.info(
+                    "**Sandbox tip:** To simulate completion, log into "
+                    "developer.safaricom.co.ke → Simulate → STK Push callback.",
+                    icon="💡",
+                )
+        else:
+            err = result.get("error", "Unknown error")
+            if err == "CREDENTIALS_MISSING":
+                st.error(
+                    "M-Pesa credentials not configured. "
+                    "Add MPESA_CONSUMER_KEY, MPESA_CONSUMER_SECRET, "
+                    "and MPESA_PASSKEY to your `.env` file."
+                )
+            else:
+                st.error(f"STK push failed: {err}")
+
+st.divider()
+
+# ─────────────────────────────────────────────
+# GIVING SUMMARY
+# ─────────────────────────────────────────────
+st.subheader("Giving Summary")
+
+summary = get_giving_summary(sandbox_only=is_sandbox)
+c1, c2 = st.columns(2)
+c1.metric(f"Total Received {summary['label']}", f"KES {summary['total_kes']:,}")
+c2.metric("Transactions", summary["transaction_count"])
+
+st.divider()
+
+# ─────────────────────────────────────────────
+# LIVE ACTIVATION GUIDE
+# ─────────────────────────────────────────────
+if is_sandbox:
+    with st.expander("📋 Activate Live M-Pesa Giving"):
+        checklist = live_activation_checklist()
+        st.markdown(f"**Status:** {checklist['status']}")
+        st.markdown(f"**Estimated approval time:** {checklist['estimated_time']}")
+        for step in checklist["live_requirements"]:
+            st.markdown(f"- {step}")
+        st.caption(f"Full guide: `{checklist['guide']}`")
