@@ -288,3 +288,77 @@ def test_ai_bot_missing_key(monkeypatch):
     from services.ai_service import bot_respond
     result = bot_respond("Hello", [])
     assert result["success"] is False
+
+
+# ─────────────────────────────────────────────
+# USSD SERVICE TESTS
+# ─────────────────────────────────────────────
+
+def test_ussd_service_imports():
+    from services.ussd_service import handle_ussd_session, channel_setup_guide
+    assert callable(handle_ussd_session)
+    guide = channel_setup_guide()
+    assert "steps" in guide
+    assert len(guide["steps"]) > 0
+
+
+def test_ussd_main_menu():
+    from services.ussd_service import handle_ussd_session
+    result = handle_ussd_session("s1", "*384*1#", "+254700000000", "")
+    assert result.startswith("CON")
+    assert "Find Parish" in result
+
+
+def test_ussd_mass_times():
+    from services.ussd_service import handle_ussd_session
+    result = handle_ussd_session("s2", "*384*1#", "+254700000000", "2")
+    assert result.startswith("END")
+    assert "Mass" in result or "am" in result
+
+
+def test_ussd_daily_reading():
+    from services.ussd_service import handle_ussd_session
+    result = handle_ussd_session("s3", "*384*1#", "+254700000000", "4")
+    assert result.startswith("END")
+
+
+def test_ussd_emergency_contacts():
+    from services.ussd_service import handle_ussd_session
+    result = handle_ussd_session("s4", "*384*1#", "+254700000000", "5")
+    assert result.startswith("END")
+
+
+def test_ussd_invalid_choice():
+    from services.ussd_service import handle_ussd_session
+    result = handle_ussd_session("s5", "*384*1#", "+254700000000", "9")
+    assert result.startswith("CON")
+    assert "Invalid" in result
+
+
+def test_ussd_find_parish_prompt():
+    from services.ussd_service import handle_ussd_session
+    result = handle_ussd_session("s6", "*384*1#", "+254700000000", "1")
+    assert result.startswith("CON")
+
+
+def test_ussd_giving_prompt():
+    from services.ussd_service import handle_ussd_session
+    result = handle_ussd_session("s7", "*384*1#", "+254700000000", "3")
+    assert result.startswith("CON")
+    assert "KES" in result
+
+
+def test_ussd_giving_invalid_amount():
+    from services.ussd_service import handle_ussd_session
+    result = handle_ussd_session("s8", "*384*1#", "+254700000000", "3*abc")
+    assert result.startswith("END")
+    assert "Invalid" in result or "amount" in result.lower()
+
+
+def test_ussd_response_length():
+    """All USSD responses must be under 182 chars (AT hard limit)."""
+    from services.ussd_service import handle_ussd_session
+    for text in ["", "1", "2", "3", "4", "5", "9"]:
+        result = handle_ussd_session("len-test", "*384*1#", "+254700000000", text)
+        prefix_len = 4  # "CON " or "END "
+        assert len(result) <= 182 + prefix_len, f"Response too long for input '{text}': {len(result)} chars"
