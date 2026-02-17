@@ -204,3 +204,41 @@ if __name__ == "__main__":
         port=int(os.getenv("PORT", 8001)),
         reload=True,
     )
+
+
+# ─────────────────────────────────────────────
+# USSD WEBHOOK — AFRICA'S TALKING
+# ─────────────────────────────────────────────
+
+@app.post("/webhook/ussd")
+async def ussd_webhook(request: Request):
+    """
+    Africa's Talking USSD webhook.
+    AT sends form-encoded POST on every keypress.
+    Register this URL in AT dashboard → USSD → Create Channel → Callback URL.
+
+    Sandbox: use Launch Simulator at account.africastalking.com — no real URL needed.
+    Live: needs public HTTPS endpoint (this Render service).
+    """
+    try:
+        from services.ussd_service import handle_ussd_session, log_ussd_session
+
+        form = dict(await request.form())
+        session_id   = form.get("sessionId", "")
+        service_code = form.get("serviceCode", "")
+        phone        = form.get("phoneNumber", "")
+        text         = form.get("text", "")
+
+        logger.info("USSD: phone=%s text='%s'", phone, text)
+
+        response = handle_ussd_session(session_id, service_code, phone, text)
+        log_ussd_session(session_id, phone, text, response)
+
+        # AT requires plain text response with Content-Type text/plain
+        from fastapi.responses import PlainTextResponse
+        return PlainTextResponse(content=response)
+
+    except Exception as e:
+        logger.error("USSD webhook error: %s", e)
+        from fastapi.responses import PlainTextResponse
+        return PlainTextResponse(content="END Service unavailable. Please try again.")
