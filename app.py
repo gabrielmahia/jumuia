@@ -2,11 +2,11 @@
 Catholic Network Tools — Main Application Entry Point
 
 Pages:
-  /              → Home / Role selector
-  /AI_Assistant  → Translation, Homily Helper, Parish Insights, Chat Bot
-  /Directory     → Parish Directory (local + GCatholic rails)
-  /Giving        → M-Pesa giving (sandbox)
-  /Bot_Setup     → WhatsApp bot activation status
+  /               → Home / Role selector
+  /AI_Assistant   → Translation, Homily Helper, Parish Insights, Chat Bot
+  /Directory      → Parish Directory (local + GCatholic rails)
+  /Giving         → M-Pesa giving (sandbox)
+  /Bot_Setup      → WhatsApp bot activation status
 """
 
 import streamlit as st
@@ -35,10 +35,11 @@ st.markdown(
     """
 )
 
+# UPDATED: Now references Google API Key for the free tier
 st.info(
     "**DEMO ENVIRONMENT** — Parish data is seeded sample data. "
     "M-Pesa giving uses Safaricom sandbox (no real transactions). "
-    "AI features require a valid ANTHROPIC_API_KEY in your `.env`.",
+    "AI features require a valid GOOGLE_API_KEY in your `.env` or Streamlit Secrets.",
     icon="ℹ️"
 )
 
