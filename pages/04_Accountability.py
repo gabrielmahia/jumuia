@@ -4,7 +4,13 @@ Diocese transparency, finance, and synodality.
 """
 
 import streamlit as st
-import plotly.graph_objects as go
+
+# Guard plotly import
+try:
+    import plotly.graph_objects as go
+    PLOTLY_AVAILABLE = True
+except ImportError:
+    PLOTLY_AVAILABLE = False
 
 st.set_page_config(page_title="Accountability", page_icon="📋", layout="wide")
 
@@ -82,14 +88,22 @@ with tab_overview:
         st.markdown(f"**Youth engagement:** {d['youth_pct']}%")
 
     st.divider()
-    fig = go.Figure(go.Scatterpolar(
-        r=[d['fti'], 10-d['pci'], d['jci'], d['synod_score'], d['fti']],
-        theta=["Transparency","Pastoral Health","Justice","Synodality","Transparency"],
-        fill="toself", line_color="#3b82f6", fillcolor="rgba(59,130,246,0.2)"
-    ))
-    fig.update_layout(polar=dict(radialaxis=dict(range=[0,10])),
-                      title="Ecosystem Health Radar", height=350)
-    st.plotly_chart(fig, use_container_width=True)
+    if PLOTLY_AVAILABLE:
+        fig = go.Figure(go.Scatterpolar(
+            r=[d['fti'], 10-d['pci'], d['jci'], d['synod_score'], d['fti']],
+            theta=["Transparency","Pastoral Health","Justice","Synodality","Transparency"],
+            fill="toself", line_color="#3b82f6", fillcolor="rgba(59,130,246,0.2)"
+        ))
+        fig.update_layout(polar=dict(radialaxis=dict(range=[0,10])),
+                          title="Ecosystem Health Radar", height=350)
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.markdown("**📊 Ecosystem Health Summary:**")
+        col1, col2, col3, col4 = st.columns(4)
+        with col1: st.metric("Transparency", f"{d['fti']}/10", "FTI")
+        with col2: st.metric("Pastoral Health", f"{10-d['pci']}/10", "Inverse PCI")
+        with col3: st.metric("Justice", f"{d['jci']}/10", "JCI")
+        with col4: st.metric("Synodality", f"{d['synod_score']}/10", "Walking Together")
 
 with tab_stats:
     st.markdown("### Key Statistics")

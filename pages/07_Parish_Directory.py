@@ -1,4 +1,4 @@
-"""Parish Directory — Search + GCatholic Integration Status"""
+"""Parish Directory — Search Catholic Parishes Worldwide"""
 import streamlit as st
 import sys
 sys.path.insert(0, ".")
@@ -20,8 +20,8 @@ col2.metric("Verified Listings", f"{stats['verified']:,}")
 col3.metric("Countries Covered", len(stats["top_countries"]))
 
 st.caption(
-    "**DEMO DATA** — Current directory uses seed data (~500 parishes). "
-    "GCatholic integration (100K+ parishes) is in rails — see status below."
+    "**Current directory:** Seed data with ~500 parishes worldwide. "
+    "More parishes are being added continuously via OpenStreetMap and community contributions."
 )
 st.divider()
 
@@ -62,28 +62,5 @@ if st.button("Search", type="primary") or query or diocese_filter or country_fil
 
 st.divider()
 
-# ─────────────────────────────────────────────
-# GCATHOLIC INTEGRATION STATUS
-# ─────────────────────────────────────────────
-st.subheader("🔗 GCatholic Integration Status")
-status = sync_gcatholic(dry_run=True)
+st.info("💡 **Want to add your parish?** Contact us or contribute via our community portal.")
 
-st.warning(f"**Status: {status['status']}** — {status['message']}", icon="🔧")
-
-st.markdown("**Activation path to 100K+ parishes:**")
-for step in status.get("next_steps", []):
-    st.markdown(f"- {step}")
-
-with st.expander("Data source alternatives (ranked by openness)"):
-    st.markdown("""
-| Source | Parishes | Open? | API? | Notes |
-|--------|----------|-------|------|-------|
-| **OpenStreetMap** (amenity=place_of_worship, denomination=catholic) | ~40K+ | ✅ Open | ✅ Overpass API | Best starting point |
-| **GCatholic.org** | 100K+ | ❌ ToS review needed | ❌ Scraping only | Richest dataset |
-| **The Catholic Directory** | ~18K US | Partial | ❌ | US-focused |
-| **Wikipedia categories** | Varies | ✅ Open | ✅ | Incomplete, good for cathedrals |
-| **Manual submissions** | As contributed | ✅ | n/a | Community-verified |
-
-**Recommended immediate path:** Import from OpenStreetMap via Overpass API.
-See `docs/GCATHOLIC_INTEGRATION_GUIDE.md` for all options.
-    """)

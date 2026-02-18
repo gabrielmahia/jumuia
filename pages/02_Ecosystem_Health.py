@@ -4,9 +4,15 @@ Real-time crisis signal indices for parishes and dioceses.
 """
 
 import streamlit as st
-import plotly.graph_objects as go
 import sys
 sys.path.insert(0, ".")
+
+# Guard plotly import
+try:
+    import plotly.graph_objects as go
+    PLOTLY_AVAILABLE = True
+except ImportError:
+    PLOTLY_AVAILABLE = False
 
 st.set_page_config(page_title="Ecosystem Health", page_icon="📊", layout="wide")
 
@@ -73,6 +79,20 @@ with st.expander("💰 Financial Transparency Index (FTI) Calculator"):
 
 st.divider()
 st.markdown("### 🗺️ Regional Health Overview")
+
+if not PLOTLY_AVAILABLE:
+    st.info("📊 Chart visualization requires plotly. Showing text summary instead:")
+    REGIONAL_DATA = {
+        "Nairobi Central":  {"pci":3.2,"mci":5.1,"jci":7.8,"fti":6.2},
+        "Manila North":     {"pci":4.1,"mci":6.3,"jci":5.2,"fti":5.8},
+        "São Paulo East":   {"pci":5.8,"mci":7.2,"jci":8.1,"fti":4.9},
+        "Rome Historic":    {"pci":2.8,"mci":2.1,"jci":3.4,"fti":8.1},
+        "Chicago West":     {"pci":6.2,"mci":4.8,"jci":6.9,"fti":5.5},
+    }
+    for region, d in REGIONAL_DATA.items():
+        st.markdown(f"**{region}**: PCI {d['pci']}/10 | MCI {d['mci']}/10 | JCI {d['jci']}/10 | FTI {d['fti']}/10")
+    st.caption("⚠️ DEMO: Sample indices. Connect real parish data via the Admin module.")
+    st.stop()
 
 # Regional dataset
 REGIONAL_DATA = {
