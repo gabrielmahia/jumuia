@@ -1,24 +1,143 @@
 """AI Assistant — Translation, Homily Helper, Parish Insights, Chat"""
 import streamlit as st
-import sys
-sys.path.insert(0, ".")
+import os
 
-from services.ai_service import (
-    translate_text,
-    homily_helper,
-    generate_parish_insights,
-    bot_respond,
-    SUPPORTED_LANGUAGES,
-)
+# 1. DIRECT GEMINI INTEGRATION (Replaces services.ai_service)
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
+
+# Define Languages locally
+SUPPORTED_LANGUAGES = {
+    "en": "English",
+    "sw": "Swahili",
+    "fr": "French",
+    "es": "Spanish",
+    "it": "Italian",
+    "la": "Latin",
+    "lg": "Luganda",
+    "kik": "Kikuyu"
+}
+
+# 2. INITIALIZE GEMINI (The Engine)
+def get_model():
+    # Bridge Streamlit Secrets to OS Environment
+    if "GOOGLE_API_KEY" in st.secrets:
+        os.environ["GOOGLE_API_KEY"] = st.secrets["GOOGLE_API_KEY"]
+    
+    # Use Gemini 1.5 Flash (Best balance of speed/free-tier allowance)
+    return ChatGoogleGenerativeAI(
+        model="gemini-1.5-flash",
+        temperature=0.4,
+        convert_system_message_to_human=True 
+    )
+
+# 3. RE-IMPLEMENTED LOGIC FUNCTIONS (Using Gemini)
+
+def bot_respond(prompt, history, language_code):
+    try:
+        llm = get_model()
+        
+        # Build context from history
+        messages = [
+            SystemMessage(content=f"You are a helpful Catholic Parish Assistant. Answer in {SUPPORTED_LANGUAGES.get(language_code, 'English')}.")
+        ]
+        for turn in history:
+            if turn["role"] == "user":
+                messages.append(HumanMessage(content=turn["content"]))
+            else:
+                messages.append(AIMessage(content=turn["content"]))
+        
+        messages.append(HumanMessage(content=prompt))
+        
+        response = llm.invoke(messages)
+        return {"success": True, "reply": response.content}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+def translate_text(text, target_lang_code, source_lang_code, context):
+    try:
+        llm = get_model()
+        target_lang = SUPPORTED_LANGUAGES.get(target_lang_code)
+        
+        prompt = f"""
+        Role: Expert Liturgical Translator.
+        Task: Translate the following text into {target_lang}.
+        Context: {context}
+        Constraint: Preserve liturgical accuracy and Catholic terminology.
+        
+        Text:
+        {text}
+        """
+        response = llm.invoke(prompt)
+        return {"success": True, "translated": response.content, "model": "Gemini 1.5 Flash"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+def homily_helper(gospel_ref, season, parish_ctx, lang_code, audience):
+    try:
+        llm = get_model()
+        lang = SUPPORTED_LANGUAGES.get(lang_code)
+        
+        prompt = f"""
+        Role: Catholic Homiletics Assistant.
+        Task: Create homily preparation notes.
+        Language: {lang}
+        
+        Inputs:
+        - Readings: {gospel_ref}
+        - Season: {season}
+        - Audience: {audience}
+        - Context: {parish_ctx}
+        
+        Output Structure:
+        1. Exegetical Insight (The core meaning)
+        2. Theological Connection (Catechism link)
+        3. Pastoral Application (3 practical points for this audience)
+        4. Analogy/Story Idea
+        """
+        response = llm.invoke(prompt)
+        return {
+            "success": True, 
+            "content": response.content, 
+            "disclaimer": "⚠️ AI-generated notes. Use for brainstorming only.",
+            "model": "Gemini 1.5 Flash"
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+def generate_parish_insights(data, report_type):
+    try:
+        llm = get_model()
+        prompt = f"""
+        Role: Parish Administrator Analyst.
+        Task: Analyze this raw data and generate a {report_type} report.
+        
+        Raw Data:
+        {data}
+        
+        Requirements:
+        - Identify trends (attendance, giving, sacraments).
+        - Highlight anomalies or areas for concern.
+        - Suggest 2 actionable next steps.
+        - Keep it professional and concise.
+        """
+        response = llm.invoke(prompt)
+        return {"success": True, "insights": response.content, "model": "Gemini 1.5 Flash"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+# ─────────────────────────────────────────────
+# UI SETUP (Standard Streamlit)
+# ─────────────────────────────────────────────
 
 st.set_page_config(page_title="AI Assistant — CNT", page_icon="🤖", layout="wide")
 st.title("🤖 AI Assistant")
-st.caption("Powered by Claude (Anthropic). Haiku for summaries/translation · Sonnet for homily and insights.")
+st.caption("Powered by Google Gemini 1.5 Flash (Free Tier)")
 
 tab1, tab2, tab3, tab4 = st.tabs(
     ["💬 Chat Bot", "🌍 Translation", "📖 Homily Helper", "📊 Parish Insights"]
 )
-
 
 # ─────────────────────────────────────────────
 # TAB 1 — CHAT BOT
@@ -155,7 +274,7 @@ with tab3:
     if st.button("Generate Preparation Notes", type="primary", key="homily_btn"):
         if gospel_ref.strip():
             lang_code_h = [k for k, v in SUPPORTED_LANGUAGES.items() if v == delivery_lang][0]
-            with st.spinner("Preparing homily notes… (Sonnet)"):
+            with st.spinner("Preparing homily notes…"):
                 result = homily_helper(
                     gospel_ref, liturgical_season, parish_ctx,
                     lang_code_h, audience
