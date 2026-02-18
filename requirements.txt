@@ -1,27 +1,26 @@
 # Catholic Network Tools — Python Dependencies
 # Python 3.11+
 
-# Core
+# Core app
 streamlit>=1.35.0
-langchain-google-genai>=4.2.0
-python-dotenv>=1.0.0
-
-# M-Pesa / Safaricom Daraja
 requests>=2.31.0
-
-# WhatsApp — Africa's Talking (optional, install for live bot)
-africastalking>=1.2.6
-
-# WhatsApp — Twilio (optional, alternative)
-# twilio>=8.0.0
-
-# Data
 pandas>=2.0.0
 
-# Testing
+# AI (Gemini)
+langchain>=0.2.0
+langchain-core>=0.2.0
+langchain-google-genai>=1.0.0
+google-generativeai>=0.7.2
+
+# Local dev only (optional)
+python-dotenv>=1.0.0
+
+# Testing / quality (dev)
 pytest>=8.0.0
 pytest-cov>=5.0.0
-
-# Code quality
 ruff>=0.4.0
 pre-commit>=3.7.0
+
+# WhatsApp integrations (optional; comment out unless used in Streamlit runtime)
+# africastalking>=1.2.6
+# twilio>=8.0.0
