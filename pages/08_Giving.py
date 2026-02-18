@@ -15,6 +15,34 @@ st.set_page_config(page_title="Parish Giving — CNT", page_icon="🤝", layout=
 
 init_giving_db()
 
+# ── Location / Currency detection (non-blocking) ──────────────────────────────
+if "user_location" not in st.session_state:
+    try:
+        from services.location_service import detect_location, format_currency as fmt_currency
+        st.session_state.user_location = detect_location()
+    except Exception:
+        st.session_state.user_location = {
+            "country": "Unknown", "currency": "USD", "detected": False,
+            "mpesa_relevant": False, "is_vpn": False, "city": "Unknown",
+        }
+
+loc = st.session_state.user_location
+
+if loc.get("detected"):
+    if loc.get("is_vpn"):
+        st.caption(f"📍 Location (via VPN): {loc['city']}, {loc['country']} · Currency: {loc['currency']}")
+    else:
+        st.caption(f"📍 Detected: {loc['city']}, {loc['country']} · Currency: {loc['currency']}")
+    if not loc.get("mpesa_relevant") and st.session_state.get("mpesa_warning_shown") is not True:
+        st.info(
+            f"ℹ️ You appear to be outside the M-Pesa coverage area ({loc['country']}). "
+            "M-Pesa giving is available in Kenya, Tanzania, Ghana, and other Safaricom markets. "
+            "International giving options (card, bank transfer) are on our roadmap.",
+            icon="🌍",
+        )
+        st.session_state.mpesa_warning_shown = True
+
+
 st.title("🤝 Parish Giving")
 
 is_sandbox = MPESA_ENV == "sandbox"
