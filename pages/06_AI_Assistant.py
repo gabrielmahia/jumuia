@@ -24,9 +24,9 @@ def get_model():
     if "GOOGLE_API_KEY" in st.secrets:
         os.environ["GOOGLE_API_KEY"] = st.secrets["GOOGLE_API_KEY"]
     
-    # Use Gemini 1.5 Flash (Best balance of speed/free-tier allowance)
+    # Use Gemini 1.5 Pro (Stable, widely available)
     return ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash",
+        model="gemini-1.5-pro",
         temperature=0.4,
         convert_system_message_to_human=True 
     )
