@@ -8,6 +8,35 @@ st.set_page_config(page_title="Daily Prayers", page_icon="🙏", layout="wide")
 st.title("🙏 Daily Prayers")
 st.caption("Essential Catholic prayers · Rosary · Chaplets · Multilingual")
 
+# ── Today's Readings Banner ────────────────────────────────────────────────────
+try:
+    from services.lectionary import get_reading, liturgical_color
+    from datetime import date
+    r = get_reading()
+    season_color = {"Advent": "#6B21A8", "Lent": "#7C3AED", "Easter": "#D97706",
+                    "Christmas": "#FFFFFF", "Ordinary": "#15803D"}.get(r["season"], "#15803D")
+    feast_line = f"**{r['feast']}** — " if r["feast"] else ""
+    refs = " · ".join(r["readings"]) if r["readings"] else ""
+    link = f"[Full readings →](https://{r['link']})"
+    
+    st.markdown(f"""
+<div style="background:rgba(11,31,58,0.06);border-left:4px solid {season_color};
+     border-radius:0 8px 8px 0;padding:0.9rem 1.2rem;margin-bottom:1.5rem;">
+  <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;
+       letter-spacing:0.1em;color:#6B7280;margin-bottom:0.3rem;">
+    TODAY · {r["season"].upper()} WEEK {r["week"]} · YEAR {r["cycle"]}
+  </div>
+  <div style="font-size:1rem;color:#1F2937;line-height:1.5;">
+    {feast_line}{refs}
+  </div>
+</div>
+""", unsafe_allow_html=True)
+    col1, col2 = st.columns([3,1])
+    with col2:
+        st.link_button("Full readings (USCCB) →", f"https://{r['link']}", use_container_width=True)
+except Exception:
+    pass
+
 PRAYERS = {
     "en": {
         "our_father": (

@@ -64,7 +64,16 @@ MAIN_MENU = """Parish Steward
 2. Mass Times
 3. Give via M-Pesa
 4. Today's Reading
-5. Emergency Contacts"""
+5. Emergency Contacts
+6. Kiswahili"""
+
+MAIN_MENU_SW = """Mwenyekiti wa Parokia
+1. Tafuta Kanisa
+2. Ratiba ya Misa
+3. Toa kwa M-Pesa
+4. Somo la Leo
+5. Namba za Dharura
+6. English"""
 
 FIND_PARISH_PROMPT = "Enter your city or town:\n(e.g. Nairobi, Nakuru, Kisumu)"
 
@@ -74,15 +83,15 @@ St Paul's: 8am 10am
 Christ the King: 7am 9am 11am
 All: Sunday"""
 
-DAILY_READINGS = {
-    0: "Monday: Ps 119 | Gospel: Matt 5:1-12",  # Mon
-    1: "Tuesday: Ps 23 | Gospel: Mark 10:13-16",
-    2: "Wednesday: Is 55:1-3 | Gospel: Matt 14:13-21",
-    3: "Thursday: Jer 31:31-34 | Gospel: John 6:51-58",
-    4: "Friday: Ps 51 | Gospel: Matt 5:20-26",
-    5: "Saturday: Acts 1:12-14 | Gospel: John 19:25-27",
-    6: "Sunday: See parish bulletin for full readings",
-}
+# Readings now served from lectionary service (real cycle-aware)
+def _get_reading_text() -> str:
+    try:
+        from services.lectionary import ussd_reading
+        return ussd_reading()
+    except Exception:
+        from datetime import date
+        days = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]
+        return f"{days[date.today().weekday()]} reading\nSee: usccb.org/bible/readings"
 
 EMERGENCY_CONTACTS = """Parish Emergency:
 Holy Family: 0202228959
@@ -209,14 +218,33 @@ def handle_ussd_session(
 
     # ── 4. DAILY READING ──────────────────────
     elif choice == "4":
-        day = datetime.now().weekday()  # 0=Mon, 6=Sun
-        reading = DAILY_READINGS.get(day, "See parish bulletin")
-        msg = f"Today's Reading\n{reading}\n\nFull readings: Daily Prayers page"
+        reading = _get_reading_text()
+        msg = f"Today's Reading\n{reading}\n\nFull: usccb.org/readings"
         return end(msg[:178])
 
     # ── 5. EMERGENCY CONTACTS ─────────────────
     elif choice == "5":
         return end(EMERGENCY_CONTACTS)
+
+    # ── 6. KISWAHILI ──────────────────────────
+    elif choice == "6":
+        if len(parts) == 1:
+            return con(MAIN_MENU_SW)
+        # Kiswahili submenus: text is "6*1", "6*2" etc
+        sw_choice = parts[1]
+        if sw_choice == "1":
+            return con("Ingiza mji wako:\n(mfano: Nairobi, Nakuru, Kisumu)")
+        elif sw_choice == "2":
+            return end("Ratiba ya Misa Nairobi:\nHoly Family: 7am 9am 11am 6pm\nSt Paul's: 8am 10am\nKristo Mfalme: 7am 9am 11am\nJumapili zote")
+        elif sw_choice == "4":
+            reading = _get_reading_text()
+            return end(f"Somo la Leo\n{reading}\n\nZaidi: usccb.org/readings")[:178]
+        elif sw_choice == "5":
+            return end("Dharura ya Parokia:\nHoly Family: 0202228959\nDiocesi Nairobi: 0722205176\nCaritas Kenya: 0202714188\nJibu 0 kwa menyu kuu")
+        elif sw_choice == "6":
+            return con(MAIN_MENU)
+        else:
+            return con(f"Chaguo batili.\n{MAIN_MENU_SW}")
 
     # ── INVALID INPUT ─────────────────────────
     else:

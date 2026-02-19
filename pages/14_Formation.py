@@ -1,6 +1,11 @@
 """Formation & Spiritual Education — Programmes, enrolment, curriculum, progress tracking."""
 
 import streamlit as st
+try:
+    from services.save_indicator import mark_saved, show_save_status
+except Exception:
+    def mark_saved(x): pass
+    def show_save_status(x, y=None): pass
 from datetime import date
 
 st.set_page_config(page_title="Formation", page_icon="🎓", layout="wide")
@@ -58,7 +63,8 @@ with tab1:
                     "Duration": duration, "Enrolled": enrolled, "Status": status,
                     "Meeting": meeting_day, "Location": location}
                 st.session_state.formation_programmes.append(_prog)
-                _save("formation_programme", _prog)
+                _ok = _save("formation_programme", _prog)
+                    show_save_status("formation_programme", _ok)
                 st.success(f"✅ '{prog_name}' added.")
 
 with tab2:
@@ -91,7 +97,8 @@ with tab2:
                     "Programme": programme, "Enrolled": str(enrol_date),
                     "Sessions": sessions_attended, "Status": completion_status, "Notes": notes}
                 st.session_state.formation_participants.append(_part)
-                _save("formation_participant", _part)
+                _ok = _save("formation_participant", _part)
+                    show_save_status("formation_participant", _ok)
                 st.success(f"✅ {name} registered for {programme}.")
 
 with tab3:

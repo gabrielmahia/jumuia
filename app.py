@@ -30,13 +30,52 @@ except Exception:
 # ── Sidebar branding ──────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("""
-<div style="padding:1.25rem 0 0.75rem; border-bottom:1px solid rgba(201,168,76,0.25); margin-bottom:0.5rem;">
+<div style="padding:1.25rem 0 0.75rem; border-bottom:1px solid rgba(201,168,76,0.25); margin-bottom:1rem;">
   <div style="font-family:'DM Serif Display',Georgia,serif; font-size:1.2rem; color:white; font-weight:400; line-height:1.2;">
     Catholic Parish<br>Steward
   </div>
   <div style="font-size:0.72rem; color:rgba(201,168,76,0.75); text-transform:uppercase; letter-spacing:0.1em; margin-top:0.3rem;">
     Serving parishes worldwide
   </div>
+</div>
+""", unsafe_allow_html=True)
+
+    # ── Primary tools (3 things a parishioner needs) ───────────────────────
+    st.markdown('<div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(201,168,76,0.75);padding:0 0 0.4rem;">For Parishioners</div>', unsafe_allow_html=True)
+    st.page_link("pages/01_Find_Church.py" if False else "pages/07_Parish_Directory.py", label="🗺️ Find a Church")
+    st.page_link("pages/09_Daily_Prayers.py", label="📖 Daily Prayers & Readings")
+    st.page_link("pages/06_AI_Assistant.py", label="🤖 Ask the Assistant")
+
+    st.divider()
+
+    # ── Coordinator tools ──────────────────────────────────────────────────
+    st.markdown('<div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(201,168,76,0.75);padding:0 0 0.4rem;">Parish Coordinators</div>', unsafe_allow_html=True)
+    st.page_link("pages/10_Sacraments.py", label="✝️ Sacraments Register")
+    st.page_link("pages/11_SCCs.py", label="🏘️ Small Communities")
+    st.page_link("pages/12_Catechist_Certification.py", label="🎓 Catechists")
+    st.page_link("pages/13_Pastoral_Care.py", label="🤲 Pastoral Care")
+    st.page_link("pages/14_Formation.py", label="📚 Formation & RCIA")
+    st.page_link("pages/08_Giving.py", label="💰 Parish Giving")
+
+    st.divider()
+
+    # ── More tools (collapsed) ─────────────────────────────────────────────
+    with st.expander("More tools"):
+        st.page_link("pages/_00_Liturgy.py", label="📋 Liturgy & Calendar")
+        st.page_link("pages/_02_Ecosystem_Health.py", label="📊 Ecosystem Health")
+        st.page_link("pages/_03_Justice_Network.py", label="⚖️ Justice Network")
+        st.page_link("pages/_04_Accountability.py", label="📋 Accountability")
+        st.page_link("pages/_05_Diaspora.py", label="🌏 Diaspora Connect")
+        st.page_link("pages/_15_Admin_Data.py", label="📁 Admin & Data")
+
+    st.divider()
+
+    # ── USSD dial code ─────────────────────────────────────────────────────
+    st.markdown("""
+<div style="padding:0.75rem;background:rgba(201,168,76,0.1);border-radius:8px;border:1px solid rgba(201,168,76,0.25);text-align:center;">
+  <div style="font-size:0.65rem;color:rgba(201,168,76,0.75);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.25rem;">Any phone in Kenya</div>
+  <div style="font-family:monospace;font-size:1.1rem;color:white;font-weight:600;">*384*248724#</div>
+  <div style="font-size:0.65rem;color:rgba(255,255,255,0.4);margin-top:0.2rem;">No internet needed</div>
 </div>
 """, unsafe_allow_html=True)
 
