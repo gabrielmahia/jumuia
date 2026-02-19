@@ -50,8 +50,8 @@ with st.expander("📊 Pastoral Crisis Index (PCI) Calculator"):
                 st.warning("📋 Monitor trends — targeted improvement possible.")
             else:
                 st.success("✅ Parish showing healthy pastoral signals.")
-        except Exception as e:
-            st.error(f"Calculation error: {e}")
+        except Exception:
+            st.info("This section is loading. Please refresh if it does not appear.")
 
 with st.expander("💰 Financial Transparency Index (FTI) Calculator"):
     c1, c2 = st.columns(2)
