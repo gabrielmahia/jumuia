@@ -68,4 +68,19 @@ with st.sidebar:
 </div>
 """, unsafe_allow_html=True)
 
+# ── Force Material Symbols font for sidebar icons ─────────────────────────────
+st.markdown("""
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block">
+<style>
+.material-symbols-rounded { font-family: 'Material Symbols Rounded'; font-weight: normal;
+  font-style: normal; font-size: 24px; line-height: 1; letter-spacing: normal;
+  text-transform: none; display: inline-block; white-space: nowrap;
+  word-wrap: normal; direction: ltr; -webkit-font-feature-settings: 'liga';
+  font-feature-settings: 'liga'; -webkit-font-smoothing: antialiased; }
+/* Fix sidebar collapse button icon */
+[data-testid="collapsedControl"] { font-family: 'Material Symbols Rounded' !important; }
+button[kind="header"] { font-family: 'Material Symbols Rounded' !important; }
+</style>
+""", unsafe_allow_html=True)
+
 pg.run()
