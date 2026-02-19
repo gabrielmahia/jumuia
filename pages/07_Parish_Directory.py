@@ -414,14 +414,17 @@ with tab2:
         submitted = st.form_submit_button("Submit Parish", type="primary")
 
     if submitted and name and city and country:
+        from services.sheets import _save
         new_id = max((p["id"] for p in st.session_state.confirmed_parishes +
                       st.session_state.submitted_parishes), default=0) + 1
-        st.session_state.submitted_parishes.append({
+        parish_data = {
             "id": new_id, "name": name, "city": city, "country": country,
             "diocese": diocese, "address": address, "phone": phone,
             "mass_times": mass_times, "verified": False, "confirmations": 0,
             "submitted_by": submitter_role, "added": str(date.today()),
-        })
+        }
+        st.session_state.submitted_parishes.append(parish_data)
+        _save("parish_submission", parish_data)
         st.success(
             f"✅ **{name}** submitted. It will appear in the directory once "
             "3 parishioners confirm it, or a parish coordinator verifies it."

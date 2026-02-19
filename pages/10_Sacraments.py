@@ -61,12 +61,13 @@ with tabs[0]:
 
             submitted = st.form_submit_button("💧 Record Baptism", type="primary")
             if submitted and child_name:
-                st.session_state.sacrament_records["baptism"].append({
-                    "Name": child_name, "DOB": str(dob), "Baptism Date": str(bap_date),
+                from services.sheets import _save
+                _bap = {"Name": child_name, "DOB": str(dob), "Baptism Date": str(bap_date),
                     "Place": place, "Minister": minister, "Father": father_name,
                     "Mother": mother_name, "Godfather": godfather, "Godmother": godmother,
-                    "Type": baptism_type, "Register No.": reg_number,
-                })
+                    "Type": baptism_type, "Register No.": reg_number}
+                st.session_state.sacrament_records["baptism"].append(_bap)
+                _save("sacrament_baptism", _bap)
                 st.success(f"✅ Baptism of {child_name} recorded.")
                 st.balloons()
 
@@ -100,11 +101,12 @@ with tabs[1]:
             notes = st.text_area("Notes")
 
             if st.form_submit_button("🕊️ Record Confirmation", type="primary") and cand_name:
-                st.session_state.sacrament_records["confirmation"].append({
-                    "Name": cand_name, "Date": str(conf_date), "Bishop": bishop,
+                from services.sheets import _save
+                _conf = {"Name": cand_name, "Date": str(conf_date), "Bishop": bishop,
                     "Conf. Name": conf_name, "Sponsor": sponsor_name,
-                    "Prep Completed": prep_completed, "Notes": notes,
-                })
+                    "Prep Completed": prep_completed, "Notes": notes}
+                st.session_state.sacrament_records["confirmation"].append(_conf)
+                _save("sacrament_confirmation", _conf)
                 st.success(f"✅ Confirmation of {cand_name} recorded.")
 
 # ── FIRST EUCHARIST ───────────────────────────────────────────────────────────
@@ -132,11 +134,12 @@ with tabs[2]:
             reconciliation_prior = st.checkbox("First Reconciliation completed prior to Communion")
 
             if st.form_submit_button("🍞 Record First Communion", type="primary") and child_name:
-                st.session_state.sacrament_records["eucharist"].append({
-                    "Name": child_name, "Date": str(comm_date), "Age": age,
+                from services.sheets import _save
+                _euch = {"Name": child_name, "Date": str(comm_date), "Age": age,
                     "Priest": minister, "Catechist": catechist, "Prep Months": prep_months,
-                    "Reconciliation Prior": reconciliation_prior,
-                })
+                    "Reconciliation Prior": reconciliation_prior}
+                st.session_state.sacrament_records["eucharist"].append(_euch)
+                _save("sacrament_eucharist", _euch)
                 st.success(f"✅ First Communion of {child_name} recorded.")
 
 # ── MARRIAGE ─────────────────────────────────────────────────────────────────
@@ -208,13 +211,14 @@ with tabs[3]:
             notes = st.text_area("Notes (impediments resolved, special circumstances)", height=70)
 
             if st.form_submit_button("💍 Record Marriage", type="primary") and groom and bride:
-                st.session_state.sacrament_records["marriage"].append({
-                    "Groom": groom, "Bride": bride, "Date": str(wed_date),
+                from services.sheets import _save
+                _mar = {"Groom": groom, "Bride": bride, "Date": str(wed_date),
                     "Place": wed_place, "Minister": minister, "Form": form,
                     "Witness 1": witness1, "Witness 2": witness2,
                     "Mentor Husband": mentor_husband, "Mentor Wife": mentor_wife,
-                    "Pre-Cana": pre_cana, "Banns": banns, "Notes": notes,
-                })
+                    "Pre-Cana": pre_cana, "Banns": banns, "Notes": notes}
+                st.session_state.sacrament_records["marriage"].append(_mar)
+                _save("sacrament_marriage", _mar)
                 st.success(f"✅ Marriage of {groom} & {bride} recorded.")
                 st.balloons()
 
@@ -264,10 +268,11 @@ with tabs[5]:
                 seminary = st.text_input("Seminary / Novitiate")
 
             if st.form_submit_button("✝️ Record", type="primary") and person:
-                st.session_state.sacrament_records["holy_orders"].append({
-                    "Name": person, "Date": str(ord_date), "Type": ord_type,
-                    "Bishop/Superior": ordaining_bishop, "Diocese/Congregation": diocese_congregation,
-                })
+                from services.sheets import _save
+                _ord = {"Name": person, "Date": str(ord_date), "Type": ord_type,
+                    "Bishop/Superior": ordaining_bishop, "Diocese/Congregation": diocese_congregation}
+                st.session_state.sacrament_records["holy_orders"].append(_ord)
+                _save("sacrament_holy_orders", _ord)
                 st.success(f"✅ {ord_type} of {person} recorded.")
 
 # ── ANOINTING OF THE SICK ─────────────────────────────────────────────────────
@@ -294,10 +299,11 @@ with tabs[6]:
                 outcome = st.text_input("Follow-up / Outcome (optional)")
 
             if st.form_submit_button("🕯️ Record Anointing", type="primary") and person:
-                st.session_state.sacrament_records["anointing"].append({
-                    "Name": person, "Date": str(anoint_date), "Minister": minister,
-                    "Location": location, "Reason": reason, "Viaticum": viaticum,
-                })
+                from services.sheets import _save
+                _anoint = {"Name": person, "Date": str(anoint_date), "Minister": minister,
+                    "Location": location, "Reason": reason, "Viaticum": viaticum}
+                st.session_state.sacrament_records["anointing"].append(_anoint)
+                _save("sacrament_anointing", _anoint)
                 st.success(f"✅ Anointing of {person} recorded.")
 
 # Summary

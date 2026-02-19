@@ -53,11 +53,12 @@ with tab1:
                 status = st.selectbox("Status", ["Planned", "Active", "Completed", "Suspended"])
 
             if st.form_submit_button("➕ Add Programme", type="primary") and prog_name:
-                st.session_state.formation_programmes.append({
-                    "Programme": prog_name, "Category": category, "Leader": leader,
+                from services.sheets import _save
+                _prog = {"Programme": prog_name, "Category": category, "Leader": leader,
                     "Duration": duration, "Enrolled": enrolled, "Status": status,
-                    "Meeting": meeting_day, "Location": location,
-                })
+                    "Meeting": meeting_day, "Location": location}
+                st.session_state.formation_programmes.append(_prog)
+                _save("formation_programme", _prog)
                 st.success(f"✅ '{prog_name}' added.")
 
 with tab2:
@@ -85,11 +86,12 @@ with tab2:
             notes = st.text_area("Notes / Special requirements")
 
             if st.form_submit_button("Register", type="primary") and name:
-                st.session_state.formation_participants.append({
-                    "Name": name, "Phone": phone, "Email": email,
+                from services.sheets import _save
+                _part = {"Name": name, "Phone": phone, "Email": email,
                     "Programme": programme, "Enrolled": str(enrol_date),
-                    "Sessions": sessions_attended, "Status": completion_status, "Notes": notes,
-                })
+                    "Sessions": sessions_attended, "Status": completion_status, "Notes": notes}
+                st.session_state.formation_participants.append(_part)
+                _save("formation_participant", _part)
                 st.success(f"✅ {name} registered for {programme}.")
 
 with tab3:
