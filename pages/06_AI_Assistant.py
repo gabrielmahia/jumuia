@@ -1,5 +1,5 @@
 """AI Assistant — Translation, Homily Helper, Parish Insights, Chat
-Powered by Claude (Anthropic) via services/ai_service.py
+Powered by Gemini (Google) via services/ai_service.py
 """
 import streamlit as st
 import os
@@ -12,24 +12,26 @@ _AI_AVAILABLE = False
 _ai_error_msg = ""
 
 try:
-    if "ANTHROPIC_API_KEY" in st.secrets:
-        os.environ["ANTHROPIC_API_KEY"] = st.secrets["ANTHROPIC_API_KEY"]
+    for secret_key in ("GEMINI_API_KEY", "GOOGLE_API_KEY"):
+        if secret_key in st.secrets:
+            os.environ[secret_key] = st.secrets[secret_key]
     from services.ai_service import (
         translate_text, homily_helper, generate_parish_insights, bot_respond, SUPPORTED_LANGUAGES,
     )
-    _AI_AVAILABLE = bool(os.getenv("ANTHROPIC_API_KEY", ""))
+    _AI_AVAILABLE = bool(os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY"))
     if not _AI_AVAILABLE:
-        _ai_error_msg = "ANTHROPIC_API_KEY not configured in Streamlit secrets."
+        _ai_error_msg = "GEMINI_API_KEY not configured in Streamlit secrets."
 except ImportError as e:
     _ai_error_msg = f"AI service unavailable: {e}"
 
 st.title("🤖 AI Parish Assistant")
-st.caption("Powered by Claude (Anthropic) · Multilingual · Liturgically aware")
+st.caption("Powered by Gemini (Google) · Multilingual · Liturgically aware")
 
 if not _AI_AVAILABLE:
     st.warning(
         f"⚠️ **AI features offline.** {_ai_error_msg}\n\n"
-        "Add `ANTHROPIC_API_KEY` to Streamlit secrets (`Settings → Secrets`).",
+        "Add `GEMINI_API_KEY` to Streamlit secrets (`Settings → Secrets`).\n\n"
+        "Get a free key at [aistudio.google.com](https://aistudio.google.com) → API Keys.",
         icon="🔑",
     )
     st.markdown("""
@@ -50,7 +52,7 @@ tab1, tab2, tab3, tab4 = st.tabs(
 
 with tab1:
     st.subheader("Parish Assistant Chat")
-    st.caption("Ask about Mass times, sacraments, the liturgical calendar. Pastoral counseling: speak with your priest.")
+    st.caption("Ask about Mass times, sacraments, the liturgical calendar. For pastoral counseling: speak with your priest.")
     sel = st.selectbox("Chat language", _all_langs, key="chat_lang")
     lang_code = lang_options[sel]
     if "chat_history" not in st.session_state:
@@ -66,7 +68,7 @@ with tab1:
                 result = bot_respond(prompt, st.session_state.chat_history, language_code=lang_code)
             if result["success"]:
                 st.markdown(result["reply"])
-                st.caption(f"Model: {result.get('model','claude')}")
+                st.caption(f"Model: {result.get('model','gemini')}")
                 st.session_state.chat_history.append({"role": "user", "content": prompt})
                 st.session_state.chat_history.append({"role": "assistant", "content": result["reply"]})
             else:
@@ -95,7 +97,7 @@ with tab2:
             if r["success"]:
                 st.success("Translation complete")
                 st.text_area("Translated text", r["translated"], height=150)
-                st.caption(f"Model: {r.get('model','claude')}")
+                st.caption(f"Model: {r.get('model','gemini')}")
             else:
                 st.error(f"Error: {r['error']}")
         else:
@@ -121,7 +123,7 @@ with tab3:
             if r["success"]:
                 st.info(r["disclaimer"])
                 st.markdown(r["content"])
-                st.caption(f"Model: {r.get('model','claude')}")
+                st.caption(f"Model: {r.get('model','gemini')}")
             else:
                 st.error(f"Error: {r['error']}")
         else:
@@ -146,10 +148,10 @@ with tab4:
             if r["success"]:
                 st.success("Insights ready")
                 st.markdown(r["insights"])
-                st.caption(f"Model: {r.get('model','claude')}")
+                st.caption(f"Model: {r.get('model','gemini')}")
             else:
                 st.error(f"Error: {r['error']}")
         else:
             st.warning("Please enter parish data.")
     st.divider()
-    st.caption("🔒 Data is sent to Claude (Anthropic) for analysis and is not stored. Do not enter personally identifiable parishioner data.")
+    st.caption("🔒 Data is sent to Gemini (Google) for analysis and is not stored. Do not enter personally identifiable parishioner data.")
