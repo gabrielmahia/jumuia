@@ -34,6 +34,14 @@ st.set_page_config(
 )
 
 
+
+# ── Global theme ─────────────────────────────────────────────────────────────
+try:
+    from services.theme import inject as _inject_theme
+    _inject_theme()
+except Exception:
+    pass
+
 # ── Mobile-first UX (applies globally) ──────────────────────────────────────
 try:
     from services.mobile_ux import inject_mobile_css, data_saver_banner
