@@ -1,5 +1,10 @@
 """Parish Giving — M-Pesa STK Push (Sandbox Active / Live Rails)"""
 import streamlit as st
+try:
+    from services.save_indicator import mark_saved, show_save_status
+except Exception:
+    def mark_saved(x): pass
+    def show_save_status(x, y=None): pass
 import sys
 sys.path.insert(0, ".")
 

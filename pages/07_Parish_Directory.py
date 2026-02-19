@@ -1,6 +1,11 @@
 """Parish Directory — Search + Manual submission + Live OSM worldwide."""
 
 import streamlit as st
+try:
+    from services.save_indicator import mark_saved, show_save_status
+except Exception:
+    def mark_saved(x): pass
+    def show_save_status(x, y=None): pass
 import urllib.request
 import json
 import time
@@ -424,7 +429,8 @@ with tab2:
             "submitted_by": submitter_role, "added": str(date.today()),
         }
         st.session_state.submitted_parishes.append(parish_data)
-        _save("parish_submission", parish_data)
+        _ok = _save("parish_submission", parish_data)
+                    show_save_status("parish_submission", _ok)
         st.success(
             f"✅ **{name}** submitted. It will appear in the directory once "
             "3 parishioners confirm it, or a parish coordinator verifies it."

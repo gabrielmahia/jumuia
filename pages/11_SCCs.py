@@ -1,6 +1,11 @@
 """Small Christian Communities (SCCs) — Register, meetings, formation, coordination."""
 
 import streamlit as st
+try:
+    from services.save_indicator import mark_saved, show_save_status
+except Exception:
+    def mark_saved(x): pass
+    def show_save_status(x, y=None): pass
 from datetime import date, time
 
 st.set_page_config(page_title="SCCs — Catholic Network Tools", page_icon="👥", layout="wide")
@@ -87,7 +92,8 @@ with tab1:
                     "Focus": ", ".join(focus), "Notes": notes,
                 }
                 st.session_state.sccs.append(scc_data)
-                _save("scc_registration", scc_data)
+                _ok = _save("scc_registration", scc_data)
+                    show_save_status("scc_registration", _ok)
                 st.success(f"✅ SCC '{name}' added successfully!")
                 st.balloons()
 
@@ -129,7 +135,8 @@ with tab2:
                     "Prayer Intentions": prayer_intentions,
                 }
                 st.session_state.scc_meetings.append(meeting_data)
-                _save("scc_meeting", meeting_data)
+                _ok = _save("scc_meeting", meeting_data)
+                    show_save_status("scc_meeting", _ok)
                 st.success(f"✅ Meeting for {selected_scc} on {meeting_date} recorded.")
 
     if st.session_state.scc_meetings:

@@ -2,6 +2,11 @@
 Real-world fields: godparents, confirmatory couples, banns, dispensations."""
 
 import streamlit as st
+try:
+    from services.save_indicator import mark_saved, show_save_status
+except Exception:
+    def mark_saved(x): pass
+    def show_save_status(x, y=None): pass
 from datetime import date
 
 st.set_page_config(page_title="Sacraments", page_icon="✝️", layout="wide")
@@ -67,7 +72,8 @@ with tabs[0]:
                     "Mother": mother_name, "Godfather": godfather, "Godmother": godmother,
                     "Type": baptism_type, "Register No.": reg_number}
                 st.session_state.sacrament_records["baptism"].append(_bap)
-                _save("sacrament_baptism", _bap)
+                _ok = _save("sacrament_baptism", _bap)
+                    show_save_status("sacrament_baptism", _ok)
                 st.success(f"✅ Baptism of {child_name} recorded.")
                 st.balloons()
 
@@ -106,7 +112,8 @@ with tabs[1]:
                     "Conf. Name": conf_name, "Sponsor": sponsor_name,
                     "Prep Completed": prep_completed, "Notes": notes}
                 st.session_state.sacrament_records["confirmation"].append(_conf)
-                _save("sacrament_confirmation", _conf)
+                _ok = _save("sacrament_confirmation", _conf)
+                    show_save_status("sacrament_confirmation", _ok)
                 st.success(f"✅ Confirmation of {cand_name} recorded.")
 
 # ── FIRST EUCHARIST ───────────────────────────────────────────────────────────
@@ -139,7 +146,8 @@ with tabs[2]:
                     "Priest": minister, "Catechist": catechist, "Prep Months": prep_months,
                     "Reconciliation Prior": reconciliation_prior}
                 st.session_state.sacrament_records["eucharist"].append(_euch)
-                _save("sacrament_eucharist", _euch)
+                _ok = _save("sacrament_eucharist", _euch)
+                    show_save_status("sacrament_eucharist", _ok)
                 st.success(f"✅ First Communion of {child_name} recorded.")
 
 # ── MARRIAGE ─────────────────────────────────────────────────────────────────
@@ -218,7 +226,8 @@ with tabs[3]:
                     "Mentor Husband": mentor_husband, "Mentor Wife": mentor_wife,
                     "Pre-Cana": pre_cana, "Banns": banns, "Notes": notes}
                 st.session_state.sacrament_records["marriage"].append(_mar)
-                _save("sacrament_marriage", _mar)
+                _ok = _save("sacrament_marriage", _mar)
+                    show_save_status("sacrament_marriage", _ok)
                 st.success(f"✅ Marriage of {groom} & {bride} recorded.")
                 st.balloons()
 
@@ -272,7 +281,8 @@ with tabs[5]:
                 _ord = {"Name": person, "Date": str(ord_date), "Type": ord_type,
                     "Bishop/Superior": ordaining_bishop, "Diocese/Congregation": diocese_congregation}
                 st.session_state.sacrament_records["holy_orders"].append(_ord)
-                _save("sacrament_holy_orders", _ord)
+                _ok = _save("sacrament_holy_orders", _ord)
+                    show_save_status("sacrament_holy_orders", _ok)
                 st.success(f"✅ {ord_type} of {person} recorded.")
 
 # ── ANOINTING OF THE SICK ─────────────────────────────────────────────────────
@@ -303,7 +313,8 @@ with tabs[6]:
                 _anoint = {"Name": person, "Date": str(anoint_date), "Minister": minister,
                     "Location": location, "Reason": reason, "Viaticum": viaticum}
                 st.session_state.sacrament_records["anointing"].append(_anoint)
-                _save("sacrament_anointing", _anoint)
+                _ok = _save("sacrament_anointing", _anoint)
+                    show_save_status("sacrament_anointing", _ok)
                 st.success(f"✅ Anointing of {person} recorded.")
 
 # Summary

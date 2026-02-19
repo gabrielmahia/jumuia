@@ -1,6 +1,11 @@
 """Pastoral Care — Homebound visits, grief support, mentorship, new member integration."""
 
 import streamlit as st
+try:
+    from services.save_indicator import mark_saved, show_save_status
+except Exception:
+    def mark_saved(x): pass
+    def show_save_status(x, y=None): pass
 from datetime import date
 
 st.set_page_config(page_title="Pastoral Care", page_icon="🤝", layout="wide")
@@ -60,7 +65,8 @@ with tab1:
                     "Communion": communion, "Notes": notes,
                 }
                 st.session_state.homebound.append(_hb)
-                _save("pastoral_homebound", _hb)
+                _ok = _save("pastoral_homebound", _hb)
+                    show_save_status("pastoral_homebound", _ok)
                 st.success(f"✅ {name} added to homebound register.")
 
     with st.expander("📋 Record a Visit"):
@@ -127,7 +133,8 @@ with tab2:
                     "Assigned To": assigned, "Check-in": checkin, "Notes": notes,
                 }
                 st.session_state.grief.append(_gr)
-                _save("pastoral_grief", _gr)
+                _ok = _save("pastoral_grief", _gr)
+                    show_save_status("pastoral_grief", _ok)
                 st.success(f"✅ Grief support record for {name} added.")
 
 # ── MENTORSHIP ────────────────────────────────────────────────────────────────

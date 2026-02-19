@@ -1,6 +1,11 @@
 """Catechist Certification Tracking — Multi-level, renewals, diocesan standards."""
 
 import streamlit as st
+try:
+    from services.save_indicator import mark_saved, show_save_status
+except Exception:
+    def mark_saved(x): pass
+    def show_save_status(x, y=None): pass
 from datetime import date, timedelta
 
 st.set_page_config(page_title="Catechist Certification", page_icon="📚", layout="wide")
@@ -101,7 +106,8 @@ with tab1:
                     "Hours Required": req, "Status": status,
                     "Background Check": bg_check, "Renewal Due": renewal, "Notes": notes}
                 st.session_state.catechists.append(_cat)
-                _save("catechist_registration", _cat)
+                _ok = _save("catechist_registration", _cat)
+                    show_save_status("catechist_registration", _ok)
                 st.success(f"✅ {name} added as {level} catechist.")
 
 with tab2:
@@ -174,7 +180,8 @@ with tab3:
                     "Date": str(completed), "Provider": provider,
                     "Hours": hours, "Category": category, "Certificate": cert_received}
                 st.session_state.training_log.append(_tr)
-                _save("catechist_training", _tr)
+                _ok = _save("catechist_training", _tr)
+                    show_save_status("catechist_training", _ok)
                 # Update catechist hours
                 for c in st.session_state.catechists:
                     if c["Name"] == catechist:
