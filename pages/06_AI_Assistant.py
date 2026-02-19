@@ -80,17 +80,27 @@ def _generate(prompt: str, api_key: str, model: str) -> str:
     _mem_cache[key] = {"val": text, "ts": now}
     return text
 
-def _safe_gen(prompt, api_key, model):
-    try:
-        return True, _generate(prompt, api_key, model)
-    except urllib.error.HTTPError as e:
-        body = e.read()[:300].decode("utf-8", "ignore")
-        if e.code == 429: return False, "quota"
-        try: msg = json.loads(body).get("error", {}).get("message", body[:100])
-        except Exception: msg = body[:100]
-        return False, msg
-    except Exception as e:
-        return False, str(e)[:100]
+def _safe_gen(prompt, api_key, primary_model):
+    """Try primary model, cascade to fallbacks on quota (429). Each has separate daily pool."""
+    FALLBACKS = [
+        "gemini-1.5-flash-8b",
+        "gemini-1.5-flash",
+        "gemini-2.0-flash-lite",
+    ]
+    candidates = [primary_model] + [m for m in FALLBACKS if m != primary_model]
+    for model in candidates:
+        try:
+            return True, _generate(prompt, api_key, model)
+        except urllib.error.HTTPError as e:
+            body = e.read()[:300].decode("utf-8", "ignore")
+            if e.code == 429:
+                continue  # quota hit — try next model
+            try: msg = json.loads(body).get("error", {}).get("message", body[:100])
+            except Exception: msg = body[:100]
+            return False, msg
+        except Exception as e:
+            return False, str(e)[:100]
+    return False, "quota"  # all models exhausted
 
 _DEMO = [
     (["what are you","who are you"], "I'm the Catholic Parish Steward AI assistant — here to help with Mass times, sacraments, the liturgical calendar, and translating parish announcements. For pastoral counseling, please speak with your priest."),
