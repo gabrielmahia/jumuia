@@ -96,15 +96,19 @@ with st.sidebar:
     st.caption("Global Catholic Ecosystem Intelligence")
     st.divider()
 
-    page = st.radio("Navigate", [
-        "🏠 Home",
-        "🔍 Find My Church",
-        "📊 Ecosystem Health",
-        "⚖️ Justice Network",
-        "📋 Accountability",
-        "🌏 Diaspora",
-        "🆘 Crisis Response",
-    ], label_visibility="collapsed")
+    # Role-based navigation
+    ROLES = {
+        "👤 Visitor": ["🏠 Home", "🔍 Find My Church", "🌏 Diaspora"],
+        "✝️ Parishioner": ["🏠 Home", "🔍 Find My Church", "📊 Ecosystem Health", "🌏 Diaspora", "⚖️ Justice Network"],
+        "🏘️ Parish Coordinator": ["🏠 Home", "🔍 Find My Church", "📊 Ecosystem Health", "⚖️ Justice Network", "📋 Accountability", "🌏 Diaspora", "🆘 Crisis Response"],
+        "⛪ Priest / Deacon": ["🏠 Home", "🔍 Find My Church", "📊 Ecosystem Health", "⚖️ Justice Network", "📋 Accountability", "🌏 Diaspora", "🆘 Crisis Response"],
+        "🏛️ Diocese / Researcher": ["🏠 Home", "🔍 Find My Church", "📊 Ecosystem Health", "⚖️ Justice Network", "📋 Accountability", "🌏 Diaspora", "🆘 Crisis Response"],
+    }
+
+    role = st.selectbox("I am a…", list(ROLES.keys()), key="user_role")
+    available_pages = ROLES[role]
+
+    page = st.radio("Navigate", available_pages, label_visibility="collapsed")
 
     st.divider()
     st.markdown("### 📊 Global Stats (Demo)")
