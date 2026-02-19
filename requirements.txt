@@ -7,8 +7,8 @@ requests>=2.31.0
 pandas>=2.0.0
 plotly>=5.17.0
 
-# AI (Gemini / Google)
-google-generativeai>=0.7.0
+# AI (Gemini — new SDK)
+google-genai>=1.0.0
 
 # Local dev (optional)
 python-dotenv>=1.0.0
