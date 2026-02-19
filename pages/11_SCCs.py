@@ -78,13 +78,16 @@ with tab1:
             notes = st.text_area("Notes / Special circumstances", height=70)
 
             if st.form_submit_button("➕ Add SCC", type="primary") and name:
-                st.session_state.sccs.append({
+                from services.sheets import _save
+                scc_data = {
                     "Name": name, "Zone": zone, "Leader": leader_name,
                     "Phone": leader_phone, "Meeting Day": meeting_day,
                     "Meeting Time": meeting_time, "Location": location,
                     "Families": families, "Status": status,
                     "Focus": ", ".join(focus), "Notes": notes,
-                })
+                }
+                st.session_state.sccs.append(scc_data)
+                _save("scc_registration", scc_data)
                 st.success(f"✅ SCC '{name}' added successfully!")
                 st.balloons()
 
@@ -118,12 +121,15 @@ with tab2:
             absences_reason = st.text_input("Notable absences / follow-up needed")
 
             if st.form_submit_button("📅 Record Meeting", type="primary"):
-                st.session_state.scc_meetings.append({
+                from services.sheets import _save
+                meeting_data = {
                     "SCC": selected_scc, "Date": str(meeting_date),
                     "Attendees": attendees, "Reading": reading,
                     "Lumko Step": lumko_step, "New Action": new_action,
                     "Prayer Intentions": prayer_intentions,
-                })
+                }
+                st.session_state.scc_meetings.append(meeting_data)
+                _save("scc_meeting", meeting_data)
                 st.success(f"✅ Meeting for {selected_scc} on {meeting_date} recorded.")
 
     if st.session_state.scc_meetings:

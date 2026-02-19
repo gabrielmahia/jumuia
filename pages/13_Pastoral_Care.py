@@ -52,12 +52,15 @@ with tab1:
             notes = st.text_area("Notes (language preference, best times, special needs)", height=70)
 
             if st.form_submit_button("🏠 Add to Register", type="primary") and name:
-                st.session_state.homebound.append({
+                from services.sheets import _save
+                _hb = {
                     "Name": name, "Condition": condition, "Address": address,
                     "Phone": phone, "Emergency Contact": emergency, "Freq": freq,
                     "Minister": minister, "Last Visit": str(date.today()),
                     "Communion": communion, "Notes": notes,
-                })
+                }
+                st.session_state.homebound.append(_hb)
+                _save("pastoral_homebound", _hb)
                 st.success(f"✅ {name} added to homebound register.")
 
     with st.expander("📋 Record a Visit"):
@@ -117,11 +120,14 @@ with tab2:
             notes = st.text_area("Notes / Context")
 
             if st.form_submit_button("💔 Add Case", type="primary") and name:
-                st.session_state.grief.append({
+                from services.sheets import _save
+                _gr = {
                     "Name": name, "Phone": phone, "Loss Type": loss_type,
                     "Date of Loss": str(loss_date), "Support": support,
                     "Assigned To": assigned, "Check-in": checkin, "Notes": notes,
-                })
+                }
+                st.session_state.grief.append(_gr)
+                _save("pastoral_grief", _gr)
                 st.success(f"✅ Grief support record for {name} added.")
 
 # ── MENTORSHIP ────────────────────────────────────────────────────────────────

@@ -94,13 +94,14 @@ with tab1:
                 req = CERT_LEVELS[level]["hours"]
                 valid = CERT_LEVELS[level]["years_valid"]
                 renewal = (start + timedelta(days=365 * valid)).strftime("%Y-%m-%d")
-                st.session_state.catechists.append({
-                    "Name": name, "Email": email, "Phone": phone,
+                from services.sheets import _save
+                _cat = {"Name": name, "Email": email, "Phone": phone,
                     "Level": level, "Ministry": ministry,
                     "Start Date": str(start), "Hours Completed": hours_done,
                     "Hours Required": req, "Status": status,
-                    "Background Check": bg_check, "Renewal Due": renewal, "Notes": notes,
-                })
+                    "Background Check": bg_check, "Renewal Due": renewal, "Notes": notes}
+                st.session_state.catechists.append(_cat)
+                _save("catechist_registration", _cat)
                 st.success(f"✅ {name} added as {level} catechist.")
 
 with tab2:
@@ -168,11 +169,12 @@ with tab3:
             notes = st.text_area("Notes")
 
             if st.form_submit_button("📋 Log Training", type="primary") and course and catechist:
-                st.session_state.training_log.append({
-                    "Catechist": catechist, "Course": course,
+                from services.sheets import _save
+                _tr = {"Catechist": catechist, "Course": course,
                     "Date": str(completed), "Provider": provider,
-                    "Hours": hours, "Category": category, "Certificate": cert_received,
-                })
+                    "Hours": hours, "Category": category, "Certificate": cert_received}
+                st.session_state.training_log.append(_tr)
+                _save("catechist_training", _tr)
                 # Update catechist hours
                 for c in st.session_state.catechists:
                     if c["Name"] == catechist:
