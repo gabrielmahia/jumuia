@@ -47,9 +47,9 @@ def _easter(year: int) -> date:
     g = (b - f + 1) // 3
     h = (19 * a + b - d - g + 15) % 30
     i, k = divmod(c, 4)
-    l = (32 + 2 * e + 2 * i - h - k) % 7
-    m = (a + 11 * h + 22 * l) // 451
-    month, day = divmod(114 + h + l - 7 * m, 31)
+    ll = (32 + 2 * e + 2 * i - h - k) % 7
+    m = (a + 11 * h + 22 * ll) // 451
+    month, day = divmod(114 + h + ll - 7 * m, 31)
     return date(year, month, day + 1)
 
 
@@ -73,8 +73,6 @@ def _liturgical_season(today: date) -> Tuple[str, int]:
     easter = _easter(year)
     advent = _advent_start(year)
     prev_advent = _advent_start(year - 1)
-    prev_easter = _easter(year - 1)
-
     # Ash Wednesday = 46 days before Easter
     ash_wednesday = easter - timedelta(days=46)
     # Pentecost = 49 days after Easter

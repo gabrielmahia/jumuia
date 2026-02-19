@@ -37,7 +37,6 @@ CALLBACK FORMAT (Africa's Talking sends this to your webhook):
 
 import os
 import logging
-from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -106,7 +105,9 @@ Reply 0 for main menu"""
 
 def _search_parish_ussd(city: str) -> str:
     """Search parishes via OSM Nominatim — no local DB needed."""
-    import urllib.request, urllib.parse, json as _json
+    import urllib.request
+    import urllib.parse
+    import json as _json
     try:
         q = urllib.parse.quote(f"Catholic church {city}")
         url = (f"https://nominatim.openstreetmap.org/search"
@@ -125,7 +126,7 @@ def _search_parish_ussd(city: str) -> str:
         return end("\n".join(lines[:4]))  # keep under 182 chars
     except Exception as e:
         logger.error("USSD parish search error: %s", e)
-        return end(f"Search unavailable.\nVisit catholicparishsteward.streamlit.app")
+        return end("Search unavailable.\nVisit catholicparishsteward.streamlit.app")
 
 
 # ─────────────────────────────────────────────
