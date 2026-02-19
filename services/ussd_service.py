@@ -59,9 +59,9 @@ def end(text: str) -> str:
 # MENU SCREENS (keep each under 160 chars for readability on small screens)
 # ─────────────────────────────────────────────
 
-MAIN_MENU = """Catholic Network Tools
+MAIN_MENU = """Parish Steward
 1. Find Parish
-2. Mass Times (Nairobi)
+2. Mass Times
 3. Give via M-Pesa
 4. Today's Reading
 5. Emergency Contacts"""
@@ -96,21 +96,27 @@ Reply 0 for main menu"""
 # ─────────────────────────────────────────────
 
 def _search_parish_ussd(city: str) -> str:
-    """Search parishes for USSD — returns short text (< 160 chars)."""
+    """Search parishes via OSM Nominatim — no local DB needed."""
+    import urllib.request, urllib.parse, json as _json
     try:
-        from services.directory_service import search_parishes
-        results = search_parishes(query=city, limit=3)
+        q = urllib.parse.quote(f"Catholic church {city}")
+        url = (f"https://nominatim.openstreetmap.org/search"
+               f"?q={q}&format=json&limit=3&addressdetails=0")
+        req = urllib.request.Request(
+            url, headers={"User-Agent": "CatholicParishSteward/1.0"}
+        )
+        with urllib.request.urlopen(req, timeout=4) as r:
+            results = _json.loads(r.read())
         if not results:
-            return end(f"No parishes found in {city}.\nTry: Nairobi, Nakuru, Kisumu")
-        lines = [f"Parishes in {city}:"]
-        for p in results[:3]:
-            name = p["name"][:25]
-            phone = p.get("phone", "")[:14] or "No phone"
-            lines.append(f"{name}\n{phone}")
-        return end("\n".join(lines))
+            return end(f"No parishes found near {city}.\nTry: Nairobi, Nakuru, Kisumu")
+        lines = [f"Churches near {city[:15]}:"]
+        for item in results[:3]:
+            name = item.get("display_name","Church").split(",")[0][:22]
+            lines.append(name)
+        return end("\n".join(lines[:4]))  # keep under 182 chars
     except Exception as e:
         logger.error("USSD parish search error: %s", e)
-        return end("Search unavailable. Try again later.")
+        return end(f"Search unavailable.\nVisit catholicparishsteward.streamlit.app")
 
 
 # ─────────────────────────────────────────────
@@ -205,7 +211,8 @@ def handle_ussd_session(
     elif choice == "4":
         day = datetime.now().weekday()  # 0=Mon, 6=Sun
         reading = DAILY_READINGS.get(day, "See parish bulletin")
-        return end(f"Today's Reading\n{reading}\n\nFor full readings visit your parish or Magnificat app.")
+        msg = f"Today's Reading\n{reading}\n\nFull readings: Daily Prayers page"
+        return end(msg[:178])
 
     # ── 5. EMERGENCY CONTACTS ─────────────────
     elif choice == "5":

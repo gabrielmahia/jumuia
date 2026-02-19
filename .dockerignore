@@ -1,0 +1,15 @@
+# Exclude Streamlit app files — webhook only needs services/ and gospelmap/
+pages/
+app.py
+.streamlit/
+*.db
+data/
+tests/
+docs/
+gospelmap/church_search.py
+__pycache__/
+*.pyc
+*.pyo
+.git/
+.env
+*.log
