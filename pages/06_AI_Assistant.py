@@ -114,7 +114,7 @@ def _demo(msg):
     m = msg.lower()
     for keys, reply in _DEMO:
         if any(k in m for k in keys): return reply
-    return "The AI assistant is warming up. Meanwhile: use Parish Directory for churches, Daily Prayers for the Rosary and readings."
+    return "The assistant is getting ready. You can find Mass times in the Parish Directory, or pray along with the Daily Prayers page while you wait."
 
 # ── Page ──────────────────────────────────────────────────────────────────────
 try:
@@ -131,7 +131,7 @@ model = _discover_model(api_key)
 _live = bool(model)
 
 if not _live:
-    st.warning("AI service not available right now. Demo responses shown.", icon="⚙️")
+    st.info("The assistant is responding with suggested answers while we restore full service. All other parish tools are working normally.", icon="✝️")
 
 tab_chat, tab_translate, tab_homily, tab_insights = st.tabs([
     "💬 Chat", "🌍 Translation", "📖 Homily Helper", "📊 Parish Insights"
@@ -168,7 +168,7 @@ with tab_chat:
             with st.spinner("…"):
                 ok, result = _safe_gen(f"{sys}\n\n{hist}Assistant:", api_key, model)
             if ok: reply = result
-            elif result == "quota": reply = "Daily request limit reached — available again later today."
+            elif result == "quota": reply = "The assistant is taking a short break and will be back later today. In the meantime, your priest or parish coordinator can help with any urgent questions."
             else: reply = _demo(user_msg)
         else:
             reply = _demo(user_msg)
@@ -212,7 +212,7 @@ with tab_translate:
         if src_code == tgt_code:
             st.warning("Source and target language are the same.")
         elif not _live:
-            st.info("Translation requires a live AI connection. Please try again shortly.")
+            st.info("Translation is not available right now. Please try again shortly.", icon="✝️")
         else:
             prompt = (f"Translate from {src_sel} to {tgt_sel}. Context: {ctx_sel}. "
                       "Preserve liturgical terms and saint names. Return ONLY the translated text.\n\nText:\n" + tr_text.strip())
@@ -223,7 +223,7 @@ with tab_translate:
                 st.markdown(f"> {result}")
                 st.download_button("Download", result, file_name=f"translation_{tgt_code}.txt")
             elif result == "quota":
-                st.warning("Daily quota reached — available again later today.")
+                st.info("Notes are not available right now. Please try again later today.", icon="✝️")
             else:
                 st.info("Translation not available right now. Please try again shortly.")
 
@@ -243,7 +243,7 @@ with tab_homily:
 
     if st.button("Generate notes", type="primary", key="hom_btn") and gospel_ref.strip():
         if not _live:
-            st.info("Requires live AI connection. Please try again shortly.")
+            st.info("Insights are not available right now. Please try again shortly.", icon="✝️")
         else:
             prompt = (f"Catholic homily preparation assistant for priests/deacons.\n"
                       f"Reading: {gospel_ref}\nSeason: {season}\n"
@@ -295,10 +295,12 @@ with tab_insights:
             else:
                 st.info("Insights not available right now. Please try again shortly.")
 
-# ── Status ────────────────────────────────────────────────────────────────────
-with st.expander("🔧 Connection status", expanded=False):
-    st.markdown(f"**Model:** `{model or 'none'}`")
-    st.markdown(f"**Status:** {'✅ Live' if _live else '⚠️ Demo mode'}")
-    if st.button("Re-discover model", key="rediscover"):
-        st.cache_data.clear()
-        st.rerun()
+# ── Admin-only status (hidden unless ?admin=1 in URL) ─────────────────────────
+_params = st.query_params
+if _params.get("admin") == "1":
+    with st.expander("🔧 Technical status (admin)", expanded=True):
+        st.markdown(f"**Model:** `{model or 'none'}`")
+        st.markdown(f"**Status:** {'✅ Live' if _live else '⚠️ Demo mode'}")
+        if st.button("Re-discover model", key="rediscover"):
+            st.cache_data.clear()
+            st.rerun()
