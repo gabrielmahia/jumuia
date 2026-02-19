@@ -93,7 +93,7 @@ with tab1:
                 }
                 st.session_state.sccs.append(scc_data)
                 _ok = _save("scc_registration", scc_data)
-                    show_save_status("scc_registration", _ok)
+                show_save_status("scc_registration", _ok)
                 st.success(f"✅ SCC '{name}' added successfully!")
                 st.balloons()
 
@@ -136,7 +136,7 @@ with tab2:
                 }
                 st.session_state.scc_meetings.append(meeting_data)
                 _ok = _save("scc_meeting", meeting_data)
-                    show_save_status("scc_meeting", _ok)
+                show_save_status("scc_meeting", _ok)
                 st.success(f"✅ Meeting for {selected_scc} on {meeting_date} recorded.")
 
     if st.session_state.scc_meetings:

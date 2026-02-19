@@ -430,7 +430,7 @@ with tab2:
         }
         st.session_state.submitted_parishes.append(parish_data)
         _ok = _save("parish_submission", parish_data)
-                    show_save_status("parish_submission", _ok)
+        show_save_status("parish_submission", _ok)
         st.success(
             f"✅ **{name}** submitted. It will appear in the directory once "
             "3 parishioners confirm it, or a parish coordinator verifies it."

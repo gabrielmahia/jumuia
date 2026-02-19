@@ -8,8 +8,9 @@ RUN pip install --no-cache-dir -r requirements-webhook.txt
 
 # App code — only what USSD needs
 COPY webhook_ussd.py .
+COPY services/__init__.py ./services/
 COPY services/ussd_service.py ./services/
-COPY services/__init__.py ./services/ 2>/dev/null || touch services/__init__.py
+COPY services/lectionary.py ./services/
 
 ENV PORT=8080
 EXPOSE 8080

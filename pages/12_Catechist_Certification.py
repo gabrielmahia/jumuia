@@ -107,7 +107,7 @@ with tab1:
                     "Background Check": bg_check, "Renewal Due": renewal, "Notes": notes}
                 st.session_state.catechists.append(_cat)
                 _ok = _save("catechist_registration", _cat)
-                    show_save_status("catechist_registration", _ok)
+                show_save_status("catechist_registration", _ok)
                 st.success(f"✅ {name} added as {level} catechist.")
 
 with tab2:
@@ -181,7 +181,7 @@ with tab3:
                     "Hours": hours, "Category": category, "Certificate": cert_received}
                 st.session_state.training_log.append(_tr)
                 _ok = _save("catechist_training", _tr)
-                    show_save_status("catechist_training", _ok)
+                show_save_status("catechist_training", _ok)
                 # Update catechist hours
                 for c in st.session_state.catechists:
                     if c["Name"] == catechist:

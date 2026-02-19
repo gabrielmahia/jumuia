@@ -64,7 +64,7 @@ with tab1:
                     "Meeting": meeting_day, "Location": location}
                 st.session_state.formation_programmes.append(_prog)
                 _ok = _save("formation_programme", _prog)
-                    show_save_status("formation_programme", _ok)
+                show_save_status("formation_programme", _ok)
                 st.success(f"✅ '{prog_name}' added.")
 
 with tab2:
@@ -98,7 +98,7 @@ with tab2:
                     "Sessions": sessions_attended, "Status": completion_status, "Notes": notes}
                 st.session_state.formation_participants.append(_part)
                 _ok = _save("formation_participant", _part)
-                    show_save_status("formation_participant", _ok)
+                show_save_status("formation_participant", _ok)
                 st.success(f"✅ {name} registered for {programme}.")
 
 with tab3:
