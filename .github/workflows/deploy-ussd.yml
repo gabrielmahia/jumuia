@@ -35,11 +35,11 @@ jobs:
           flags: --allow-unauthenticated --memory=256Mi --timeout=10
           env_vars: |
             AFRICASTALKING_USERNAME=sandbox
-          secrets: |
-            AFRICASTALKING_API_KEY=AT_API_KEY:latest
+            AFRICASTALKING_API_KEY=${{ secrets.AT_API_KEY }}
 
       - name: Verify deployment
         run: |
-          URL="https://cnt-ussd-860570427256.africa-south1.run.app/health"
-          echo "Checking $URL"
-          curl -sf "$URL" && echo "✅ Service healthy" || echo "❌ Health check failed"
+          sleep 10
+          curl -sf https://cnt-ussd-860570427256.africa-south1.run.app/health \
+            && echo "✅ Service healthy" \
+            || echo "❌ Health check failed"
