@@ -66,7 +66,7 @@ with tab1:
                 }
                 st.session_state.homebound.append(_hb)
                 _ok = _save("pastoral_homebound", _hb)
-                    show_save_status("pastoral_homebound", _ok)
+                show_save_status("pastoral_homebound", _ok)
                 st.success(f"✅ {name} added to homebound register.")
 
     with st.expander("📋 Record a Visit"):
@@ -134,7 +134,7 @@ with tab2:
                 }
                 st.session_state.grief.append(_gr)
                 _ok = _save("pastoral_grief", _gr)
-                    show_save_status("pastoral_grief", _ok)
+                show_save_status("pastoral_grief", _ok)
                 st.success(f"✅ Grief support record for {name} added.")
 
 # ── MENTORSHIP ────────────────────────────────────────────────────────────────
