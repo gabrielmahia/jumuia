@@ -15,7 +15,7 @@ try:
     from services.mass_readings import get_daily_readings
     _LIT_OK = True
 except Exception as e:
-    st.error(f"Liturgical service unavailable: {e}")
+    st.info("Today's readings are being updated. Please refresh the page in a moment.")
 
 # ── Season color mapping ──────────────────────────────────────────────────────
 _SEASON_EMOJI = {
@@ -139,9 +139,9 @@ if readings:
                         st.markdown(r["content"])
                         st.session_state.reflection_generated[cache_key] = r["content"]
                     else:
-                        st.error(f"Could not generate reflection: {r['error']}")
+                        st.info("A reflection is not available right now. Try again shortly.")
                 except Exception as ex:
-                    st.error(f"AI service error: {ex}")
+                    st.info("AI reflection is not available right now. Try again shortly.")
     else:
         # Static reflection prompts based on season
         prompts = {

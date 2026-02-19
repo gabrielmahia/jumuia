@@ -129,7 +129,7 @@ out body 15;
                 else:
                     st.info("No results in OSM. Try a different spelling or add the parish below.")
             except Exception as e:
-                st.warning(f"OSM search unavailable: {e}")
+                st.info("Live search is not available right now. Please use the main search above or add a parish manually.")
 
 # ── TAB 2: ADD A PARISH ───────────────────────────────────────────────────────
 with tab2:

@@ -48,7 +48,7 @@ if search_btn:
                 churches = search_by_city(city.strip(), country.strip() or None, limit=15)
             except Exception as e:
                 churches = []
-                st.error(f"Search error: {e}")
+                st.warning("Search is not available right now. Please check your connection and try again.")
 
         if not churches:
             st.warning(f"No churches found in {city}. Try a larger city or different spelling.")

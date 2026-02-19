@@ -70,7 +70,7 @@ if st.button("🔍 Find My Community", type="primary"):
                 churches = search_by_city(your_city.strip(), your_country.strip() or None, limit=12)
             except Exception as e:
                 churches = []
-                st.error(f"Search error: {e}")
+                st.warning("Search is not available right now. Please try again shortly.")
 
         if not churches:
             st.warning(f"No churches found in {your_city}. Try a larger nearby city.")

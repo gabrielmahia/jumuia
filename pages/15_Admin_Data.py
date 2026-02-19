@@ -103,7 +103,7 @@ with tab2:
                     st.session_state[target_key] = existing + records
                 st.success(f"✅ {len(records)} records imported into {target_key}.")
         except Exception as e:
-            st.error(f"Error reading CSV: {e}")
+            st.error("The file could not be read. Please check that it is a valid CSV file and try again.")
 
     st.divider()
     st.subheader("📋 CSV Templates")

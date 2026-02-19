@@ -1,16 +1,13 @@
 """
 AI Service — Catholic Network Tools
-Powered by Gemini via google-genai SDK.
+Powered by Gemini via direct REST API (no SDK dependency issues).
 
-Free tier limits (per key per day):
-  gemini-2.0-flash     → 1,500 req/day, 15 RPM
-  gemini-1.5-flash-8b  → separate quota pool (fallback)
-
-On quota exhaustion: returns user-friendly message, never raw JSON errors.
-Responses cached 1hr to conserve quota.
+Avoids SDK version/platform conflicts by calling the Gemini REST endpoint directly.
+Free tier: ~1,500 req/day on gemini-2.0-flash. Falls back to gemini-1.5-flash-8b.
+All errors return user-friendly messages — no raw HTTP/JSON ever surfaces.
 """
 
-import os, time, logging, functools
+import os, time, logging, requests as _requests
 logger = logging.getLogger(__name__)
 
 SUPPORTED_LANGUAGES = {
@@ -22,219 +19,219 @@ SUPPORTED_LANGUAGES = {
     "lg": "Luganda",
 }
 
-# Model cascade — try primary first, fall back on 429
-PRIMARY_MODEL   = "gemini-2.0-flash"
-FALLBACK_MODEL  = "gemini-1.5-flash-8b"  # separate free-tier quota pool
+PRIMARY_MODEL  = "gemini-2.0-flash"
+FALLBACK_MODEL = "gemini-1.5-flash-8b"
 
-_genai_available = False
-try:
-    from google import genai as _genai
-    _genai_available = True
-except ImportError:
-    logger.warning("google-genai not installed. AI features offline.")
+_GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
 
-
-def _api_key():
-    key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
-    if not key:
-        raise EnvironmentError(
-            "GEMINI_API_KEY not set. Add it to Streamlit secrets → Settings → Secrets."
-        )
-    return key
-
-
-def _generate(prompt: str, model: str = PRIMARY_MODEL, retry: bool = True) -> str:
-    """Generate with automatic fallback on 429 (quota exhausted)."""
-    if not _genai_available:
-        raise EnvironmentError("google-genai package not installed.")
-
-    client = _genai.Client(api_key=_api_key())
-    try:
-        r = client.models.generate_content(model=model, contents=prompt)
-        return r.text.strip()
-    except Exception as e:
-        err_str = str(e)
-        if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
-            if model != FALLBACK_MODEL and retry:
-                # Try the fallback model (different quota pool)
-                logger.info("Primary model quota hit — trying fallback model.")
-                time.sleep(2)
-                return _generate(prompt, model=FALLBACK_MODEL, retry=False)
-            raise QuotaExceededError()
-        raise
-
-
-class QuotaExceededError(Exception):
-    """Raised when all models have hit their free-tier quota."""
-    pass
-
-
-def _quota_response():
-    return {
-        "success": False,
-        "model": None,
-        "error": "quota_exceeded",
-        "message": (
-            "The AI assistant has reached its daily limit for free requests. "
-            "It resets automatically at midnight (Pacific Time). "
-            "For uninterrupted access, your parish can enable a paid Gemini plan at aistudio.google.com."
-        ),
-    }
-
-
-# ─── Simple in-memory cache (reduces repeated identical queries) ──────────────
-
+# ── Simple in-memory cache (1hr TTL) ─────────────────────────────────────────
 _cache: dict = {}
-CACHE_TTL = 3600  # 1 hour
+_CACHE_TTL = 3600
 
 def _cached(key: str, fn):
     now = time.time()
-    if key in _cache and now - _cache[key]["ts"] < CACHE_TTL:
+    if key in _cache and now - _cache[key]["ts"] < _CACHE_TTL:
         return _cache[key]["val"]
     result = fn()
     _cache[key] = {"val": result, "ts": now}
     return result
 
+# ── Error categories ──────────────────────────────────────────────────────────
+class QuotaExceededError(Exception): pass
+class AIUnavailableError(Exception): pass
 
-# ─── 1. TRANSLATION ───────────────────────────────────────────────────────────
+# ── Friendly public messages (no tech jargon) ─────────────────────────────────
+_MSG = {
+    "quota": (
+        "The AI assistant has reached its daily request limit and will be "
+        "available again later today. Your priest or parish coordinator can "
+        "help with any urgent questions in the meantime."
+    ),
+    "unavailable": (
+        "The AI assistant is not available right now. "
+        "Please try again in a few minutes."
+    ),
+    "no_key": (
+        "The AI assistant has not been set up for this parish yet. "
+        "Contact your parish coordinator to activate it."
+    ),
+    "translation_fail": "Translation is not available right now. Please try again shortly.",
+    "homily_fail":      "Notes could not be generated right now. Please try again shortly.",
+    "insights_fail":    "Insights could not be generated right now. Please try again shortly.",
+    "chat_fail":        "I couldn't respond right now. Please try again in a moment.",
+}
+
+def _api_key() -> str:
+    key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+    if not key:
+        raise AIUnavailableError("no_key")
+    return key
+
+def _call(prompt: str, model: str, api_key: str) -> str:
+    """Single REST call to Gemini generateContent endpoint."""
+    url = f"{_GEMINI_BASE}/{model}:generateContent?key={api_key}"
+    payload = {"contents": [{"parts": [{"text": prompt}]}]}
+    try:
+        resp = _requests.post(url, json=payload, timeout=30)
+    except _requests.Timeout:
+        raise AIUnavailableError("timeout")
+    except _requests.ConnectionError:
+        raise AIUnavailableError("connection")
+
+    if resp.status_code == 429:
+        raise QuotaExceededError()
+    if resp.status_code == 400:
+        raise AIUnavailableError("bad_request")
+    if resp.status_code == 403:
+        raise AIUnavailableError("forbidden")
+    if not resp.ok:
+        raise AIUnavailableError(f"http_{resp.status_code}")
+
+    data = resp.json()
+    try:
+        return data["candidates"][0]["content"]["parts"][0]["text"].strip()
+    except (KeyError, IndexError):
+        raise AIUnavailableError("bad_response")
+
+def _generate(prompt: str, model: str = PRIMARY_MODEL) -> str:
+    """Generate with automatic fallback on quota exhaustion."""
+    key = _api_key()
+    try:
+        return _call(prompt, model, key)
+    except QuotaExceededError:
+        if model == PRIMARY_MODEL:
+            logger.info("Primary model quota hit — trying fallback.")
+            time.sleep(1)
+            try:
+                return _call(prompt, FALLBACK_MODEL, key)
+            except QuotaExceededError:
+                raise
+            except AIUnavailableError:
+                raise
+        raise
+
+
+# ═══ PUBLIC API ═══════════════════════════════════════════════════════════════
 
 def translate_text(text, target_language_code, source_language_code="en",
                    context="Catholic parish communication"):
     if target_language_code not in SUPPORTED_LANGUAGES:
-        return {"success": False, "translated": text, "model": None,
-                "error": f"Unsupported language: {target_language_code}"}
+        return {"success": False, "translated": text, "error": "unsupported_language"}
     target = SUPPORTED_LANGUAGES[target_language_code]
     source = SUPPORTED_LANGUAGES.get(source_language_code, "English")
     prompt = (
         f"Translate from {source} to {target}. Context: {context}.\n"
         "Preserve liturgical terminology and saint names exactly. "
-        "Return ONLY the translated text, no preamble.\n\nText:\n{text}"
-    ).format(text=text)
-
-    cache_key = f"translate:{source_language_code}:{target_language_code}:{hash(text)}"
+        "Return ONLY the translated text, no preamble.\n\nText:\n" + text
+    )
+    cache_key = f"tr:{source_language_code}:{target_language_code}:{hash(text)}"
     try:
         translated = _cached(cache_key, lambda: _generate(prompt))
-        return {"success": True, "translated": translated, "model": PRIMARY_MODEL, "error": None}
+        return {"success": True, "translated": translated, "error": None}
     except QuotaExceededError:
-        r = _quota_response()
-        r["translated"] = text
-        return r
-    except Exception as e:
-        logger.error("Translation error: %s", e)
-        return {"success": False, "translated": text, "model": None,
-                "error": "Translation unavailable. Please try again shortly."}
+        return {"success": False, "translated": text,
+                "error": "quota", "message": _MSG["quota"]}
+    except AIUnavailableError as e:
+        if "no_key" in str(e):
+            return {"success": False, "translated": text,
+                    "error": "no_key", "message": _MSG["no_key"]}
+        return {"success": False, "translated": text,
+                "error": "unavailable", "message": _MSG["translation_fail"]}
+    except Exception:
+        return {"success": False, "translated": text,
+                "error": "unavailable", "message": _MSG["translation_fail"]}
 
 
-# ─── 2. HOMILY HELPER ─────────────────────────────────────────────────────────
-
-_HOMILY_SYSTEM = (
-    "You are a Catholic homily preparation assistant for priests and deacons. "
-    "Deep knowledge of Scripture, Catechism of the Catholic Church, and the liturgical calendar. "
-    "This is a PREPARATION AID only — never a finished homily. "
-    "Ground content in Scripture and authentic Catholic teaching. Be pastorally sensitive."
+_HOMILY_DISCLAIMER = (
+    "These are preparation notes only — they do not replace personal prayer, "
+    "pastoral discernment, or the priest's own preparation."
 )
 
 def homily_helper(gospel_reference, liturgical_season, parish_context="",
                   language_code="en", audience="general parish community"):
     lang = SUPPORTED_LANGUAGES.get(language_code, "English")
     prompt = (
-        f"{_HOMILY_SYSTEM}\n\nPrepare homily notes for:\n"
-        f"• Reading/Gospel: {gospel_reference}\n"
-        f"• Liturgical season: {liturgical_season}\n"
-        f"• Parish context: {parish_context or 'General mixed-age parish'}\n"
-        f"• Audience: {audience}\n• Delivery language: {lang}\n\n"
-        "Provide structured notes:\n"
-        "1. Core theological theme (2–3 sentences)\n"
-        "2. Key pastoral message for this congregation\n"
-        "3. 2–3 concrete life-application points\n"
-        "4. Opening image or story angle\n"
-        "5. Closing prayer prompt\n\n"
-        "Use clear headers. Concise. Pastoral, not academic."
+        "You are a Catholic homily preparation assistant for priests and deacons.\n"
+        f"Reading/Gospel: {gospel_reference}\nSeason: {liturgical_season}\n"
+        f"Parish context: {parish_context or 'General mixed-age parish'}\n"
+        f"Audience: {audience}\nDelivery language: {lang}\n\n"
+        "Provide:\n1. Core theological theme (2–3 sentences)\n"
+        "2. Key pastoral message\n3. 2–3 life-application points\n"
+        "4. Opening image or story angle\n5. Closing prayer prompt\n"
+        "Use clear headers. Be pastoral, not academic."
     )
-    disclaimer = (
-        "⚠️ Preparation aid only — does not replace prayer, "
-        "personal discernment, or the priest's own pastoral judgment."
-    )
-    cache_key = f"homily:{gospel_reference}:{liturgical_season}:{language_code}"
+    cache_key = f"hom:{gospel_reference}:{liturgical_season}:{language_code}"
     try:
         content = _cached(cache_key, lambda: _generate(prompt))
-        return {"success": True, "content": content, "disclaimer": disclaimer,
-                "model": PRIMARY_MODEL, "error": None}
+        return {"success": True, "content": content,
+                "disclaimer": _HOMILY_DISCLAIMER, "error": None}
     except QuotaExceededError:
-        r = _quota_response()
-        r.update({"content": "", "disclaimer": disclaimer})
-        return r
-    except Exception as e:
-        return {"success": False, "content": "", "disclaimer": disclaimer,
-                "model": None, "error": str(e)}
+        return {"success": False, "content": "", "disclaimer": _HOMILY_DISCLAIMER,
+                "error": "quota", "message": _MSG["quota"]}
+    except AIUnavailableError as e:
+        msg = _MSG["no_key"] if "no_key" in str(e) else _MSG["homily_fail"]
+        return {"success": False, "content": "", "disclaimer": _HOMILY_DISCLAIMER,
+                "error": "unavailable", "message": msg}
+    except Exception:
+        return {"success": False, "content": "", "disclaimer": _HOMILY_DISCLAIMER,
+                "error": "unavailable", "message": _MSG["homily_fail"]}
 
-
-# ─── 3. PARISH INSIGHTS ───────────────────────────────────────────────────────
 
 def generate_parish_insights(parish_data, insight_type="community_summary"):
     PROMPTS = {
         "community_summary": (
-            "Summarize this parish data for a coordinator. "
-            "Highlight 2 strengths and 2 areas needing attention. "
-            "Suggest 3 concrete next steps. Plain language. Max 250 words."
+            "Summarize this parish data for a coordinator. Highlight 2 strengths "
+            "and 2 areas needing attention. Suggest 3 concrete next steps. "
+            "Plain language, no jargon. Max 250 words."
         ),
         "action_brief": (
             "List 'What Needs Attention This Week' — exactly 5 items, "
             "one sentence each. Plain language, action-oriented."
         ),
         "monthly_report": (
-            "Write a concise monthly parish report for a priest. "
-            "Cover community health, ministry activity, and one suggested focus area. "
-            "Warm, professional tone. Max 300 words."
+            "Write a concise monthly parish report for a priest. Cover community health, "
+            "ministry activity, and one suggested focus area. Warm, professional. Max 300 words."
         ),
     }
     prompt = f"{PROMPTS.get(insight_type, PROMPTS['community_summary'])}\n\nParish data:\n{parish_data}"
     try:
-        insights = _generate(prompt)
-        return {"success": True, "insights": insights, "model": PRIMARY_MODEL, "error": None}
+        return {"success": True, "insights": _generate(prompt), "error": None}
     except QuotaExceededError:
-        r = _quota_response()
-        r["insights"] = ""
-        return r
-    except Exception as e:
-        return {"success": False, "insights": "", "model": None, "error": str(e)}
+        return {"success": False, "insights": "", "error": "quota", "message": _MSG["quota"]}
+    except AIUnavailableError as e:
+        msg = _MSG["no_key"] if "no_key" in str(e) else _MSG["insights_fail"]
+        return {"success": False, "insights": "", "error": "unavailable", "message": msg}
+    except Exception:
+        return {"success": False, "insights": "", "error": "unavailable",
+                "message": _MSG["insights_fail"]}
 
-
-# ─── 4. CHAT BOT ─────────────────────────────────────────────────────────────
 
 _BOT_SYSTEM = (
-    "You are a helpful assistant for a Catholic parish. "
-    "Help with: finding parishes, Mass times, liturgical calendar, Catholic teaching (informational only), "
-    "parish services, sacraments, and Catholic traditions. "
-    "Do NOT give pastoral counseling or doctrinal rulings. "
-    "Refer personal spiritual questions to the parish priest. "
-    "Be warm, respectful, and concise. Respond in max 3 sentences unless asked for more."
+    "You are a helpful, warm assistant for a Catholic parish. "
+    "Help with: Mass times, sacraments, liturgical calendar, Catholic traditions, parish services. "
+    "Do NOT provide pastoral counseling or doctrinal rulings — refer those to the parish priest. "
+    "Be concise: max 3 sentences unless the user asks for more detail."
 )
 
 def bot_respond(user_message, conversation_history, language_code="en"):
     lang = SUPPORTED_LANGUAGES.get(language_code, "English")
     history = ""
     for msg in (conversation_history or [])[-6:]:
-        role = "User" if msg["role"] == "user" else "Assistant"
+        role = "You" if msg["role"] == "user" else "Assistant"
         history += f"{role}: {msg['content']}\n"
-
     prompt = (
         f"{_BOT_SYSTEM}\nAlways respond in {lang}.\n\n"
-        f"{'Conversation so far:' + chr(10) + history if history else ''}"
-        f"User: {user_message}\n\nAssistant:"
+        + (f"Previous messages:\n{history}\n" if history else "")
+        + f"User: {user_message}\n\nAssistant:"
     )
     try:
-        reply = _generate(prompt)
-        return {"success": True, "reply": reply, "model": PRIMARY_MODEL, "error": None}
+        return {"success": True, "reply": _generate(prompt), "error": None}
     except QuotaExceededError:
-        r = _quota_response()
-        r["reply"] = (
-            "The AI assistant has reached its daily limit. "
-            "It resets at midnight Pacific Time. "
-            "Your priest or parish coordinator can help with your question in the meantime."
-        )
-        return r
-    except Exception as e:
-        return {"success": False,
-                "reply": "Sorry, I couldn't process that right now. Please try again.",
-                "model": None, "error": str(e)}
+        return {"success": False, "error": "quota", "message": _MSG["quota"],
+                "reply": _MSG["quota"]}
+    except AIUnavailableError as e:
+        msg = _MSG["no_key"] if "no_key" in str(e) else _MSG["chat_fail"]
+        return {"success": False, "error": "unavailable", "message": msg, "reply": msg}
+    except Exception:
+        return {"success": False, "error": "unavailable",
+                "message": _MSG["chat_fail"], "reply": _MSG["chat_fail"]}

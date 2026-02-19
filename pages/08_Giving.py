@@ -102,7 +102,7 @@ st.info(
 
 if st.button("Send M-Pesa Prompt", type="primary", use_container_width=True):
     if not phone or len(phone) < 10:
-        st.error("Please enter a valid phone number (2547XXXXXXXX format)")
+        st.warning("Please enter your M-Pesa phone number in the format 2547XXXXXXXX (e.g. 254712345678).")
     else:
         with st.spinner("Sending STK push…"):
             result = initiate_stk_push(
@@ -121,15 +121,7 @@ if st.button("Send M-Pesa Prompt", type="primary", use_container_width=True):
                     icon="💡",
                 )
         else:
-            err = result.get("error", "Unknown error")
-            if err == "CREDENTIALS_MISSING":
-                st.error(
-                    "M-Pesa credentials not configured. "
-                    "Add MPESA_CONSUMER_KEY, MPESA_CONSUMER_SECRET, "
-                    "and MPESA_PASSKEY to your `.env` file."
-                )
-            else:
-                st.error(f"STK push failed: {err}")
+            st.warning("The payment request could not be completed. Please try again or contact your parish.")
 
 st.divider()
 

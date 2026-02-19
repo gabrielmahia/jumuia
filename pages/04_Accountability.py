@@ -49,7 +49,7 @@ except ImportError:
 
 diocese_list = list(DIOCESES.keys())
 if not diocese_list:
-    st.error("Accountability data module not loaded.")
+    st.info("Accountability data is being prepared.")
     st.stop()
 
 col_sel, col_qual = st.columns([3, 1])
@@ -126,7 +126,7 @@ with tab_finance:
               "✅ Yes — full or partial disclosure" if bp else "❌ No public disclosure found")
     
     if not bp:
-        st.error("⚠️ No public budget found for this diocese.")
+        st.info("Budget data for this diocese has not been published yet.")
     else:
         st.success("✅ Some budget information publicly available.")
     
