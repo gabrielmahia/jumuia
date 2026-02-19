@@ -1,203 +1,285 @@
-"""AI Assistant — Gemini-powered parish helper."""
-import streamlit as st, os, sys
-sys.path.insert(0, ".")
+"""AI Parish Assistant — Chat, Translation, Homily Helper, Parish Insights."""
 
-st.set_page_config(page_title="AI Parish Assistant", page_icon="🤖", layout="wide")
+import streamlit as st
+
+st.set_page_config(page_title="Catholic Parish Steward", page_icon="✝️", layout="wide")
 
 try:
-    from services.theme import inject, hero, quota_notice
+    from services.theme import inject, hero, section_label
     inject()
 except Exception:
     pass
 
-# ── Load AI service ───────────────────────────────────────────────────────────
-_AI_READY = False
-_ai_setup_msg = ""
-
 try:
-    for k in ("GEMINI_API_KEY", "GOOGLE_API_KEY"):
-        if k in st.secrets:
-            os.environ[k] = st.secrets[k]
     from services.ai_service import (
-        translate_text, homily_helper, generate_parish_insights,
-        bot_respond, SUPPORTED_LANGUAGES,
+        bot_respond, translate_text, homily_helper, generate_parish_insights,
+        SUPPORTED_LANGUAGES, diagnose, _last_error_type
     )
-    _AI_READY = bool(os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY"))
-    if not _AI_READY:
-        _ai_setup_msg = "setup"
-except Exception:
-    _ai_setup_msg = "setup"
+    _ai_loaded = True
+except Exception as e:
+    _ai_loaded = False
+    _ai_load_err = str(e)
 
-# ── Hero ─────────────────────────────────────────────────────────────────────
+# ── Page header ───────────────────────────────────────────────────────────────
 try:
     hero("AI Parish Assistant", "Multilingual · Liturgically aware · Powered by Gemini", "AI")
 except Exception:
     st.title("🤖 AI Parish Assistant")
 
-# ── Not configured ────────────────────────────────────────────────────────────
-if not _AI_READY:
-    st.info(
-        "The AI assistant has not been set up for this parish yet. "
-        "Your parish coordinator can activate it — no technical knowledge required.",
-        icon="✝️",
-    )
-    st.markdown("""
-**Once activated, this assistant helps with:**
-
-- 💬 **Chat** — Ask about Mass times, sacraments, and the liturgical calendar
-- 🌍 **Translation** — Bulletins and announcements in English, Kiswahili, Luganda, French, and more
-- 📖 **Homily Helper** — Preparation notes for priests and deacons
-- 📊 **Parish Insights** — Plain-language summaries of parish activity
-""")
+# ── API key check + diagnostic banner ─────────────────────────────────────────
+if not _ai_loaded:
+    st.error(f"AI service could not be loaded: {_ai_load_err}")
     st.stop()
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
-SUPPORTED_LANGUAGES_FALLBACK = {
-    "en":"English","sw":"Kiswahili","fr":"French",
-    "es":"Spanish","pt":"Portuguese","lg":"Luganda",
-}
-_langs = SUPPORTED_LANGUAGES if "_AI_READY" else SUPPORTED_LANGUAGES_FALLBACK
-_all_langs = list(_langs.values())
-_lang_code = {v: k for k, v in _langs.items()}
+key_present = bool(__import__("os").getenv("GEMINI_API_KEY") or __import__("os").getenv("GOOGLE_API_KEY"))
 
+if not key_present:
+    st.info(
+        "The AI assistant has not been set up for this parish yet. "
+        "Contact your parish coordinator to activate it.",
+        icon="✝️",
+    )
+    st.stop()
+
+# ── Run diagnostic (cached 10 min per session) ────────────────────────────────
+if "ai_diag" not in st.session_state:
+    with st.spinner("Checking AI connection…"):
+        st.session_state.ai_diag = diagnose()
+
+diag = st.session_state.ai_diag
+
+if diag["status"] == "ip_restricted":
+    st.markdown("""
+<div style="background:#FFF3CD;border-left:5px solid #C9A84C;border-radius:8px;
+padding:1rem 1.25rem;margin-bottom:1.5rem;">
+<strong>⚙️ One quick fix needed</strong><br>
+The AI key is configured but Google Cloud Console is blocking requests from external servers.
+This is a <strong>30-second fix</strong> — no code change required.
+</div>
+""", unsafe_allow_html=True)
+
+    with st.expander("📋 Fix instructions (30 seconds)", expanded=True):
+        for i, step in enumerate(diag["fix_steps"], 1):
+            st.markdown(f"**{i}.** {step}")
+        st.markdown("""
+---
+**Why this happens:** Keys created in Google Cloud Console have 'Application restrictions'
+set to 'HTTP referrers' or 'IP addresses' by default, which blocks server-to-server calls.
+AI Studio keys are unrestricted by default — creating a fresh one there is the fastest fix.
+
+**Fastest path:** [Open AI Studio → Get API key](https://aistudio.google.com/app/apikey) →
+Create API key in existing project → copy it → paste into Streamlit secrets as
+`GOOGLE_API_KEY = "..."` → Save.
+""")
+
+    st.caption("While the fix is applied, demo responses are shown below.")
+    st.divider()
+
+elif diag["status"] == "quota":
+    st.warning("Daily AI quota reached — resets at midnight Pacific Time. Demo responses shown.", icon="⏳")
+    st.divider()
+
+elif diag["status"] != "ok":
+    st.info(diag.get("detail", "AI unavailable. Demo responses shown below."), icon="ℹ️")
+    st.divider()
+
+
+# ── Helper: show errors ────────────────────────────────────────────────────────
 def _show_error(result: dict):
-    """Show a public-friendly message. Never shows technical details."""
-    err = result.get("error", "")
+    err = result.get("error")
     msg = result.get("message", "")
-
     if err == "quota":
-        st.markdown(
-            f"""<div style="background:#FFF8E7;border-left:4px solid #C9A84C;
-            border-radius:8px;padding:1rem 1.25rem;margin:0.5rem 0;
-            color:#5C4A1E;font-size:0.93rem;">
-            ⏳ {msg}
-            </div>""",
-            unsafe_allow_html=True,
-        )
+        st.markdown(f"""
+<div style="background:#FFF8E7;border-left:4px solid #C9A84C;border-radius:8px;
+padding:1rem 1.25rem;color:#5C4A1E;margin:.5rem 0;">
+⏳ {msg}
+</div>""", unsafe_allow_html=True)
+    elif err == "ip_restricted":
+        st.info("Demo response shown — see fix instructions above.", icon="⚙️")
     else:
-        st.info(msg or "This feature is not available right now. Please try again in a moment.")
+        st.info(msg or "Not available right now. Please try again shortly.")
 
-# ── Tabs ──────────────────────────────────────────────────────────────────────
-tab1, tab2, tab3, tab4 = st.tabs([
+
+# ── Tab layout ─────────────────────────────────────────────────────────────────
+tab_chat, tab_translate, tab_homily, tab_insights = st.tabs([
     "💬 Chat", "🌍 Translation", "📖 Homily Helper", "📊 Parish Insights"
 ])
 
-# ── CHAT ─────────────────────────────────────────────────────────────────────
-with tab1:
-    st.subheader("Ask your parish assistant")
-    st.caption("Mass times · Sacraments · Calendar · Ministries · For pastoral counseling, speak with your priest.")
 
-    lang_sel = st.selectbox("Language / Lugha", _all_langs, key="chat_lang",
-                            label_visibility="visible")
-    lang_code = _lang_code.get(lang_sel, "en")
+# ══ CHAT ══════════════════════════════════════════════════════════════════════
+with tab_chat:
+    st.markdown("**Ask your parish assistant**")
+    st.caption("Mass times · Sacraments · Calendar · Ministries · For pastoral counseling, speak with your priest.")
 
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = []
 
-    for turn in st.session_state.chat_history:
-        with st.chat_message(turn["role"]):
-            st.markdown(turn["content"])
+    lang_options = list(SUPPORTED_LANGUAGES.items())
+    lang_display = [v for _, v in lang_options]
+    lang_codes   = [k for k, _ in lang_options]
 
-    if prompt := st.chat_input("Ask anything about your parish…"):
-        with st.chat_message("user"):
-            st.markdown(prompt)
-        with st.chat_message("assistant"):
-            with st.spinner("…"):
-                result = bot_respond(prompt, st.session_state.chat_history, language_code=lang_code)
-            if result["success"]:
-                st.markdown(result["reply"])
-                st.session_state.chat_history.append({"role": "user", "content": prompt})
-                st.session_state.chat_history.append({"role": "assistant", "content": result["reply"]})
-            else:
-                _show_error(result)
-                # Still show the friendly reply for quota messages
-                reply = result.get("reply", "")
-                if reply and result.get("error") == "quota":
-                    st.markdown(reply)
+    try:
+        section_label("LANGUAGE / LUGHA")
+    except Exception:
+        st.markdown("**Language / Lugha**")
+
+    lang_sel = st.selectbox("Language", lang_display, label_visibility="collapsed", key="chat_lang")
+    lang_code = lang_codes[lang_display.index(lang_sel)]
+
+    # Chat input
+    user_msg = st.text_input(
+        "Message",
+        placeholder="Ask anything about your parish…",
+        label_visibility="collapsed",
+        key="chat_input",
+    )
+
+    if st.button("Send", type="primary", key="chat_send") and user_msg.strip():
+        with st.spinner("…"):
+            result = bot_respond(user_msg.strip(), st.session_state.chat_history, lang_code)
+
+        st.session_state.chat_history.append({"role": "user", "content": user_msg.strip()})
+
+        if result.get("success") or result.get("use_demo"):
+            reply = result.get("reply", "")
+            st.session_state.chat_history.append({"role": "assistant", "content": reply})
+        else:
+            _show_error(result)
+
+    # Display history
+    for msg in st.session_state.chat_history:
+        if msg["role"] == "user":
+            st.markdown(f"""
+<div style="display:flex;align-items:flex-start;gap:.75rem;margin:.75rem 0;">
+  <span style="font-size:1.6rem">😊</span>
+  <div style="background:rgba(11,31,58,0.06);border-radius:12px;
+  padding:.65rem 1rem;flex:1;">{msg['content']}</div>
+</div>""", unsafe_allow_html=True)
+        else:
+            is_demo = (diag["status"] != "ok")
+            badge = " <small style='color:#C9A84C;font-size:0.7rem'>(demo)</small>" if is_demo else ""
+            st.markdown(f"""
+<div style="display:flex;align-items:flex-start;gap:.75rem;margin:.75rem 0;">
+  <span style="font-size:1.6rem">✝️</span>
+  <div style="background:rgba(201,168,76,0.08);border-left:3px solid #C9A84C;
+  border-radius:0 12px 12px 0;padding:.65rem 1rem;flex:1;">
+  {msg['content']}{badge}</div>
+</div>""", unsafe_allow_html=True)
 
     if st.session_state.chat_history:
-        if st.button("Clear conversation", key="clr_chat"):
+        if st.button("Clear conversation", key="clear_chat"):
             st.session_state.chat_history = []
             st.rerun()
 
-# ── TRANSLATION ───────────────────────────────────────────────────────────────
-with tab2:
-    st.subheader("Translate parish text")
-    st.caption("Liturgical terminology and saint names preserved across all languages.")
-    c1, c2 = st.columns(2)
-    src = c1.selectbox("From", _all_langs, key="src_lang")
-    tgt = c2.selectbox("To", [v for v in _all_langs if v != src], key="tgt_lang")
-    ctx = st.text_input("What is this text for? (optional)",
-                        placeholder="e.g. Sunday bulletin, Mass announcement")
-    txt = st.text_area("Text to translate", height=120)
-    if st.button("Translate", type="primary"):
-        if not txt.strip():
-            st.warning("Please enter some text to translate.")
-        else:
-            sc = _lang_code.get(src, "en")
-            tc = _lang_code.get(tgt, "sw")
-            with st.spinner(f"Translating to {tgt}…"):
-                r = translate_text(txt, tc, sc, ctx or "Catholic parish communication")
-            if r["success"]:
-                st.text_area("Translation", r["translated"], height=120)
-            else:
-                _show_error(r)
 
-# ── HOMILY HELPER ─────────────────────────────────────────────────────────────
-with tab3:
-    st.subheader("Homily Preparation Notes")
-    st.markdown(
-        """<div style="background:#F0F7FF;border-left:4px solid #4A90D9;
-        border-radius:8px;padding:0.75rem 1rem;font-size:0.9rem;color:#1a3a6b">
-        ✝️ These notes are a preparation aid — they do not replace personal prayer or the priest's own discernment.
-        </div>""",
-        unsafe_allow_html=True,
-    )
-    st.write("")
-    c1, c2 = st.columns(2)
-    gospel_ref = c1.text_input("Reading or Gospel passage", placeholder="e.g. John 6:51-58")
-    season_sel = c1.selectbox("Liturgical season",
-        ["Ordinary Time","Advent","Christmas","Lent","Holy Week","Easter"])
-    dlang = c2.selectbox("Delivery language", _all_langs, key="homily_lang")
-    audience = c2.text_input("Who is the congregation?", value="General mixed-age parish")
-    pctx = st.text_area("Any context about your parish? (optional)", height=60,
-        placeholder="e.g. Urban parish, many young families, celebrating a school anniversary…")
-    if st.button("Prepare Notes", type="primary"):
-        if not gospel_ref.strip():
-            st.warning("Please enter a reading or Gospel reference.")
-        else:
-            lc = _lang_code.get(dlang, "en")
-            with st.spinner("Preparing notes…"):
-                r = homily_helper(gospel_ref, season_sel, pctx, lc, audience)
-            if r["success"]:
-                st.caption(r["disclaimer"])
-                st.markdown(r["content"])
-            else:
-                _show_error(r)
+# ══ TRANSLATION ══════════════════════════════════════════════════════════════
+with tab_translate:
+    st.markdown("**Translate parish content**")
+    st.caption("Announcements, liturgy, pastoral letters — into 6 African and global languages.")
 
-# ── PARISH INSIGHTS ───────────────────────────────────────────────────────────
-with tab4:
-    st.subheader("Parish Activity Insights")
-    st.caption("Paste your parish numbers and get a plain-language summary.")
-    _labels = {
-        "community_summary": "Community Overview — for coordinators",
-        "action_brief":      "What Needs Attention This Week",
-        "monthly_report":    "Monthly Summary — for the parish priest",
+    c1, c2 = st.columns([2, 1])
+    with c1:
+        text_input = st.text_area("Text to translate", height=150,
+                                   placeholder="Paste parish announcement, homily notes, or bulletin text here…")
+    with c2:
+        src_sel = st.selectbox("From", list(SUPPORTED_LANGUAGES.values()), key="tr_src")
+        tgt_sel = st.selectbox("To",   list(SUPPORTED_LANGUAGES.values()),
+                                index=list(SUPPORTED_LANGUAGES.values()).index("Kiswahili"), key="tr_tgt")
+        ctx_sel = st.selectbox("Context",
+            ["Catholic parish communication","Liturgical text","Pastoral letter",
+             "Youth ministry","Community announcement"])
+
+    src_code = [k for k,v in SUPPORTED_LANGUAGES.items() if v == src_sel][0]
+    tgt_code = [k for k,v in SUPPORTED_LANGUAGES.items() if v == tgt_sel][0]
+
+    if st.button("Translate", type="primary", key="tr_btn") and text_input.strip():
+        if src_code == tgt_code:
+            st.warning("Source and target language are the same.")
+        else:
+            with st.spinner(f"Translating to {tgt_sel}…"):
+                result = translate_text(text_input.strip(), tgt_code, src_code, ctx_sel)
+            if result["success"]:
+                st.success(f"**{tgt_sel} translation:**")
+                st.markdown(f"> {result['translated']}")
+                st.download_button("Download translation", result["translated"],
+                                   file_name=f"translation_{tgt_code}.txt", mime="text/plain")
+            else:
+                _show_error(result)
+
+
+# ══ HOMILY HELPER ════════════════════════════════════════════════════════════
+with tab_homily:
+    st.markdown("**Homily preparation notes**")
+    st.caption("For priests and deacons — preparation aids, not replacements for personal prayer.")
+
+    c1, c2 = st.columns(2)
+    with c1:
+        gospel_ref = st.text_input("Gospel / Reading reference",
+                                    placeholder="John 20:1-9 · Luke 15:11-32")
+        season     = st.selectbox("Liturgical season",
+            ["Ordinary Time","Advent","Christmas","Lent","Easter","Pentecost",
+             "Feast Day","Special occasion"])
+    with c2:
+        audience   = st.text_input("Audience",
+                                    placeholder="Mixed families · Youth Mass · Funeral")
+        context    = st.text_input("Parish context (optional)",
+                                    placeholder="Rural parish · City centre · SCC gathering")
+        hom_lang   = st.selectbox("Language",
+            list(SUPPORTED_LANGUAGES.values()), key="hom_lang")
+        hom_code   = [k for k,v in SUPPORTED_LANGUAGES.items() if v == hom_lang][0]
+
+    if st.button("Generate preparation notes", type="primary", key="hom_btn") and gospel_ref.strip():
+        with st.spinner("Preparing notes…"):
+            result = homily_helper(gospel_ref.strip(), season,
+                                   context.strip(), hom_code,
+                                   audience.strip() or "general parish community")
+        if result["success"]:
+            st.markdown(result["content"])
+            st.caption(f"⚠️ {result['disclaimer']}")
+            st.download_button("Download notes", result["content"],
+                               file_name="homily_notes.txt", mime="text/plain")
+        else:
+            _show_error(result)
+
+
+# ══ PARISH INSIGHTS ══════════════════════════════════════════════════════════
+with tab_insights:
+    st.markdown("**AI-generated parish insights**")
+    st.caption("Enter parish data and get a plain-language summary for coordinators or priests.")
+
+    insight_type = st.radio("Report type",
+        ["Community summary","Action brief (this week)","Monthly report"],
+        horizontal=True, key="ins_type")
+
+    type_map = {
+        "Community summary": "community_summary",
+        "Action brief (this week)": "action_brief",
+        "Monthly report": "monthly_report",
     }
-    itype = st.selectbox("What kind of summary do you need?",
-                         list(_labels.keys()), format_func=lambda x: _labels[x])
-    pdata = st.text_area("Parish data", height=160,
-        placeholder="Sunday attendance: 240\nGiving this month: KES 42,000\nBaptisms this quarter: 8\nActive SCCs: 12")
-    if st.button("Generate Summary", type="primary"):
-        if not pdata.strip():
-            st.warning("Please enter some parish data first.")
-        else:
-            with st.spinner("Preparing summary…"):
-                r = generate_parish_insights(pdata, itype)
-            if r["success"]:
-                st.markdown(r["insights"])
-            else:
-                _show_error(r)
 
-    st.divider()
-    st.caption("Information entered here is used only to generate your summary and is not saved or shared.")
+    parish_data = st.text_area("Parish data or notes", height=200,
+        placeholder=(
+            "Examples:\n"
+            "- Sunday attendance: 280 adults, 90 children\n"
+            "- 3 upcoming baptisms, 1 marriage preparation\n"
+            "- SCC participation up 15% this month\n"
+            "- Youth group needs a new coordinator\n"
+            "- Roof repair fund: KES 180,000 of KES 600,000 target"
+        ))
+
+    if st.button("Generate insights", type="primary", key="ins_btn") and parish_data.strip():
+        with st.spinner("Analysing…"):
+            result = generate_parish_insights(parish_data.strip(), type_map[insight_type])
+        if result["success"]:
+            st.markdown(result["insights"])
+            st.download_button("Download report", result["insights"],
+                               file_name="parish_insights.txt", mime="text/plain")
+        else:
+            _show_error(result)
+
+# ── Diagnostic refresh ────────────────────────────────────────────────────────
+with st.expander("🔧 AI connection status"):
+    st.json(diag)
+    if st.button("Re-run diagnostic", key="rediag"):
+        del st.session_state["ai_diag"]
+        st.rerun()
