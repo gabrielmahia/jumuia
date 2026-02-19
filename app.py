@@ -33,6 +33,15 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+
+# ── Mobile-first UX (applies globally) ──────────────────────────────────────
+try:
+    from services.mobile_ux import inject_mobile_css, data_saver_banner
+    inject_mobile_css()
+    data_saver_banner()
+except Exception:
+    pass
+
 # ── Shared CSS ────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
