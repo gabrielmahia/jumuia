@@ -144,6 +144,8 @@ with tab_chat:
 
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = []
+    if "chat_input_counter" not in st.session_state:
+        st.session_state.chat_input_counter = 0
 
     lang_vals = list(SUPPORTED_LANGUAGES.values())
     lang_keys = list(SUPPORTED_LANGUAGES.keys())
@@ -154,7 +156,8 @@ with tab_chat:
     lang_code = lang_keys[lang_vals.index(lang_sel)]
 
     user_msg = st.text_input("Message", placeholder="Ask anything about your parish…",
-                              label_visibility="collapsed", key="chat_input")
+                              label_visibility="collapsed",
+                              key=f"chat_input_{st.session_state.chat_input_counter}")
 
     if st.button("Send ↑", type="primary", key="chat_send") and user_msg.strip():
         st.session_state.chat_history.append({"role": "user", "content": user_msg.strip()})
@@ -173,6 +176,7 @@ with tab_chat:
         else:
             reply = _demo(user_msg)
         st.session_state.chat_history.append({"role": "assistant", "content": reply})
+        st.session_state.chat_input_counter += 1  # clears the input field
         st.rerun()
 
     for msg in st.session_state.chat_history:
@@ -191,6 +195,7 @@ with tab_chat:
     if st.session_state.chat_history:
         if st.button("Clear", key="clear_chat"):
             st.session_state.chat_history = []
+            st.session_state.chat_input_counter += 1
             st.rerun()
 
 # ── Translation ───────────────────────────────────────────────────────────────
