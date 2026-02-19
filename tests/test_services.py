@@ -6,7 +6,6 @@ Run: pytest tests/ -v
 import os
 import sqlite3
 import sys
-import tempfile
 import pytest
 
 # ─────────────────────────────────────────────
@@ -29,8 +28,7 @@ def temp_db(tmp_path, monkeypatch):
 def test_ai_service_imports():
     sys.path.insert(0, ".")
     from services.ai_service import (
-        translate_text, homily_helper, generate_parish_insights,
-        bot_respond, SUPPORTED_LANGUAGES
+        SUPPORTED_LANGUAGES
     )
     assert "en" in SUPPORTED_LANGUAGES
     assert "sw" in SUPPORTED_LANGUAGES
@@ -39,23 +37,21 @@ def test_ai_service_imports():
 
 def test_directory_service_imports():
     from services.directory_service import (
-        init_db, search_parishes, get_stats, sync_gcatholic
+        init_db
     )
     assert callable(init_db)
 
 
 def test_mpesa_service_imports():
     from services.mpesa_service import (
-        get_access_token, initiate_stk_push, handle_callback,
-        get_giving_summary, live_activation_checklist
+        initiate_stk_push
     )
     assert callable(initiate_stk_push)
 
 
 def test_whatsapp_service_imports():
     from services.whatsapp_service import (
-        parse_at_inbound, parse_twilio_inbound,
-        activation_status, _detect_language_simple
+        activation_status
     )
     assert callable(activation_status)
 
@@ -81,9 +77,8 @@ def test_directory_search_empty():
 
 def test_directory_search_with_data(tmp_path, monkeypatch):
     """Insert a test parish and verify search finds it."""
-    from services.directory_service import init_db, search_parishes, DB_PATH
+    from services.directory_service import init_db, search_parishes
     import services.directory_service as ds
-    import pathlib
 
     # Patch DB_PATH to temp
     db_file = tmp_path / "test_search.db"
@@ -119,7 +114,6 @@ def test_gcatholic_rails_returns_correct_status():
 
 def test_mpesa_missing_credentials_returns_graceful_error():
     """Without credentials, initiate_stk_push should return structured error."""
-    import os
     os.environ.pop("MPESA_CONSUMER_KEY", None)
     os.environ.pop("MPESA_CONSUMER_SECRET", None)
     from services.mpesa_service import initiate_stk_push
@@ -176,7 +170,6 @@ def test_mpesa_live_checklist_structure():
 
 def test_giving_db_init_and_summary(tmp_path, monkeypatch):
     import services.mpesa_service as ms
-    import pathlib
     db_file = tmp_path / "giving.db"
     monkeypatch.setattr(ms, "DB_PATH", db_file)
     ms.init_giving_db()
