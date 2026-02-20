@@ -69,7 +69,26 @@ def sidebar_widget():
             "margin-bottom:0.3rem;margin-top:0.75rem;'>Your Parish</div>",
             unsafe_allow_html=True
         )
-        with st.expander("Set up →", expanded=False):
+        # Force sidebar inputs to be readable — dark sidebar overrides defaults
+        st.markdown("""
+<style>
+[data-testid="stSidebar"] [data-testid="stTextInput"] input {
+    background-color: #ffffff !important;
+    color: #0B1F3A !important;
+    border: 1px solid rgba(201,168,76,0.4) !important;
+    border-radius: 6px !important;
+}
+[data-testid="stSidebar"] [data-testid="stTextInput"] input::placeholder {
+    color: #9CA3AF !important;
+}
+[data-testid="stSidebar"] [data-testid="stExpander"] {
+    border: 1px solid rgba(201,168,76,0.25) !important;
+    border-radius: 8px !important;
+    background: rgba(255,255,255,0.04) !important;
+}
+</style>
+""", unsafe_allow_html=True)
+        with st.expander("Set up →", expanded=True):
             name = st.text_input("Parish name", placeholder="e.g. Holy Family Basilica",
                                   key="pi_name", label_visibility="collapsed")
             col1, col2 = st.columns(2)
