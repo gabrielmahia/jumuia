@@ -2,7 +2,11 @@
 AI Parish Assistant — self-contained. No service abstraction.
 Auto-discovers available models via /v1beta/models.
 """
-import os, json, time, urllib.request, urllib.error
+import os
+import json
+import time
+import urllib.request
+import urllib.error
 import streamlit as st
 
 st.set_page_config(page_title="Catholic Parish Steward", page_icon="✝️", layout="wide")
@@ -134,6 +138,7 @@ if not _live:
     st.info("The assistant is responding with suggested answers while we restore full service. All other parish tools are working normally.", icon="✝️")
 
 tab_chat, tab_translate, tab_homily, tab_insights = st.tabs([
+    # tabs intentionally kept simple
     "💬 Chat", "🌍 Translation", "📖 Homily Helper", "📊 Parish Insights"
 ])
 
@@ -163,9 +168,14 @@ with tab_chat:
         st.session_state.chat_history.append({"role": "user", "content": user_msg.strip()})
         if _live:
             lang_name = SUPPORTED_LANGUAGES.get(lang_code, "English")
-            sys = (f"You are a warm Catholic parish assistant. Help with Mass times, sacraments, "
-                   f"liturgical calendar, and parish services. Do NOT provide pastoral counseling — "
-                   f"refer those to the priest. Always respond in {lang_name}. Max 3 sentences.")
+            sys = (f"You are a warm Catholic parish assistant serving a global community. "
+                   f"Help with: Mass times, sacraments, liturgical seasons, Catholic traditions, "
+                   f"prayer guidance, and general parish questions. "
+                   f"When you don't know specific local details (priest names, exact Mass times, "
+                   f"specific parish events), say so honestly and suggest the person contact their "
+                   f"parish directly or visit in person — never invent names, numbers, or details. "
+                   f"Do not provide pastoral counseling — gently refer those to a priest or trusted person. "
+                   f"Always respond in {lang_name}. Keep answers concise — 2 to 3 sentences unless more detail is clearly needed.")
             hist = "".join(f"{'User' if m['role']=='user' else 'Assistant'}: {m['content']}\n"
                            for m in st.session_state.chat_history[-6:])
             with st.spinner("…"):
