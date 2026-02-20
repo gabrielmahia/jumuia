@@ -232,27 +232,25 @@ def t(key: str) -> str:
 
 
 def lang_selector():
-    """Render compact language selector in sidebar."""
+    """Render compact language selector. Call inside a st.sidebar context."""
     current = get_lang()
-    current_label = LANGUAGES.get(current, "English")
 
-    with st.sidebar:
-        st.markdown(
-            "<div style='font-size:0.65rem;color:rgba(255,255,255,0.45);"
-            "text-transform:uppercase;letter-spacing:0.08em;"
-            "margin-bottom:0.2rem;margin-top:0.5rem;'>Language / Lugha</div>",
-            unsafe_allow_html=True
-        )
-        lang_labels = list(LANGUAGES.values())
-        lang_codes  = list(LANGUAGES.keys())
-        selected_label = st.selectbox(
-            "Language",
-            lang_labels,
-            index=lang_codes.index(current),
-            label_visibility="collapsed",
-            key="lang_selector_widget"
-        )
-        new_code = lang_codes[lang_labels.index(selected_label)]
-        if new_code != current:
-            st.session_state["ui_lang"] = new_code
-            st.rerun()
+    st.markdown(
+        "<div style='font-size:0.65rem;color:rgba(255,255,255,0.45);"
+        "text-transform:uppercase;letter-spacing:0.08em;"
+        "margin-bottom:0.2rem;margin-top:0.75rem;'>🌐 Language / Lugha</div>",
+        unsafe_allow_html=True
+    )
+    lang_labels = list(LANGUAGES.values())
+    lang_codes  = list(LANGUAGES.keys())
+    selected_label = st.selectbox(
+        "Language",
+        lang_labels,
+        index=lang_codes.index(current),
+        label_visibility="collapsed",
+        key="lang_selector_widget"
+    )
+    new_code = lang_codes[lang_labels.index(selected_label)]
+    if new_code != current:
+        st.session_state["ui_lang"] = new_code
+        st.rerun()
