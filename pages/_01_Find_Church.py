@@ -38,86 +38,101 @@ with c3:
 
 search_btn = st.button("🔍 Find Churches Near Me", type="primary", use_container_width=True)
 
+# ── Run search and cache results in session_state ─────────────────────────────
+# Critical: results MUST survive reruns so save buttons can fire correctly.
 if search_btn:
     if not city.strip():
         st.warning("Please enter a city name")
+        st.session_state.pop("_church_results", None)
     else:
         with st.spinner(f"Searching for Catholic churches in {city}... (OSM live data)"):
             try:
                 from gospelmap.church_search import search_by_city
-                churches = search_by_city(city.strip(), country.strip() or None, limit=15)
-            except Exception:
-                churches = []
-                st.warning("Search is not available right now. Please check your connection and try again.")
+                results = search_by_city(city.strip(), country.strip() or None, limit=15)
+                st.session_state["_church_results"] = results
+                st.session_state["_church_search_city"] = city.strip()
+                st.session_state["_church_search_country"] = country.strip()
+            except Exception as e:
+                st.session_state.pop("_church_results", None)
+                st.warning(f"Search is not available right now. Please check your connection and try again.")
 
-        if not churches:
-            st.warning(f"No churches found in {city}. Try a larger city or different spelling.")
-            st.info("💡 OSM coverage varies by region. Major cities in East Africa, Philippines, Brazil, Europe have good coverage.")
-        else:
-            st.success(f"Found **{len(churches)} Catholic churches** near {city}")
-            st.divider()
+# ── Render cached results (persists across reruns / save button clicks) ───────
+if "_church_results" in st.session_state:
+    churches = st.session_state["_church_results"]
+    _search_city = st.session_state.get("_church_search_city", city)
+    _search_country = st.session_state.get("_church_search_country", country)
 
-            for i, c in enumerate(churches, 1):
-                with st.container():
-                    col1, col2, col3 = st.columns([3, 1, 1])
-                    with col1:
-                        st.subheader(f"{i}. {c.name}")
-                        if c.address:
-                            st.caption(f"📍 {c.address}")
-                        elif c.city:
-                            st.caption(f"📍 {c.city}{', ' + c.country if c.country else ''}")
-                    with col2:
-                        if c.distance_km:
-                            st.metric("Distance", f"{c.distance_km:.1f} km")
-                    with col3:
-                        gmaps = f"https://www.google.com/maps?q={c.latitude},{c.longitude}"
-                        st.markdown(f"[📍 Google Maps]({gmaps})")
+    if not churches:
+        st.warning(f"No churches found. Try a larger city or different spelling.")
+        st.info("💡 OSM coverage varies by region. Major cities in East Africa, Philippines, Brazil, Europe have good coverage.")
+    else:
+        st.success(f"Found **{len(churches)} Catholic churches** near {_search_city}")
+        st.divider()
 
-                    detail_cols = st.columns(3)
-                    with detail_cols[0]:
-                        if c.phone:
-                            st.write(f"📞 {c.phone}")
-                    with detail_cols[1]:
-                        if c.website:
-                            st.write(f"🌐 [{c.website[:30]}]({c.website})")
-                    with detail_cols[2]:
-                        osm_link = f"https://www.openstreetmap.org/node/{c.osm_id}" if c.osm_id else None
-                        if osm_link:
-                            st.markdown(f"[🗺️ OSM]({osm_link})")
+        for i, c in enumerate(churches, 1):
+            with st.container():
+                col1, col2, col3 = st.columns([3, 1, 1])
+                with col1:
+                    st.subheader(f"{i}. {c.name}")
+                    if c.address:
+                        st.caption(f"📍 {c.address}")
+                    elif c.city:
+                        st.caption(f"📍 {c.city}{', ' + c.country if c.country else ''}")
+                with col2:
+                    if c.distance_km:
+                        st.metric("Distance", f"{c.distance_km:.1f} km")
+                with col3:
+                    gmaps = f"https://www.google.com/maps?q={c.latitude},{c.longitude}"
+                    st.markdown(f"[📍 Google Maps]({gmaps})")
 
-                    # ── Save to directory ─────────────────────────────────────
-                    _saved_key = f"dir_saved_{c.name}_{c.latitude}"
-                    if st.session_state.get(_saved_key):
-                        st.success("✅ Saved to parish directory", icon=None)
-                    else:
-                        if st.button(
-                            "➕ Save to our directory",
-                            key=f"save_{i}_{c.name}",
-                            type="secondary",
-                        ):
-                            from services.sheets import _save
-                            _record = {
-                                "form_type": "church_directory",
-                                "name": c.name,
-                                "address": getattr(c, "address", ""),
-                                "city": getattr(c, "city", city),
-                                "country": getattr(c, "country", country),
-                                "latitude": str(c.latitude),
-                                "longitude": str(c.longitude),
-                                "phone": getattr(c, "phone", ""),
-                                "website": getattr(c, "website", ""),
-                                "osm_id": str(getattr(c, "osm_id", "")),
-                                "source": "OSM Search",
-                            }
-                            ok = _save("church_directory", _record)
-                            st.session_state[_saved_key] = True
-                            if ok:
-                                st.success(f"✅ **{c.name}** added to directory sheet!")
-                            else:
-                                st.info("Saved for this session. Connect Sheets in Admin → Data for persistence.")
-                            st.rerun()
+                detail_cols = st.columns(3)
+                with detail_cols[0]:
+                    if c.phone:
+                        st.write(f"📞 {c.phone}")
+                with detail_cols[1]:
+                    if c.website:
+                        st.write(f"🌐 [{c.website[:30]}]({c.website})")
+                with detail_cols[2]:
+                    osm_link = f"https://www.openstreetmap.org/node/{c.osm_id}" if c.osm_id else None
+                    if osm_link:
+                        st.markdown(f"[🗺️ OSM]({osm_link})")
 
-                    st.divider()
+                # ── Save to directory ─────────────────────────────────────────
+                _saved_key = f"dir_saved_{c.name}_{c.latitude}"
+                if st.session_state.get(_saved_key):
+                    st.success("✅ Saved to parish directory", icon=None)
+                else:
+                    if st.button(
+                        "➕ Save to our directory",
+                        key=f"save_{i}_{c.name}",
+                        type="secondary",
+                    ):
+                        from services.sheets import _save
+                        _record = {
+                            "name": c.name,
+                            "address": getattr(c, "address", "") or "",
+                            "city": getattr(c, "city", _search_city) or _search_city,
+                            "country": getattr(c, "country", _search_country) or _search_country,
+                            "latitude": str(c.latitude),
+                            "longitude": str(c.longitude),
+                            "phone": getattr(c, "phone", "") or "",
+                            "website": getattr(c, "website", "") or "",
+                            "osm_id": str(getattr(c, "osm_id", "") or ""),
+                            "source": "OSM Search",
+                        }
+                        ok = _save("church_directory", _record)
+                        st.session_state[_saved_key] = True
+                        if ok:
+                            st.success(f"✅ **{c.name}** saved to the directory sheet!")
+                        else:
+                            st.warning(
+                                f"⚠️ **{c.name}** could not be saved to Sheets. "
+                                "Check that **SHEETS_ENDPOINT** is set in your Streamlit secrets "
+                                "(Admin → Data Management → connect Google Sheets)."
+                            )
+                        st.rerun()
+
+                st.divider()
 
 st.info("""
 **Data Source:** OpenStreetMap (crowdsourced, real-time)
