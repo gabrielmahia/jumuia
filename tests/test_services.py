@@ -355,3 +355,74 @@ def test_ussd_response_length():
         result = handle_ussd_session("len-test", "*384*1#", "+254700000000", text)
         prefix_len = 4  # "CON " or "END "
         assert len(result) <= 182 + prefix_len, f"Response too long for input '{text}': {len(result)} chars"
+
+
+# ── Magisterial Boundary Layer tests ──────────────────────────────────────────
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+def test_magisterial_classify_safe():
+    from services.magisterial import classify_query
+    r = classify_query("What time is Sunday Mass?")
+    assert r["sensitive"] is False
+    assert r["clergy_impersonation_risk"] is False
+
+def test_magisterial_classify_sensitive():
+    from services.magisterial import classify_query
+    r = classify_query("Is contraception allowed?")
+    assert r["sensitive"] is True
+    assert r["requires_deference"] is True
+
+def test_magisterial_clergy_impersonation():
+    from services.magisterial import classify_query
+    r = classify_query("I absolve you of your sins")
+    assert r["clergy_impersonation_risk"] is True
+
+def test_magisterial_post_process_clean():
+    from services.magisterial import post_process
+    resp, ok = post_process("The Church teaches that prayer is important.")
+    assert ok is True
+
+def test_magisterial_post_process_violation():
+    from services.magisterial import post_process
+    resp, ok = post_process("I absolve you and grant you penance.")
+    assert ok is False
+    assert "priest" in resp.lower()
+
+def test_magisterial_build_system_prompt():
+    from services.magisterial import build_system_prompt
+    prompt = build_system_prompt("Swahili", "serving St. Peter's, Nairobi")
+    assert "Swahili" in prompt
+    assert "Nairobi" in prompt
+    assert "absolve" in prompt.lower() or "clergy" in prompt.lower()
+
+def test_magisterial_ccc_hint():
+    from services.magisterial import ccc_hint
+    hint = ccc_hint("baptism")
+    assert "CCC" in hint
+    assert ccc_hint("unknowntopic") == ""
+
+# ── Roles tests ────────────────────────────────────────────────────────────────
+def test_roles_rank_ordering():
+    from services.roles import _rank
+    assert _rank("parishioner") < _rank("catechist")
+    assert _rank("catechist") < _rank("coordinator")
+    assert _rank("coordinator") < _rank("priest")
+    assert _rank("priest") < _rank("diocese_admin")
+
+def test_roles_unknown_role_defaults_to_zero():
+    from services.roles import _rank
+    assert _rank("unknown_role") == 0
+
+def test_roles_is_at_least():
+    from services.roles import _rank
+    # Pure rank logic — no Streamlit runtime required
+    assert _rank("coordinator") >= _rank("catechist")
+    assert _rank("catechist") >= _rank("parishioner")
+    assert _rank("diocese_admin") > _rank("coordinator")
+
+def test_roles_all_roles_have_labels():
+    from services.roles import ROLES, ROLE_LABELS, ROLE_ICONS
+    for role in ROLES:
+        assert role in ROLE_LABELS, f"Missing label for {role}"
+        assert role in ROLE_ICONS, f"Missing icon for {role}"

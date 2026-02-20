@@ -6,6 +6,8 @@ A complete spiritual OS for parishes worldwide.
 import streamlit as st
 from services.i18n import lang_selector
 from services.parish_identity import sidebar_widget as _parish_widget
+from services.roles import sidebar_role_badge as _role_badge
+from services.privacy import privacy_sidebar_widget as _privacy_widget
 
 st.set_page_config(
     page_title="Catholic Parish Steward",
@@ -18,6 +20,23 @@ st.set_page_config(
 try:
     from services.theme import inject as _inject_theme
     _inject_theme()
+except Exception:
+    pass
+
+# ── Settings-driven accessibility ─────────────────────────────────────────────
+try:
+    from services.settings import get as _get_setting, init as _init_settings
+    _init_settings()
+    _css_overrides = []
+    if _get_setting("large_text"):
+        _css_overrides.append("html { font-size: 120% !important; }")
+    if _get_setting("text_only"):
+        _css_overrides.append(
+            "[data-testid='stPlotlyChart'], [data-testid='stVegaLiteChart'], "
+            ".element-container img { display: none !important; }"
+        )
+    if _css_overrides:
+        st.markdown(f"<style>{'  '.join(_css_overrides)}</style>", unsafe_allow_html=True)
 except Exception:
     pass
 
@@ -46,6 +65,7 @@ justice     = st.Page("pages/_03_Justice_Network.py",          title="Justice & 
 accountability = st.Page("pages/_04_Accountability.py",        title="Transparency",    icon="📋")
 diaspora    = st.Page("pages/_05_Diaspora.py",                 title="Global Diaspora",  icon="🌏")
 ussd_guide  = st.Page("pages/_16_USSD_Setup.py",         title="Set Up USSD",       icon="📱")
+settings_pg = st.Page("pages/15_Settings.py",               title="Settings",          icon="⚙️")
 admin       = st.Page("pages/_15_Admin_Data.py",               title="Admin & Data",      icon="📁")
 
 pg = st.navigation(
@@ -53,15 +73,16 @@ pg = st.navigation(
         "": [home],
         "For Parishioners": [find_church, prayers, assistant],
         "Parish Coordinators": [sacraments, sccs, catechist, pastoral, formation, giving],
-        "More Tools": [liturgy, ecosystem, justice, accountability, diaspora, admin, ussd_guide],
+        "More Tools": [liturgy, ecosystem, justice, accountability, diaspora, admin, ussd_guide, settings_pg],
     },
     position="sidebar",
     expanded=False,
 )
 
-# ── Parish identity + language selector ──────────────────────────────────────
+# ── Parish identity, role badge + language selector ──────────────────────────
 with st.sidebar:
     _parish_widget()
+    _role_badge()
     lang_selector()
 
 # ── Sidebar footer ────────────────────────────────────────────────────────────

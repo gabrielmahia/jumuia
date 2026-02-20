@@ -9,6 +9,10 @@ Demo fallback: pre-written responses serve visitors when the key is restricted.
 import os
 import time
 import logging
+try:
+    from services import magisterial as _mag
+except Exception:
+    _mag = None
 import json
 import urllib.request
 import urllib.error
@@ -331,19 +335,29 @@ def generate_parish_insights(parish_data, insight_type="community_summary"):
     except Exception:
         return {"success": False, "insights": "", "error": "unavailable", "message": _MSG["unavailable"]}
 
-_BOT_SYSTEM = (
-    "You are a helpful, warm assistant for a Catholic parish. "
-    "Help with: Mass times, sacraments, liturgical calendar, Catholic traditions, parish services. "
-    "Do NOT provide pastoral counseling — refer those to the parish priest. Max 3 sentences."
-)
-
 def bot_respond(user_message, conversation_history, language_code="en"):
     lang = SUPPORTED_LANGUAGES.get(language_code, "English")
+
+    # §3 Magisterial Boundary Layer — classify before sending to model
+    try:
+        from services import magisterial as _mag
+        classification = _mag.classify_query(user_message)
+        if classification["sensitive"]:
+            _mag.log_sensitive(user_message[:30] + "...", classification)
+        system = _mag.build_system_prompt(lang)
+    except Exception:
+        system = (
+            "You are a helpful, warm assistant for a Catholic parish. "
+            "Help with: Mass times, sacraments, liturgical calendar, Catholic traditions. "
+            "Do NOT provide pastoral counseling — refer those to the parish priest. "
+            f"Always respond in {lang}."
+        )
+
     history = "".join(
         f"{'You' if m['role']=='user' else 'Assistant'}: {m['content']}\n"
         for m in (conversation_history or [])[-6:]
     )
-    prompt = (f"{_BOT_SYSTEM}\nAlways respond in {lang}.\n\n"
+    prompt = (f"{system}\n\n"
               + (f"Previous:\n{history}\n" if history else "")
               + f"User: {user_message}\n\nAssistant:")
     try:

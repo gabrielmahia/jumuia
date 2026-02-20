@@ -10,6 +10,12 @@ except Exception:
 from datetime import date
 
 st.set_page_config(page_title="Sacraments", page_icon="✝️", layout="wide")
+try:
+    from services.roles import require_role as _require_role
+    _require_role("coordinator", "Sacramental Records")
+except Exception:
+    pass
+
 
 st.title("✝️ Sacramental Records")
 st.caption("Complete record-keeping for all 7 sacraments · Real-world fields")

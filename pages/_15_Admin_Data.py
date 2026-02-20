@@ -5,6 +5,12 @@ import pandas as pd
 from datetime import datetime
 
 st.set_page_config(page_title="Admin — Data Management", page_icon="⚙️", layout="wide")
+try:
+    from services.roles import require_role as _require_role
+    _require_role("coordinator", "Admin & Data")
+except Exception:
+    pass
+
 
 st.title("⚙️ Admin — Data Management")
 st.caption("Bulk import/export · CSV/Excel · Session data · Backup & restore")
@@ -107,7 +113,20 @@ with tab2:
                 else:
                     existing = st.session_state.get(target_key, [])
                     st.session_state[target_key] = existing + records
-                st.success(f"✅ {len(records)} records imported into {target_key}.")
+                # Persist to Sheets
+                _saved_count = 0
+                try:
+                    from services.sheets import _save as _sheets_save
+                    from services.parish_identity import inject_into_record as _enrich
+                    for _rec in records:
+                        if _sheets_save(target_key, _enrich(_rec)):
+                            _saved_count += 1
+                except Exception:
+                    pass
+                if _saved_count:
+                    st.success(f"✅ {len(records)} records imported · {_saved_count} saved to Sheets")
+                else:
+                    st.success(f"✅ {len(records)} records imported into {target_key} (session only)")
         except Exception:
             st.error("The file could not be read. Please check that it is a valid CSV file and try again.")
 

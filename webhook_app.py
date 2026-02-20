@@ -40,6 +40,35 @@ from services.mpesa_service import handle_callback, init_giving_db
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+# ─────────────────────────────────────────────
+# RATE LIMITING — in-memory token bucket
+# Spec §8: rate limiting required. No external dependency.
+# ─────────────────────────────────────────────
+import time
+import threading
+from collections import defaultdict
+
+_rl_lock = threading.Lock()
+_rl_buckets: dict = defaultdict(lambda: {"tokens": 10, "last": time.monotonic()})
+_RL_CAPACITY = 10       # max requests per burst
+_RL_RATE = 1.0          # tokens refilled per second
+_RL_USSD_CAPACITY = 30  # USSD needs higher burst (menu traversal)
+
+
+def _rate_check(key: str, capacity: int = _RL_CAPACITY) -> bool:
+    """Token bucket check. Returns True if request is allowed."""
+    now = time.monotonic()
+    with _rl_lock:
+        bucket = _rl_buckets[key]
+        elapsed = now - bucket["last"]
+        bucket["tokens"] = min(capacity, bucket["tokens"] + elapsed * _RL_RATE)
+        bucket["last"] = now
+        if bucket["tokens"] >= 1:
+            bucket["tokens"] -= 1
+            return True
+        return False
+
+
 
 WEBHOOK_SECRET = os.getenv("WEBHOOK_SECRET", "")  # Optional: add to AT/Twilio for verification
 
@@ -98,9 +127,27 @@ async def whatsapp_at_webhook(request: Request):
     Register this URL in AT dashboard → WhatsApp → Callback URL.
     """
     try:
-        payload = await request.json()
-        logger.info("AT WhatsApp inbound: %s", payload)
+        # Rate limit by client IP
+        client_ip = request.client.host if request.client else "unknown"
+        if not _rate_check(f"whatsapp_at:{client_ip}"):
+            logger.warning("Rate limit: AT WhatsApp %s", client_ip)
+            raise HTTPException(status_code=429, detail="Rate limit exceeded")
 
+        # Signature verification when WEBHOOK_SECRET is configured
+        if WEBHOOK_SECRET:
+            import hmac as _hmac
+            import hashlib
+            raw_body = await request.body()
+            sig = request.headers.get("X-AT-Signature", "")
+            expected = _hmac.new(WEBHOOK_SECRET.encode(), raw_body, hashlib.sha256).hexdigest()
+            if not _hmac.compare_digest(sig, expected):
+                logger.warning("Invalid AT webhook signature from %s", client_ip)
+                raise HTTPException(status_code=403, detail="Invalid signature")
+            payload = __import__("json").loads(raw_body)
+        else:
+            payload = await request.json()
+
+        logger.info("AT WhatsApp inbound: %s", payload)
         parsed = parse_at_inbound(payload)
         if not parsed or not parsed.get("message"):
             return JSONResponse({"status": "ignored", "reason": "empty_message"})
@@ -228,6 +275,12 @@ async def ussd_webhook(request: Request):
         service_code = form.get("serviceCode", "")
         phone        = form.get("phoneNumber", "")
         text         = form.get("text", "")
+
+        # Rate limit by phone (USSD bursts are legitimate during menu nav)
+        if not _rate_check(f"ussd:{phone or 'anon'}", _RL_USSD_CAPACITY):
+            from fastapi.responses import PlainTextResponse as _PR
+            logger.warning("USSD rate limit: phone=%s", phone)
+            return _PR(content="END Service is busy. Please try again in a moment.")
 
         logger.info("USSD: phone=%s text='%s'", phone, text)
 

@@ -9,6 +9,12 @@ except Exception:
 from datetime import date
 
 st.set_page_config(page_title="Pastoral Care", page_icon="🤝", layout="wide")
+try:
+    from services.roles import require_role as _require_role
+    _require_role("coordinator", "Pastoral Care")
+except Exception:
+    pass
+
 
 st.title("🤝 Pastoral Care")
 st.caption("Homebound visits · Grief support · Mentorship · New member integration")

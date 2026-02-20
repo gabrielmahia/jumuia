@@ -8,6 +8,12 @@ except Exception:
     def show_save_status(x, y=None): pass
 
 st.set_page_config(page_title="SCCs — Catholic Network Tools", page_icon="👥", layout="wide")
+try:
+    from services.roles import require_role as _require_role
+    _require_role("catechist", "Small Christian Communities")
+except Exception:
+    pass
+
 
 st.title("👥 Small Christian Communities (SCCs)")
 st.caption("The backbone of African Catholicism · Est. AMECEA 1973 · 45,000+ SCCs in Kenya alone")
