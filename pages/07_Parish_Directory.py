@@ -108,7 +108,7 @@ def search_churches_by_place(geo: dict, max_results=20) -> list:
 (
   node["amenity"="place_of_worship"]["denomination"~"catholic",i]({s},{w},{n},{e});
   way["amenity"="place_of_worship"]["denomination"~"catholic",i]({s},{w},{n},{e});
-  node["amenity"="place_of_worship"]["religion"="christian"]["name"~"catholic|saint|holy|our lady|blessed|sacred heart",i]({s},{w},{n},{e});
+  node["amenity"="place_of_worship"]["religion"="christian"]["name"~"catholic|saint|holy|our lady|blessed|sacred heart|katolsk|katolska|catolica|católica|eglise|église|cattolica|katolik",i]({s},{w},{n},{e});
 );
 out body {max_results};
 """

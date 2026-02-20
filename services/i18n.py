@@ -39,6 +39,7 @@ LANGUAGES = {
     "it": "Italiano",
     "ar": "العربية",
     "lg": "Luganda",
+    "sv": "Svenska",
 }
 
 # ── Translation strings ───────────────────────────────────────────────────────
@@ -59,6 +60,7 @@ STRINGS: dict[str, dict[str, str]] = {
         "it": "Per i Parrocchiani",
         "ar": "للمؤمنين",
         "lg": "Ababiri b'ekkanisa",
+        "sv": "För församlingsbor",
     },
     "nav_coordinators": {
         "en": "Parish Coordinators",
@@ -73,6 +75,7 @@ STRINGS: dict[str, dict[str, str]] = {
         "it": "Coordinatori",
         "ar": "منسقو الرعية",
         "lg": "Abakulembeze",
+        "sv": "Församlingskoordinatorer",
     },
     "nav_more": {
         "en": "More Tools",
@@ -87,6 +90,7 @@ STRINGS: dict[str, dict[str, str]] = {
         "it": "Altri Strumenti",
         "ar": "أدوات إضافية",
         "lg": "Ebikozesebwa ebirala",
+        "sv": "Fler verktyg",
     },
 
     # ── Page titles ───────────────────────────────────────────────────────────
@@ -103,6 +107,7 @@ STRINGS: dict[str, dict[str, str]] = {
         "it": "Trova una Chiesa",
         "ar": "ابحث عن كنيسة",
         "lg": "Nonya Ekkanisa",
+        "sv": "Hitta en kyrka",
     },
     "daily_prayers": {
         "en": "Daily Prayers",
@@ -117,6 +122,7 @@ STRINGS: dict[str, dict[str, str]] = {
         "it": "Preghiere Quotidiane",
         "ar": "الصلوات اليومية",
         "lg": "Okusaba olwa buli lunaku",
+        "sv": "Dagliga böner",
     },
     "ai_assistant": {
         "en": "AI Assistant",
@@ -131,6 +137,7 @@ STRINGS: dict[str, dict[str, str]] = {
         "it": "Assistente IA",
         "ar": "المساعد الذكي",
         "lg": "Omuyambi wa AI",
+        "sv": "AI-assistent",
     },
 
     # ── Home page ─────────────────────────────────────────────────────────────
@@ -168,11 +175,13 @@ STRINGS: dict[str, dict[str, str]] = {
         "en": "Search", "es": "Buscar", "pt": "Pesquisar", "fr": "Rechercher",
         "sw": "Tafuta", "tl": "Maghanap", "ig": "Chọọ", "hi": "खोजें",
         "pl": "Szukaj", "it": "Cerca", "ar": "بحث", "lg": "Noonya",
+        "sv": "Sök",
     },
     "save": {
         "en": "Save", "es": "Guardar", "pt": "Salvar", "fr": "Enregistrer",
         "sw": "Hifadhi", "tl": "I-save", "ig": "Chekwaa", "hi": "सहेजें",
         "pl": "Zapisz", "it": "Salva", "ar": "حفظ", "lg": "Tereka",
+        "sv": "Spara",
     },
     "close": {
         "en": "Close", "es": "Cerrar", "pt": "Fechar", "fr": "Fermer",
@@ -183,6 +192,7 @@ STRINGS: dict[str, dict[str, str]] = {
         "en": "Today", "es": "Hoy", "pt": "Hoje", "fr": "Aujourd'hui",
         "sw": "Leo", "tl": "Ngayon", "ig": "Taa", "hi": "आज",
         "pl": "Dziś", "it": "Oggi", "ar": "اليوم", "lg": "Leero",
+        "sv": "Idag",
     },
 
     # ── USSD footer ───────────────────────────────────────────────────────────
@@ -199,6 +209,7 @@ STRINGS: dict[str, dict[str, str]] = {
         "it": "Accesso da telefono base",
         "ar": "وصول عبر الهاتف العادي",
         "lg": "Okukozesa simu enyangu",
+        "sv": "Grundtelefonåtkomst",
     },
     "ussd_hint": {
         "en": "Available once your diocese registers with Africa's Talking. See More Tools → Set Up USSD",
@@ -213,6 +224,7 @@ STRINGS: dict[str, dict[str, str]] = {
         "it": "Disponibile quando la diocesi si registra con Africa's Talking.",
         "ar": "متاح عند تسجيل أبرشيتك مع Africa's Talking.",
         "lg": "Ejja ng'edayosizi yo egyegamba ne Africa's Talking.",
+        "sv": "Tillgänglig när din stift registrerar sig hos Africa's Talking.",
     },
 }
 
