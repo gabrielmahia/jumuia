@@ -64,7 +64,7 @@ for camp in campaigns:
             st.metric("Parishes", camp["parishes"])
             st.metric("People", f"{camp['workers']:,}")
         with col3:
-            if st.button(f"Join Campaign", key=f"join_{camp['name'][:10]}"):
+            if st.button("Join Campaign", key=f"join_{camp['name'][:10]}"):
                 st.success("✅ You've joined! You'll receive action alerts and coordination updates.")
         st.divider()
 

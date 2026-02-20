@@ -46,7 +46,7 @@ if search_btn:
             try:
                 from gospelmap.church_search import search_by_city
                 churches = search_by_city(city.strip(), country.strip() or None, limit=15)
-            except Exception as e:
+            except Exception:
                 churches = []
                 st.warning("Search is not available right now. Please check your connection and try again.")
 

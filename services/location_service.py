@@ -5,8 +5,6 @@ Free — no API key required (ip-api.com, 45 requests/minute limit).
 Results cached per session (no repeat calls).
 """
 import requests
-from typing import Optional
-from functools import lru_cache
 
 # Currency symbols and formatting
 CURRENCY_SYMBOLS: dict[str, str] = {

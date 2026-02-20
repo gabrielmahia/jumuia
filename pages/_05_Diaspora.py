@@ -68,7 +68,7 @@ if st.button("🔍 Find My Community", type="primary"):
             try:
                 from gospelmap.church_search import search_by_city
                 churches = search_by_city(your_city.strip(), your_country.strip() or None, limit=12)
-            except Exception as e:
+            except Exception:
                 churches = []
                 st.warning("Search is not available right now. Please try again shortly.")
 

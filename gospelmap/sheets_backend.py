@@ -17,7 +17,10 @@ Without SHEETS_ENDPOINT: submissions succeed in-session only (no data loss
 for the user, but nothing persists across sessions).
 """
 
-import json, urllib.request, urllib.error, logging
+import json
+import urllib.request
+import urllib.error
+import logging
 import streamlit as st
 from datetime import datetime
 from typing import Optional
