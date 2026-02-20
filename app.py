@@ -71,6 +71,7 @@ with st.sidebar:
 </div>
 """, unsafe_allow_html=True)
 
+lang_selector()
 # sidebar collapse button icon left as Streamlit default
 
 pg.run()
