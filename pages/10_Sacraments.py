@@ -250,11 +250,16 @@ with tabs[4]:
                 general_absolution = st.checkbox("General absolution given (exceptional circumstances)")
 
             if st.form_submit_button("Record Statistics", type="primary"):
-                st.session_state.sacrament_records["reconciliation"].append({
+                from services.sheets import _save
+                _rec = {
+                    "form_type": "sacrament_reconciliation",
                     "Period": period, "Penitents": total_penitents,
                     "Confessors": confessors, "Sessions": sessions,
-                })
-                st.success("✅ Statistics recorded.")
+                    "General Absolution": general_absolution,
+                }
+                st.session_state.sacrament_records["reconciliation"].append(_rec)
+                _ok = _save("sacrament_reconciliation", _rec)
+                show_save_status("sacrament_reconciliation", _ok)
 
 # ── HOLY ORDERS / RELIGIOUS VOWS ─────────────────────────────────────────────
 with tabs[5]:

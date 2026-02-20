@@ -82,10 +82,18 @@ with tab1:
                 ["None", "Anointing of the Sick", "Reconciliation", "Viaticum"])
             observation = st.text_area("Pastoral observation / follow-up needed", height=70)
             if st.form_submit_button("Record Visit", type="primary"):
-                for p in st.session_state.homebound:
-                    if p["Name"] == visited:
-                        p["Last Visit"] = str(visit_date)
-                st.success(f"✅ Visit to {visited} on {visit_date} recorded.")
+                from services.sheets import _save
+                for _p in st.session_state.homebound:
+                    if _p["Name"] == visited:
+                        _p["Last Visit"] = str(visit_date)
+                _visit = {
+                    "form_type": "pastoral_visit",
+                    "Person": visited, "Visit Date": str(visit_date),
+                    "Communion Given": communion_given,
+                    "Sacrament": sacrament, "Observation": observation,
+                }
+                _ok = _save("pastoral_visit", _visit)
+                show_save_status("pastoral_visit", _ok)
 
 # ── GRIEF ─────────────────────────────────────────────────────────────────────
 with tab2:
@@ -171,13 +179,17 @@ with tab3:
             status = st.selectbox("Status", ["Active", "Completed", "On Hold"])
 
             if st.form_submit_button("🤝 Create Pair", type="primary") and mentor and mentee:
-                st.session_state.mentors.append({
+                from services.sheets import _save
+                _pair = {
+                    "form_type": "pastoral_mentorship",
                     "Mentor": mentor, "Mentor Phone": mentor_phone,
                     "Mentee": mentee, "Mentee Phone": mentee_phone,
                     "Focus": focus, "Frequency": frequency,
                     "Start Date": str(start), "Status": status,
-                })
-                st.success(f"✅ Mentorship pair {mentor} ↔ {mentee} created.")
+                }
+                st.session_state.mentors.append(_pair)
+                _ok = _save("pastoral_mentorship", _pair)
+                show_save_status("pastoral_mentorship", _ok)
 
 # ── NEW MEMBERS ───────────────────────────────────────────────────────────────
 with tab4:
@@ -210,12 +222,16 @@ with tab4:
 
             notes = st.text_area("Notes")
             if st.form_submit_button("🆕 Register", type="primary") and name:
-                st.session_state.new_members.append({
+                from services.sheets import _save
+                _nm = {
+                    "form_type": "pastoral_new_member",
                     "Name": name, "Phone": phone, "Email": email,
                     "Joined": str(joined), "How Connected": how,
                     "SCC": scc, "Sponsor": sponsor, "Follow-up": followup, "Notes": notes,
-                })
-                st.success(f"✅ {name} registered as new member.")
+                }
+                st.session_state.new_members.append(_nm)
+                _ok = _save("pastoral_new_member", _nm)
+                show_save_status("pastoral_new_member", _ok)
 
 st.divider()
 c1, c2, c3, c4 = st.columns(4)
