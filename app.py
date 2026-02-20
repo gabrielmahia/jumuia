@@ -66,12 +66,8 @@ with st.sidebar:
        letter-spacing:0.08em;margin-bottom:0.25rem;">Basic phone access</div>
   <div style="font-family:monospace;font-size:1.1rem;color:white;font-weight:600;">*384*248724#</div>
   <div style="font-size:0.65rem;color:rgba(255,255,255,0.5);margin-top:0.25rem;line-height:1.4;">
-    Available once your diocese<br>registers with Africa's Talking
+    Available once your diocese<br>registers with Africa's Talking.<br>See <em>More Tools → Set Up USSD</em>
   </div>
-  <a href="/Set_Up_USSD" target="_self" style="display:inline-block;margin-top:0.4rem;
-     font-size:0.65rem;color:rgba(201,168,76,0.8);text-decoration:none;">
-    How to activate →
-  </a>
 </div>
 """, unsafe_allow_html=True)
 
