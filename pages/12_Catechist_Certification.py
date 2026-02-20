@@ -30,15 +30,34 @@ MINISTRY_AREAS = [
 
 if "catechists" not in st.session_state:
     st.session_state.catechists = [
-        {"Name": "Agnes Wanjiku", "Email": "agnes@example.com", "Phone": "+254711111",
+        {"Name": "Agnes Wanjiku Muthoni", "Email": "agnes.muthoni@stjoserph.ac.ke", "Phone": "+254711234567",
          "Level": "Advanced", "Ministry": "Sacramental Preparation (Children)",
-         "Start Date": "2022-01-15", "Hours Completed": 95, "Hours Required": 120,
-         "Status": "In Progress", "Background Check": True, "Renewal Due": "2025-01-15", "Notes": ""},
-        {"Name": "Peter Otieno", "Email": "peter@example.com", "Phone": "+254722222",
+         "Start Date": "2022-03-01", "Hours Completed": 110, "Hours Required": 120,
+         "Status": "In Progress", "Background Check": True, "Renewal Due": "2026-03-15", "Notes": "Teaching First Communion class, Rongai"},
+        {"Name": "Peter Otieno Odhiambo", "Email": "", "Phone": "+254722987654",
          "Level": "Basic", "Ministry": "RCIA (Adult Formation)",
-         "Start Date": "2023-03-10", "Hours Completed": 48, "Hours Required": 48,
-         "Status": "Certified", "Background Check": True, "Renewal Due": "2026-03-10", "Notes": ""},
+         "Start Date": "2021-09-10", "Hours Completed": 48, "Hours Required": 48,
+         "Status": "Renewal Due", "Background Check": True, "Renewal Due": "2026-03-30", "Notes": "Renewal due — contact by end of month"},
+        {"Name": "Sr. Consolata Akinyi", "Email": "c.akinyi@consolata.org", "Phone": "+254733456789",
+         "Level": "Master Catechist", "Ministry": "Adult Faith Formation",
+         "Start Date": "2019-01-20", "Hours Completed": 180, "Hours Required": 180,
+         "Status": "Certified", "Background Check": True, "Renewal Due": "2027-01-20", "Notes": "Also coordinates Kiswahili liturgy group"},
+        {"Name": "James Kamau Njoroge", "Email": "", "Phone": "+254700112233",
+         "Level": "Intermediate", "Ministry": "Youth Ministry",
+         "Start Date": "2023-06-01", "Hours Completed": 55, "Hours Required": 80,
+         "Status": "In Progress", "Background Check": False, "Renewal Due": "2026-06-01", "Notes": "Background check pending — remind Fr. Daniel"},
+        {"Name": "Mary Wairimu Gitau", "Email": "wairimu.gitau@gmail.com", "Phone": "+254755667788",
+         "Level": "Basic", "Ministry": "Special Needs Ministry",
+         "Start Date": "2024-01-10", "Hours Completed": 48, "Hours Required": 48,
+         "Status": "Certified", "Background Check": True, "Renewal Due": "2027-01-10", "Notes": "Works with deaf community, St Austin's"},
     ]
+
+# Demo notice
+st.info(
+    "**Demo mode** — Sample catechists shown. Your real data will be saved to your "
+    "parish Google Sheet once connected. Changes here are session-only.",
+    icon="ℹ️"
+)
 
 tab1, tab2, tab3 = st.tabs(["👥 Catechist Register", "📊 Analytics & Renewals", "📋 Training Log"])
 
@@ -143,7 +162,8 @@ with tab2:
 
     # Level breakdown
     if st.session_state.catechists:
-        import plotly.express as px, pandas as pd
+        import plotly.express as px
+        import pandas as pd
         df = pd.DataFrame(st.session_state.catechists)
         fig = px.pie(df, names="Level", title="Catechists by Certification Level")
         fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
