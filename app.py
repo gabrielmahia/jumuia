@@ -75,17 +75,6 @@ with st.sidebar:
 </div>
 """, unsafe_allow_html=True)
 
-# ── Fix broken keyboard_double_arrow_left text in sidebar button ─────────────
-st.markdown("""
-<style>
-/* Nuke the broken ligature text — button remains clickable */
-[data-testid="collapsedControl"] { overflow: hidden; width: 2rem; }
-[data-testid="collapsedControl"] span { display: none !important; }
-[data-testid="baseButton-header"] span { display: none !important; }
-/* Add a clean visual indicator so it's obvious it's a toggle */
-[data-testid="collapsedControl"]::before { content: "☰"; font-size: 1.1rem; }
-[data-testid="baseButton-header"]::before { content: "✕"; font-size: 1rem; }
-</style>
-""", unsafe_allow_html=True)
+# sidebar collapse button icon left as Streamlit default
 
 pg.run()
