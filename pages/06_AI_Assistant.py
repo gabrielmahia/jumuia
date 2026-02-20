@@ -107,11 +107,14 @@ def _safe_gen(prompt, api_key, primary_model):
     return False, "quota"  # all models exhausted
 
 _DEMO = [
-    (["what are you","who are you"], "I'm the Catholic Parish Steward AI assistant — here to help with Mass times, sacraments, the liturgical calendar, and translating parish announcements. For pastoral counseling, please speak with your priest."),
-    (["mass","misa"], "Mass times vary by parish. Use the Parish Directory to find your local church and its schedule. Most parishes in East Africa have Sunday Masses at 7am, 9am, and 11am."),
-    (["rosary","rozari"], "The Rosary is prayed on five mysteries depending on the day: Joyful (Mon/Sat), Luminous (Thu), Sorrowful (Tue/Fri), Glorious (Wed/Sun). Visit the Daily Prayers page for the full guided Rosary."),
-    (["sacr"], "The seven sacraments are Baptism, Confirmation, Eucharist, Reconciliation, Anointing of the Sick, Holy Orders, and Matrimony. Your parish coordinator can help you prepare for any sacrament."),
-    (["hello","hi","jambo","habari"], "Hello! I'm here to help with parish questions — Mass times, sacraments, liturgical calendar, or translations. How can I help you?"),
+    (["what are you","who are you"], "I'm the Catholic Parish Steward assistant — here to help with Mass times, sacraments, the liturgical calendar, prayers, and parish questions in any language. For pastoral counseling, please speak with your priest or deacon."),
+    (["mass","misa","messe","misa","mass time","when is mass"], "Mass times vary by parish. Use the Find a Church page to locate your nearest church and its schedule. Mass schedules vary widely by parish — use the Find a Church page to locate your nearest church and its times."),
+    (["rosary","rozari","chapelet","rosário"], "The Rosary is prayed on five mysteries depending on the day: Joyful (Mon/Sat), Luminous (Thu), Sorrowful (Tue/Fri), Glorious (Wed/Sun). Visit the Daily Prayers page for the full guided Rosary."),
+    (["sacr","bapti","confirm","euchar","reconcil","confession","anointing","marriage"], "The seven sacraments are Baptism, Confirmation, Eucharist, Reconciliation, Anointing of the Sick, Holy Orders, and Matrimony. Your parish coordinator can help you prepare for any sacrament."),
+    (["lent","advent","easter","christmas","season","liturgi"], "The liturgical year moves through Advent, Christmas, Ordinary Time, Lent, and Easter. The Daily Prayers page shows today's season and scripture readings."),
+    (["pray","prayer","petition","intercession"], "The Daily Prayers page has the Rosary, Divine Mercy Chaplet, Stations of the Cross, and daily scripture readings. Prayer intentions can also be shared with your SCC or parish community."),
+    (["hello","hi","jambo","habari","hola","bonjour","ciao","oi","kumusta"], "Hello! I'm here to help with parish questions — Mass times, sacraments, liturgical calendar, prayers, or translations. How can I help you today?"),
+    (["thank","asante","gracias","merci","obrigado"], "You are welcome. May God bless you and your parish community."),
 ]
 
 def _demo(msg):

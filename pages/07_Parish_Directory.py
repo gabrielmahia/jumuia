@@ -28,13 +28,13 @@ if "confirmed_parishes" not in st.session_state:
          "diocese": "Nairobi", "address": "City Square, Nairobi", "phone": "+254 20 222 4861",
          "mass_times": "Sun: 7am, 9am, 11am, 6pm | Mon–Sat: 6:30am, 12:15pm",
          "verified": True, "confirmations": 12, "added": "2024-01-01"},
-        {"id": 2, "name": "Consolata Shrine", "city": "Nairobi", "country": "Kenya",
-         "diocese": "Nairobi", "address": "Waiyaki Way, Westlands, Nairobi", "phone": "+254 20 444 4444",
-         "mass_times": "Sun: 7am, 9am, 11am, 5pm | Daily: 6:30am",
-         "verified": True, "confirmations": 9, "added": "2024-01-10"},
-        {"id": 3, "name": "St. Austin's Parish", "city": "Nairobi", "country": "Kenya",
-         "diocese": "Nairobi", "address": "Ngong Rd, Nairobi", "phone": "+254 20 387 5000",
-         "mass_times": "Sun: 7am, 9am, 11am, 5pm | Daily: 6:30am",
+        {"id": 2, "name": "Our Lady of Perpetual Help", "city": "Cebu City", "country": "Philippines",
+         "diocese": "Cebu", "address": "Osmeña Blvd, Cebu City", "phone": "+63 32 253 9394",
+         "mass_times": "Sun: 6am, 8am, 10am, 12pm, 6pm | Daily: 6am, 6pm",
+         "verified": True, "confirmations": 7, "added": "2024-01-15"},
+        {"id": 3, "name": "Igreja Nossa Senhora da Consolação", "city": "São Paulo", "country": "Brazil",
+         "diocese": "São Paulo", "address": "Rua da Consolação, São Paulo", "phone": "+55 11 3256 0144",
+         "mass_times": "Dom: 8h, 10h, 12h, 19h | Seg–Sex: 7h, 12h, 19h",
          "verified": True, "confirmations": 8, "added": "2024-01-15"},
         {"id": 4, "name": "All Saints Catholic Church", "city": "Manassas", "country": "USA",
          "diocese": "Arlington", "address": "Stonewall Road, Manassas VA",
@@ -69,23 +69,48 @@ def _overpass(query: str, timeout=30) -> list:
         return json.loads(r.read().decode("utf-8")).get("elements", [])
 
 def geocode_place(place_name: str) -> dict | None:
-    """Convert a place name to coordinates + bounding box via Nominatim."""
+    """Convert a place name to coordinates + bounding box via Nominatim.
+    Prefers administrative/settlement results over water features."""
     encoded = urllib.parse.quote(place_name)
+    # Try with limit=5 so we can pick the best result
     url = (f"https://nominatim.openstreetmap.org/search"
-           f"?q={encoded}&format=json&limit=1&addressdetails=1")
+           f"?q={encoded}&format=json&limit=5&addressdetails=1")
     try:
         results = _http_get(url, timeout=10)
-        if results:
-            r = results[0]
-            bb = r.get("boundingbox", [])
-            return {
-                "display_name": r.get("display_name", place_name),
-                "lat": float(r["lat"]),
-                "lon": float(r["lon"]),
-                "s": float(bb[0]), "n": float(bb[1]),
-                "w": float(bb[2]), "e": float(bb[3]),
-                "type": r.get("type", ""),
-            }
+        if not results:
+            return None
+        # Prefer administrative/place results over water/natural features
+        preferred_classes = {"boundary", "place"}
+        preferred_types = {"city", "town", "village", "suburb", "county",
+                           "state", "administrative", "municipality", "region"}
+        bad_classes = {"waterway", "water", "natural"}
+        r = None
+        for candidate in results:
+            cls = candidate.get("class", "")
+            typ = candidate.get("type", "")
+            if cls in bad_classes:
+                continue
+            if cls in preferred_classes or typ in preferred_types:
+                r = candidate
+                break
+        if r is None:
+            r = results[0]  # fall back to first result
+        bb = r.get("boundingbox", [])
+        if not bb or len(bb) < 4:
+            return None
+        lat, lon = float(r["lat"]), float(r["lon"])
+        s, n, w, e = float(bb[0]), float(bb[1]), float(bb[2]), float(bb[3])
+        # Cap very large bounding boxes — use radius around centroid instead
+        lat_span, lon_span = n - s, e - w
+        if lat_span > 1.5 or lon_span > 1.5:
+            pad = 0.25  # ~28km radius — enough for a city
+            s, n, w, e = lat - pad, lat + pad, lon - pad, lon + pad
+        return {
+            "display_name": r.get("display_name", place_name),
+            "lat": lat, "lon": lon,
+            "s": s, "n": n, "w": w, "e": e,
+            "type": r.get("type", ""),
+        }
     except Exception:
         pass
     return None
@@ -383,9 +408,10 @@ with tab1:
                 elif "name_search" in osm_errors:
                     tip = "Try a simpler name — e.g. just 'Consolata' or 'Sacred Heart'."
                 st.info(
-                    "No churches found in OpenStreetMap for this search. "
-                    f"{tip} Not all rural churches are mapped yet — "
-                    "you can add one using the 'Add a Parish' tab."
+                    "No churches found for this search. "
+                    f"{tip} "
+                    "Church mapping coverage varies by region — rural areas worldwide are still being added. "
+                    "You can add your parish using the 'Add a Parish' tab below."
                 )
 
     st.caption(
@@ -416,7 +442,7 @@ with tab2:
         langs   = c2.multiselect("Languages of Mass",
             ["English","Kiswahili","Luganda","French","Dholuo","Kikuyu","Other"])
         mass_times = st.text_area("Mass Times",
-            placeholder="Sunday: 7am, 9am, 11am\nWeekdays: 6:30am", height=80)
+            placeholder="e.g. Sun: 8am, 10am, 6pm | Daily: 7am\nDom: 9h, 11h | Sab: 18h", height=80)
         confession = st.text_input("Confession times (optional)",
             placeholder="Sat 4–5pm, or by appointment")
         submitter_role = st.selectbox("Your relationship to this parish",
