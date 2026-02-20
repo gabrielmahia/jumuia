@@ -75,20 +75,16 @@ with st.sidebar:
 </div>
 """, unsafe_allow_html=True)
 
-# ── Fix broken Material Symbols icon in sidebar collapse button ───────────────
+# ── Fix broken keyboard_double_arrow_left text in sidebar button ─────────────
 st.markdown("""
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=block" rel="stylesheet">
 <style>
-/* Apply Material Symbols font to ALL elements that might show the icon */
-[data-testid="collapsedControl"],
-[data-testid="collapsedControl"] *,
-[data-testid="baseButton-header"],
-[data-testid="baseButton-header"] * {
-  font-family: "Material Symbols Rounded", sans-serif !important;
-  font-feature-settings: "liga" !important;
-  -webkit-font-feature-settings: "liga" !important;
-}
+/* Nuke the broken ligature text — button remains clickable */
+[data-testid="collapsedControl"] { overflow: hidden; width: 2rem; }
+[data-testid="collapsedControl"] span { display: none !important; }
+[data-testid="baseButton-header"] span { display: none !important; }
+/* Add a clean visual indicator so it's obvious it's a toggle */
+[data-testid="collapsedControl"]::before { content: "☰"; font-size: 1.1rem; }
+[data-testid="baseButton-header"]::before { content: "✕"; font-size: 1rem; }
 </style>
 """, unsafe_allow_html=True)
 
