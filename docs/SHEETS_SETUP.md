@@ -49,3 +49,23 @@ Each `form_type` gets its own tab, auto-created on first submission:
 - Submissions also stay in the session as before — sheets is additive
 - If SHEETS_ENDPOINT is not set, the app works normally; data just
   doesn't persist between sessions
+
+## Critical deployment setting
+
+When deploying the Apps Script web app, set:
+- **Execute as:** Me
+- **Who has access:** Anyone  ← must be "Anyone", NOT "Anyone with Google account"
+
+Without this, the POST from Streamlit Cloud will receive a 403 and data will not save.
+
+## Verifying the connection
+
+Run this in your browser console or from Cloud Shell to test:
+
+```bash
+curl -L -X POST "YOUR_ENDPOINT_URL" \
+  -H "Content-Type: application/json" \
+  -d '{"form_type":"test","message":"connection check","timestamp":"2026-02-20"}'
+```
+
+Expected response: `{"status":"ok"}`
