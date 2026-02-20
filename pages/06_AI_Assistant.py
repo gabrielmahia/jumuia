@@ -17,6 +17,17 @@ try:
 except Exception:
     pass
 
+try:
+    from services.parish_identity import ai_context as _parish_context
+except Exception:
+    def _parish_context(): return ""
+
+try:
+    from services.magisterial import classify_query as _classify, log_sensitive as _log_sensitive
+except Exception:
+    def _classify(t): return {"sensitive": False}
+    def _log_sensitive(*a): pass
+
 SUPPORTED_LANGUAGES = {
     "en": "English", "sw": "Kiswahili", "fr": "French",
     "es": "Spanish",  "pt": "Portuguese", "lg": "Luganda",
@@ -169,6 +180,10 @@ with tab_chat:
 
     if st.button("Send ↑", type="primary", key="chat_send") and user_msg.strip():
         st.session_state.chat_history.append({"role": "user", "content": user_msg.strip()})
+        # Magisterial classification — log sensitive topics before model call
+        _cls = _classify(user_msg.strip())
+        if _cls.get("sensitive"):
+            _log_sensitive(user_msg.strip()[:30] + "...", _cls)
         if _live:
             lang_name = SUPPORTED_LANGUAGES.get(lang_code, "English")
             sys = (f"You are a Catholic parish assistant serving parishioners worldwide. "
