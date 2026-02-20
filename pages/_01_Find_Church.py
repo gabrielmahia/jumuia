@@ -84,6 +84,39 @@ if search_btn:
                         osm_link = f"https://www.openstreetmap.org/node/{c.osm_id}" if c.osm_id else None
                         if osm_link:
                             st.markdown(f"[🗺️ OSM]({osm_link})")
+
+                    # ── Save to directory ─────────────────────────────────────
+                    _saved_key = f"dir_saved_{c.name}_{c.latitude}"
+                    if st.session_state.get(_saved_key):
+                        st.success("✅ Saved to parish directory", icon=None)
+                    else:
+                        if st.button(
+                            "➕ Save to our directory",
+                            key=f"save_{i}_{c.name}",
+                            type="secondary",
+                        ):
+                            from services.sheets import _save
+                            _record = {
+                                "form_type": "church_directory",
+                                "name": c.name,
+                                "address": getattr(c, "address", ""),
+                                "city": getattr(c, "city", city),
+                                "country": getattr(c, "country", country),
+                                "latitude": str(c.latitude),
+                                "longitude": str(c.longitude),
+                                "phone": getattr(c, "phone", ""),
+                                "website": getattr(c, "website", ""),
+                                "osm_id": str(getattr(c, "osm_id", "")),
+                                "source": "OSM Search",
+                            }
+                            ok = _save("church_directory", _record)
+                            st.session_state[_saved_key] = True
+                            if ok:
+                                st.success(f"✅ **{c.name}** added to directory sheet!")
+                            else:
+                                st.info("Saved for this session. Connect Sheets in Admin → Data for persistence.")
+                            st.rerun()
+
                     st.divider()
 
 st.info("""
@@ -91,3 +124,53 @@ st.info("""
 Coverage is best in Europe and East Africa, growing globally.
 Help improve coverage: [openstreetmap.org](https://openstreetmap.org)
 """)
+
+# ── Manual entry ──────────────────────────────────────────────────────────────
+st.divider()
+with st.expander("✏️ Know a church that didn't appear? Add it manually"):
+    st.caption("Your entry goes into the same parish directory sheet as search results.")
+    with st.form("manual_church_entry", clear_on_submit=True):
+        mc1, mc2 = st.columns(2)
+        with mc1:
+            m_name    = st.text_input("Church Name *", placeholder="e.g. Sacred Heart Parish")
+            m_diocese = st.text_input("Diocese", placeholder="e.g. Archdiocese of Nairobi")
+            m_country = st.text_input("Country *", placeholder="e.g. Kenya")
+            m_city    = st.text_input("City / Region", placeholder="e.g. Westlands, Nairobi")
+            m_address = st.text_input("Street Address", placeholder="e.g. Westlands Road")
+        with mc2:
+            m_lat     = st.text_input("Latitude", placeholder="e.g. -1.2634")
+            m_lon     = st.text_input("Longitude", placeholder="e.g. 36.8022")
+            m_phone   = st.text_input("Phone", placeholder="e.g. +254 20 123 4567")
+            m_website = st.text_input("Website", placeholder="https://...")
+            m_hours   = st.text_input("Mass / Opening Hours", placeholder="e.g. Sun 7am, 9am, 11am")
+        m_notes    = st.text_area("Notes", placeholder="Languages spoken, accessibility, ministries…", height=70)
+        m_added_by = st.text_input("Your name or email (optional)", placeholder="For follow-up if needed")
+
+        if st.form_submit_button("💾 Save to Directory Sheet", type="primary"):
+            if not m_name.strip():
+                st.error("Church Name is required.")
+            elif not m_country.strip():
+                st.error("Country is required.")
+            else:
+                from services.sheets import _save
+                _record = {
+                    "name": m_name.strip(),
+                    "diocese": m_diocese.strip(),
+                    "country": m_country.strip(),
+                    "city": m_city.strip(),
+                    "address": m_address.strip(),
+                    "latitude": m_lat.strip(),
+                    "longitude": m_lon.strip(),
+                    "phone": m_phone.strip(),
+                    "website": m_website.strip(),
+                    "opening_hours": m_hours.strip(),
+                    "notes": m_notes.strip(),
+                    "added_by": m_added_by.strip() or "anonymous",
+                    "source": "Manual Entry",
+                }
+                ok = _save("church_directory", _record)
+                if ok:
+                    st.success(f"✅ **{m_name.strip()}** saved to the parish directory sheet!")
+                    st.balloons()
+                else:
+                    st.info(f"✅ **{m_name.strip()}** noted for this session. Connect Sheets in Admin → Data for full persistence.")
