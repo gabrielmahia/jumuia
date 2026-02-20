@@ -8,17 +8,29 @@ except Exception:
 import sys
 sys.path.insert(0, ".")
 
-from services.mpesa_service import (
-    init_giving_db,
-    initiate_stk_push,
-    get_giving_summary,
-    live_activation_checklist,
-    MPESA_ENV,
-)
+try:
+    from services.mpesa_service import (
+        init_giving_db,
+        initiate_stk_push,
+        get_giving_summary,
+        live_activation_checklist,
+        MPESA_ENV,
+    )
+    _MPESA_OK = True
+except Exception as _mpesa_err:
+    def init_giving_db(): pass
+    def initiate_stk_push(*a, **k): return {"success": False, "message": "M-Pesa not configured"}
+    def get_giving_summary(): return {}
+    def live_activation_checklist(): return []
+    MPESA_ENV = "sandbox"
+    _MPESA_OK = False
 
 st.set_page_config(page_title="Parish Giving — CNT", page_icon="🤝", layout="centered")
 
-init_giving_db()
+try:
+    init_giving_db()
+except Exception:
+    pass
 
 # ── Location / Currency detection (non-blocking) ──────────────────────────────
 if "user_location" not in st.session_state:
