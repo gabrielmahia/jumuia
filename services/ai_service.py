@@ -257,7 +257,11 @@ def _demo_reply(message: str) -> str:
 def translate_text(text, target_language_code, source_language_code="en",
                    context="Catholic parish communication"):
     if target_language_code not in SUPPORTED_LANGUAGES:
-        return {"success": False, "translated": text, "error": "unsupported"}
+        return {
+    "success": False,
+    "error": "Unsupported language",
+    "code": "unsupported_language",
+}
     target = SUPPORTED_LANGUAGES[target_language_code]
     source = SUPPORTED_LANGUAGES.get(source_language_code, "English")
     prompt = (f"Translate from {source} to {target}. Context: {context}.\n"
