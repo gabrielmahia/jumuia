@@ -43,6 +43,7 @@ ecosystem   = st.Page("pages/_02_Ecosystem_Health.py",         title="Ecosystem 
 justice     = st.Page("pages/_03_Justice_Network.py",          title="Justice Network",   icon="⚖️")
 accountability = st.Page("pages/_04_Accountability.py",        title="Accountability",    icon="📋")
 diaspora    = st.Page("pages/_05_Diaspora.py",                 title="Diaspora Connect",  icon="🌏")
+ussd_guide  = st.Page("pages/_16_USSD_Setup.py",         title="Set Up USSD",       icon="📱")
 admin       = st.Page("pages/_15_Admin_Data.py",               title="Admin & Data",      icon="📁")
 
 pg = st.navigation(
@@ -50,7 +51,7 @@ pg = st.navigation(
         "": [home],
         "For Parishioners": [find_church, prayers, assistant],
         "Parish Coordinators": [sacraments, sccs, catechist, pastoral, formation, giving],
-        "More Tools": [liturgy, ecosystem, justice, accountability, diaspora, admin],
+        "More Tools": [liturgy, ecosystem, justice, accountability, diaspora, admin, ussd_guide],
     },
     position="sidebar",
     expanded=False,
