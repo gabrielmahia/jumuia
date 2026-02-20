@@ -1,16 +1,6 @@
 name: Deploy USSD to Cloud Run
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "webhook_ussd.py"
-      - "services/ussd_service.py"
-      - "services/lectionary.py"
-      - "services/__init__.py"
-      - "requirements-webhook.txt"
-      - "Dockerfile"
-      - ".github/workflows/deploy-ussd.yml"
   workflow_dispatch:
 
 permissions:
