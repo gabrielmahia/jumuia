@@ -23,7 +23,7 @@ init_giving_db()
 # ── Location / Currency detection (non-blocking) ──────────────────────────────
 if "user_location" not in st.session_state:
     try:
-        from services.location_service import detect_location, format_currency as fmt_currency
+        from services.location_service import detect_location
         st.session_state.user_location = detect_location()
     except Exception:
         st.session_state.user_location = {
@@ -35,7 +35,7 @@ loc = st.session_state.user_location
 
 if loc.get("detected"):
     if loc.get("is_vpn"):
-        st.caption(f"📍 Location (via VPN): {loc['city']}, {loc['country']} · Currency: {loc['currency']}")
+        st.caption(f"📍 {loc['city']}, {loc['country']} · Currency: {loc['currency']}")
     else:
         st.caption(f"📍 Detected: {loc['city']}, {loc['country']} · Currency: {loc['currency']}")
     if not loc.get("mpesa_relevant") and st.session_state.get("mpesa_warning_shown") is not True:
@@ -152,4 +152,4 @@ if is_sandbox:
         st.markdown(f"**Estimated approval time:** {checklist['estimated_time']}")
         for step in checklist["live_requirements"]:
             st.markdown(f"- {step}")
-        st.caption(f"Full guide: `{checklist['guide']}`")
+        st.caption(f"Need help? Contact your parish coordinator or see the guide at {checklist['guide']}")

@@ -54,8 +54,8 @@ if "catechists" not in st.session_state:
 
 # Demo notice
 st.info(
-    "**Demo mode** — Sample catechists shown. Your real data will be saved to your "
-    "parish Google Sheet once connected. Changes here are session-only.",
+    "**Preview mode** — Sample records shown so you can explore the tool. "
+    "Your parish's real data will be saved privately once your coordinator connects the register.",
     icon="ℹ️"
 )
 
