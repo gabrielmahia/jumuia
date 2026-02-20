@@ -134,17 +134,17 @@ def search_parishes(city: str) -> str:
         with urllib.request.urlopen(req, timeout=6) as resp:
             data = _json.loads(resp.read())
         if not data:
-            return f"No churches found near *{city}*. Try a nearby larger town."
+            return"No churches found near *{city}*. Try a nearby larger town."
         results = []
         for place in data[:4]:
             name = place.get("display_name", "").split(",")[0]
             addr = place.get("address", {})
             area = addr.get("suburb") or addr.get("city") or addr.get("town") or ""
             results.append(f"• {name}" + (f" — {area}" if area else ""))
-        return f"⛪ *Churches near {city}*\n\n" + "\n".join(results) + \
+        return"⛪ *Churches near {city}*\n\n" + "\n".join(results) + \
                "\n\n_Data: OpenStreetMap_"
     except Exception:
-        return f"Search unavailable right now. Try: catholicparishsteward.streamlit.app"
+        return"Search unavailable right now. Try: catholicparishsteward.streamlit.app"
 
 
 async def send_message(phone: str, text: str):
@@ -214,8 +214,8 @@ def handle_message(phone: str, body: str) -> str:
     # ── Unknown — show menu ───────────────────────────────────────────────
     sess["step"] = "root"
     if lang == "sw":
-        return f"Sijaelewea '{body[:20]}'\n\n" + MENU_SW
-    return f"I didn't understand '{body[:20]}'\n\n" + MENU_EN
+        return"Sijaelewea '{body[:20]}'\n\n" + MENU_SW
+    return"I didn't understand '{body[:20]}'\n\n" + MENU_EN
 
 
 # ── Webhook endpoints ─────────────────────────────────────────────────────────
