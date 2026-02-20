@@ -16,16 +16,20 @@ def mark_saved(form_type: str):
 def show_save_status(form_type: str, saved_ok: bool = None):
     """
     Display a small, calm save status indicator.
-    saved_ok: True = just saved, False = save failed, None = show last saved time
+    saved_ok: True = just saved to Sheets, False = save failed, None = show last saved time
     """
     key = f"_last_saved_{form_type}"
     last_saved = st.session_state.get(key)
 
     if saved_ok is True:
-        st.success("✓ Saved", icon=None)
+        st.success("✓ Saved to parish register", icon=None)
         mark_saved(form_type)
     elif saved_ok is False:
-        st.warning("⚠ Not saved to cloud — stored locally", icon=None)
+        st.warning(
+            "⚠ Saved for this session only — "
+            "ask your coordinator to check the register connection.",
+            icon=None
+        )
     elif last_saved:
         time_str = last_saved.strftime("%-I:%M %p")
         st.caption(f"Last saved: today {time_str}")
