@@ -13,19 +13,26 @@ st.set_page_config(page_title="Pastoral Care", page_icon="🤝", layout="wide")
 st.title("🤝 Pastoral Care")
 st.caption("Homebound visits · Grief support · Mentorship · New member integration")
 
-for key, default in [
-    ("homebound", [{"Name": "Maria Njeri", "Condition": "Elderly (88)", "Address": "Westlands Rd 12",
-                    "Phone": "+254700000001", "Emergency Contact": "Daughter: +254700000002",
-                    "Freq": "Weekly", "Minister": "Fr. Patrick", "Last Visit": "2026-02-15",
-                    "Communion": True, "Notes": "Prefers morning visits"}]),
-    ("grief", []),
-    ("mentors", []),
-    ("new_members", []),
-]:
+_sheet_map = {
+    "homebound":    "pastoral_homebound",
+    "grief":        "pastoral_grief",
+    "mentors":      "pastoral_mentorship",
+    "new_members":  "pastoral_new_member",
+}
+for key, sheet_name in _sheet_map.items():
     if key not in st.session_state:
-        st.session_state[key] = default
+        try:
+            from services.sheets import fetch as _fetch_sheets
+            _saved = _fetch_sheets(sheet_name)
+            st.session_state[key] = _saved if _saved else []
+        except Exception:
+            st.session_state[key] = []
 
-st.info("**Preview mode** — Explore the tool with sample data. Your parish records stay private once connected.", icon="ℹ️")
+try:
+    from services.save_indicator import trust_banner
+    trust_banner("pastoral care")
+except Exception:
+    pass
 
 tab1, tab2, tab3, tab4 = st.tabs(
     ["🏠 Homebound & Sick", "💔 Grief Support", "🤝 Mentorship", "🆕 New Members"]

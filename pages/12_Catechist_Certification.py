@@ -29,35 +29,19 @@ MINISTRY_AREAS = [
 ]
 
 if "catechists" not in st.session_state:
-    st.session_state.catechists = [
-        {"Name": "Agnes Wanjiku Muthoni", "Email": "agnes.muthoni@stjoserph.ac.ke", "Phone": "+254711234567",
-         "Level": "Advanced", "Ministry": "Sacramental Preparation (Children)",
-         "Start Date": "2022-03-01", "Hours Completed": 110, "Hours Required": 120,
-         "Status": "In Progress", "Background Check": True, "Renewal Due": "2026-03-15", "Notes": "Teaching First Communion class, Rongai"},
-        {"Name": "Peter Otieno Odhiambo", "Email": "", "Phone": "+254722987654",
-         "Level": "Basic", "Ministry": "RCIA (Adult Formation)",
-         "Start Date": "2021-09-10", "Hours Completed": 48, "Hours Required": 48,
-         "Status": "Renewal Due", "Background Check": True, "Renewal Due": "2026-03-30", "Notes": "Renewal due — contact by end of month"},
-        {"Name": "Sr. Consolata Akinyi", "Email": "c.akinyi@consolata.org", "Phone": "+254733456789",
-         "Level": "Master Catechist", "Ministry": "Adult Faith Formation",
-         "Start Date": "2019-01-20", "Hours Completed": 180, "Hours Required": 180,
-         "Status": "Certified", "Background Check": True, "Renewal Due": "2027-01-20", "Notes": "Also coordinates Kiswahili liturgy group"},
-        {"Name": "James Kamau Njoroge", "Email": "", "Phone": "+254700112233",
-         "Level": "Intermediate", "Ministry": "Youth Ministry",
-         "Start Date": "2023-06-01", "Hours Completed": 55, "Hours Required": 80,
-         "Status": "In Progress", "Background Check": False, "Renewal Due": "2026-06-01", "Notes": "Background check pending — remind Fr. Daniel"},
-        {"Name": "Mary Wairimu Gitau", "Email": "wairimu.gitau@gmail.com", "Phone": "+254755667788",
-         "Level": "Basic", "Ministry": "Special Needs Ministry",
-         "Start Date": "2024-01-10", "Hours Completed": 48, "Hours Required": 48,
-         "Status": "Certified", "Background Check": True, "Renewal Due": "2027-01-10", "Notes": "Works with deaf community, St Austin's"},
-    ]
+    try:
+        from services.sheets import fetch as _fetch_sheets
+        _saved = _fetch_sheets("catechist_registration")
+        st.session_state.catechists = _saved if _saved else []
+    except Exception:
+        st.session_state.catechists = []
 
 # Demo notice
-st.info(
-    "**Preview mode** — Sample records shown so you can explore the tool. "
-    "Your parish's real data will be saved privately once your coordinator connects the register.",
-    icon="ℹ️"
-)
+try:
+    from services.save_indicator import trust_banner
+    trust_banner("catechist")
+except Exception:
+    pass
 
 tab1, tab2, tab3 = st.tabs(["👥 Catechist Register", "📊 Analytics & Renewals", "📋 Training Log"])
 

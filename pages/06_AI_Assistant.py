@@ -172,6 +172,7 @@ with tab_chat:
         if _live:
             lang_name = SUPPORTED_LANGUAGES.get(lang_code, "English")
             sys = (f"You are a warm Catholic parish assistant serving a global community. "
+                   f"{_parish_context()} "
                    f"Help with: Mass times, sacraments, liturgical seasons, Catholic traditions, "
                    f"prayer guidance, and general parish questions. "
                    f"When you don't know specific local details (priest names, exact Mass times, "

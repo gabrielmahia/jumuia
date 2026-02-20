@@ -53,6 +53,13 @@ def submit(form_type: str, data: dict) -> bool:
     if not endpoint:
         return False
 
+    # Enrich with parish identity if set
+    try:
+        from services.parish_identity import inject_into_record
+        data = inject_into_record(data)
+    except Exception:
+        pass
+
     payload = {
         "form_type": form_type,
         "timestamp": datetime.utcnow().isoformat(),
@@ -81,3 +88,30 @@ def submit(form_type: str, data: dict) -> bool:
     except Exception as e:
         logger.warning("Sheets error for %s: %s", form_type, e)
         return False
+
+def fetch(sheet_name: str, max_rows: int = 200) -> list[dict]:
+    """
+    Read rows from a Google Sheet tab via the doGet endpoint.
+    Returns list of dicts (one per row). Returns [] if unavailable or not configured.
+
+    Requires doGet() deployed in the Apps Script — see docs/SHEETS_SETUP.md.
+    Never raises — silently returns empty list on any error.
+    """
+    endpoint = _endpoint()
+    if not endpoint:
+        return []
+
+    try:
+        import urllib.parse
+        params = urllib.parse.urlencode({"sheet": sheet_name})
+        url = f"{endpoint}?{params}"
+        req = urllib.request.Request(url, method="GET")
+        with urllib.request.urlopen(req, timeout=10) as r:
+            resp = json.loads(r.read().decode("utf-8"))
+            if resp.get("status") == "ok":
+                rows = resp.get("rows", [])
+                return rows[-max_rows:] if len(rows) > max_rows else rows
+    except Exception as e:
+        logger.debug("Sheets fetch error for %s: %s", sheet_name, e)
+    return []
+

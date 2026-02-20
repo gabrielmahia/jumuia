@@ -49,3 +49,16 @@ def persistence_badge():
             "🟡 Session only — add SHEETS_ENDPOINT to Streamlit secrets to persist data. "
             "See docs/SHEETS_SETUP.md"
         )
+
+
+def fetch(sheet_name: str, max_rows: int = 200) -> list:
+    """
+    Read rows back from a Google Sheet tab.
+    Returns list of dicts. Returns [] if doGet not deployed or not configured.
+    See docs/SHEETS_SETUP.md to enable read-back.
+    """
+    try:
+        from gospelmap.sheets_backend import fetch as _fetch
+        return _fetch(sheet_name, max_rows)
+    except Exception:
+        return []

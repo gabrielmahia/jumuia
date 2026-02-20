@@ -20,7 +20,11 @@ if "sacrament_records" not in st.session_state:
         "reconciliation": [], "marriage": [], "holy_orders": [], "anointing": []
     }
 
-st.info("**Preview mode** — Explore the tool with sample data. Your parish records stay private once connected.", icon="ℹ️")
+try:
+    from services.save_indicator import trust_banner
+    trust_banner("sacrament")
+except Exception:
+    pass
 
 tabs = st.tabs(["💧 Baptism", "🕊️ Confirmation", "🍞 First Eucharist",
                  "💍 Marriage", "🙏 Reconciliation", "✝️ Holy Orders / Vows", "🕯️ Anointing"])

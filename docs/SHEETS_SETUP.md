@@ -12,7 +12,9 @@ Each `form_type` gets its own tab, auto-created on first submission:
 - `scc_registration`, `scc_meeting`
 - `catechist_registration`, `catechist_training`
 - `formation_programme`, `formation_participant`
-- `pastoral_homebound`, `pastoral_grief`
+- `pastoral_homebound`, `pastoral_grief`, `pastoral_visit`, `pastoral_mentorship`, `pastoral_new_member`
+- `sacrament_reconciliation`
+- `parish_submission`
 
 ## One-time setup (~5 minutes)
 
@@ -50,6 +52,39 @@ Each `form_type` gets its own tab, auto-created on first submission:
 - If SHEETS_ENDPOINT is not set, the app works normally; data just
   doesn't persist between sessions
 
+## Enabling read-back (optional — allows records to reload after refresh)
+
+To load your saved records back into the app, update your Apps Script to add a `doGet()` function:
+
+```javascript
+function doGet(e) {
+  var params = e.parameter;
+  var sheetName = params.sheet || "submissions";
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(sheetName);
+  if (!sheet) {
+    return ContentService.createTextOutput(JSON.stringify({status: "not_found", rows: []}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  var data = sheet.getDataRange().getValues();
+  var headers = data[0];
+  var rows = data.slice(1).map(function(row) {
+    var obj = {};
+    headers.forEach(function(h, i) { obj[h] = row[i]; });
+    return obj;
+  });
+  return ContentService.createTextOutput(JSON.stringify({status: "ok", rows: rows}))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+```
+
+After adding `doGet()`:
+1. **Deploy → Manage deployments → Edit → New version → Deploy**
+2. The app will automatically load your saved records when the page opens
+
+> Note: read-back loads the most recent 200 records per tab to keep page load fast.
+
+## Critical deployment setting
 ## Critical deployment setting
 
 When deploying the Apps Script web app, set:

@@ -13,20 +13,20 @@ st.title("👥 Small Christian Communities (SCCs)")
 st.caption("The backbone of African Catholicism · Est. AMECEA 1973 · 45,000+ SCCs in Kenya alone")
 
 if "sccs" not in st.session_state:
-    st.session_state.sccs = [
-        {"Name": "St. Peter's SCC", "Zone": "Zone A", "Leader": "John Kamau",
-         "Phone": "+254712000001", "Meeting Day": "Thursday", "Meeting Time": "6:00 PM",
-         "Location": "Church Hall, Room 2", "Families": 18, "Status": "Active",
-         "Focus": "Bible Study, Justice", "Notes": ""},
-        {"Name": "Regina Coeli SCC", "Zone": "Zone B", "Leader": "Mary Ochieng",
-         "Phone": "+254712000002", "Meeting Day": "Saturday", "Meeting Time": "4:00 PM",
-         "Location": "School Compound", "Families": 22, "Status": "Active",
-         "Focus": "Prayer, Family", "Notes": ""},
-    ]
+    try:
+        from services.sheets import fetch as _fetch_sheets
+        _saved = _fetch_sheets("scc_registration")
+        st.session_state.sccs = _saved if _saved else []
+    except Exception:
+        st.session_state.sccs = []
 if "scc_meetings" not in st.session_state:
     st.session_state.scc_meetings = []
 
-st.info("**Preview mode** — Explore the tool with sample data. Your parish records stay private once connected.", icon="ℹ️")
+try:
+    from services.save_indicator import trust_banner
+    trust_banner("SCC")
+except Exception:
+    pass
 
 tab1, tab2, tab3, tab4 = st.tabs(["📋 SCC Directory", "📅 Meeting Records", "📖 Formation Resources", "📊 Analytics"])
 
