@@ -6,8 +6,12 @@ Diagnostic mode: _diagnose() returns the exact failure reason and fix instructio
 Demo fallback: pre-written responses serve visitors when the key is restricted.
 """
 
-import os, time, logging, json
-import urllib.request, urllib.error
+import os
+import time
+import logging
+import json
+import urllib.request
+import urllib.error
 
 logger = logging.getLogger(__name__)
 
@@ -186,7 +190,7 @@ def diagnose() -> dict:
             return {
                 "status": "invalid_key",
                 "title": "API key is invalid",
-                "detail": f"Google returned 400 — the key may be incorrect or revoked.",
+                "detail": "Google returned 400 — the key may be incorrect or revoked.",
                 "fix_steps": [
                     "Check the key value in Streamlit secrets matches aistudio.google.com",
                     "Create a new key if needed at aistudio.google.com → Get API key",

@@ -3,7 +3,8 @@ Today's Liturgy — Daily Mass Readings & Liturgical Season
 Computed liturgical calendar + live Scripture via bible-api.com
 """
 import streamlit as st
-import sys, os
+import sys
+import os
 sys.path.insert(0, ".")
 
 st.set_page_config(page_title="Today's Liturgy — CNT", page_icon="📖", layout="wide")
@@ -14,7 +15,7 @@ try:
     from services.liturgical_engine import get_liturgical_day
     from services.mass_readings import get_daily_readings
     _LIT_OK = True
-except Exception as e:
+except Exception:
     st.info("Today's readings are being updated. Please refresh the page in a moment.")
 
 # ── Season color mapping ──────────────────────────────────────────────────────
@@ -140,7 +141,7 @@ if readings:
                         st.session_state.reflection_generated[cache_key] = r["content"]
                     else:
                         st.info("A reflection is not available right now. Try again shortly.")
-                except Exception as ex:
+                except Exception:
                     st.info("AI reflection is not available right now. Try again shortly.")
     else:
         # Static reflection prompts based on season

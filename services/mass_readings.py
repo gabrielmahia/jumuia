@@ -14,9 +14,9 @@ Catholics worldwide share the same readings — this works for Nairobi, Manila, 
 import requests
 import datetime
 from typing import Optional
-from functools import lru_cache
 
-import sys, os
+import sys
+import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 try:
     from services.liturgical_engine import get_liturgical_day, LiturgicalDay

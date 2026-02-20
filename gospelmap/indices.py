@@ -3,8 +3,6 @@ GospelMap Indices - Real-time crisis signal detection
 Like OpenResilience: Multi-dimensional indices for decision support
 """
 
-from typing import Dict
-import math
 
 
 class EcosystemIndices:

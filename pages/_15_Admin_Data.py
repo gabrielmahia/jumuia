@@ -2,7 +2,6 @@
 
 import streamlit as st
 import pandas as pd
-import io
 from datetime import datetime
 
 st.set_page_config(page_title="Admin — Data Management", page_icon="⚙️", layout="wide")
@@ -102,7 +101,7 @@ with tab2:
                     existing = st.session_state.get(target_key, [])
                     st.session_state[target_key] = existing + records
                 st.success(f"✅ {len(records)} records imported into {target_key}.")
-        except Exception as e:
+        except Exception:
             st.error("The file could not be read. Please check that it is a valid CSV file and try again.")
 
     st.divider()
@@ -143,7 +142,7 @@ with tab3:
         if count > 0:
             c1, c2 = st.columns([4, 1])
             c1.markdown(f"**{label}** — {count} records")
-            if c2.button(f"Clear", key=f"clr_{key}"):
+            if c2.button("Clear", key=f"clr_{key}"):
                 if parent == "sacrament_records":
                     st.session_state.sacrament_records[key] = []
                 else:
