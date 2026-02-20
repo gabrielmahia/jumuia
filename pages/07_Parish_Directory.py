@@ -320,7 +320,10 @@ with tab1:
                         if geo:
                             time.sleep(0.5)
                             els = search_churches_by_place(geo, max_results=osm_max)
-                            area_label = geo["display_name"].split(",")[0]
+                            _dn_parts = geo["display_name"].split(",")
+                            area_label = _dn_parts[0].strip()
+                            if len(_dn_parts) > 1:
+                                area_label += f", {_dn_parts[1].strip()}"
                             for el in els:
                                 r = format_osm_result(el)
                                 osm_results.append(r)
