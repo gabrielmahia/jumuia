@@ -19,8 +19,11 @@ Deploy to Cloud Run:
 Africa's Talking callback URL:
   https://YOUR-SERVICE-URL/ussd
 """
-
+import os
+import json
 import logging
+import hmac as _hmac
+from fastapi import HTTPException
 from fastapi import FastAPI, Request
 from fastapi.responses import PlainTextResponse
 
@@ -126,14 +129,14 @@ def _wa_search_parishes(city: str) -> str:
         with urllib.request.urlopen(req, timeout=6) as resp:
             data = _json.loads(resp.read())
         if not data:
-            return f"No churches found near *{city}*. Try a nearby larger town."
+            return"No churches found near *{city}*. Try a nearby larger town."
         lines = []
         for place in data[:4]:
             name = place.get("display_name", "").split(",")[0]
             addr = place.get("address", {})
             area = addr.get("suburb") or addr.get("city") or addr.get("town") or ""
             lines.append(f"\u2022 {name}" + (f" \u2014 {area}" if area else ""))
-        return f"\u26ea *Churches near {city}*\n\n" + "\n".join(lines) + "\n\n_Data: OpenStreetMap_"
+        return"\u26ea *Churches near {city}*\n\n" + "\n".join(lines) + "\n\n_Data: OpenStreetMap_"
     except Exception:
         return "Search unavailable. Try: catholicparishsteward.streamlit.app"
 
