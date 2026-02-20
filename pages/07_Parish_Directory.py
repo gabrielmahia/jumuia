@@ -245,7 +245,7 @@ with tab1:
     try:
         section_label("Worldwide search — 40,000+ Catholic churches via OpenStreetMap")
     except Exception:
-        st.markdown("#### 🌍 Worldwide search")
+        st.markdown("#### 🌍 Search churches globally")
 
     st.caption(
         "Find Catholic churches anywhere on earth — cities, rural areas, remote regions. "

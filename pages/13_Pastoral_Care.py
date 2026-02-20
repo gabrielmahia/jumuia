@@ -25,6 +25,8 @@ for key, default in [
     if key not in st.session_state:
         st.session_state[key] = default
 
+st.info("**Preview mode** — Explore the tool with sample data. Your parish records stay private once connected.", icon="ℹ️")
+
 tab1, tab2, tab3, tab4 = st.tabs(
     ["🏠 Homebound & Sick", "💔 Grief Support", "🤝 Mentorship", "🆕 New Members"]
 )

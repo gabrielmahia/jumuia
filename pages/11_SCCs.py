@@ -6,7 +6,6 @@ try:
 except Exception:
     def mark_saved(x): pass
     def show_save_status(x, y=None): pass
-from datetime import date, time
 
 st.set_page_config(page_title="SCCs — Catholic Network Tools", page_icon="👥", layout="wide")
 
@@ -26,6 +25,8 @@ if "sccs" not in st.session_state:
     ]
 if "scc_meetings" not in st.session_state:
     st.session_state.scc_meetings = []
+
+st.info("**Preview mode** — Explore the tool with sample data. Your parish records stay private once connected.", icon="ℹ️")
 
 tab1, tab2, tab3, tab4 = st.tabs(["📋 SCC Directory", "📅 Meeting Records", "📖 Formation Resources", "📊 Analytics"])
 

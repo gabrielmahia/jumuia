@@ -28,6 +28,8 @@ if "formation_programmes" not in st.session_state:
 if "formation_participants" not in st.session_state:
     st.session_state.formation_participants = []
 
+st.info("**Preview mode** — Explore the tool with sample data. Your parish records stay private once connected.", icon="ℹ️")
+
 tab1, tab2, tab3 = st.tabs(["📋 Programmes", "👤 Participant Register", "📖 Curriculum Library"])
 
 with tab1:

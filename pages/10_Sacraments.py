@@ -20,6 +20,8 @@ if "sacrament_records" not in st.session_state:
         "reconciliation": [], "marriage": [], "holy_orders": [], "anointing": []
     }
 
+st.info("**Preview mode** — Explore the tool with sample data. Your parish records stay private once connected.", icon="ℹ️")
+
 tabs = st.tabs(["💧 Baptism", "🕊️ Confirmation", "🍞 First Eucharist",
                  "💍 Marriage", "🙏 Reconciliation", "✝️ Holy Orders / Vows", "🕯️ Anointing"])
 
