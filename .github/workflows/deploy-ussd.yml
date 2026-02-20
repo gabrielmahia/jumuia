@@ -11,6 +11,7 @@ on:
       - 'requirements-webhook.txt'
       - 'Dockerfile'
       - '.github/workflows/deploy-ussd.yml'
+  workflow_dispatch:  # allow manual trigger from GitHub UI
 
 jobs:
   deploy:
@@ -25,6 +26,20 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Ensure IAM permissions
+        run: |
+          gcloud projects add-iam-policy-binding gen-lang-client-0500961286 \
+            --member="serviceAccount:github-deploy@gen-lang-client-0500961286.iam.gserviceaccount.com" \
+            --role="roles/run.admin" \
+            --condition=None 2>/dev/null || true
+          gcloud projects add-iam-policy-binding gen-lang-client-0500961286 \
+            --member="serviceAccount:github-deploy@gen-lang-client-0500961286.iam.gserviceaccount.com" \
+            --role="roles/cloudbuild.builds.builder" \
+            --condition=None 2>/dev/null || true
 
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
