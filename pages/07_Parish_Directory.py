@@ -99,18 +99,23 @@ def search_churches_by_place(geo: dict, max_results=20) -> list:
     # Expand sparse boxes: if the area is small, widen it for rural contexts
     lat_span = n - s
     lon_span = e - w
-    if lat_span < 0.5 and lon_span < 0.5:
-        pad = max(0.3, (0.5 - lat_span) / 2)
+    if lat_span < 0.1 and lon_span < 0.1:
+        # Very small area (single street/village) — expand by 0.15 degrees
+        pad = 0.15
+        s -= pad; n += pad; w -= pad; e += pad
+    elif lat_span < 0.3 and lon_span < 0.3:
+        # Small town — modest expansion
+        pad = 0.05
         s -= pad; n += pad; w -= pad; e += pad
 
     query = f"""
-[out:json][timeout:25];
+[out:json][timeout:30];
 (
   node["amenity"="place_of_worship"]["denomination"~"catholic",i]({s},{w},{n},{e});
   way["amenity"="place_of_worship"]["denomination"~"catholic",i]({s},{w},{n},{e});
   node["amenity"="place_of_worship"]["religion"="christian"]["name"~"catholic|saint|holy|our lady|blessed|sacred heart|katolsk|katolska|catolica|católica|eglise|église|cattolica|katolik",i]({s},{w},{n},{e});
 );
-out body {max_results};
+out center {max_results};
 """
     return _overpass(query)
 
@@ -122,12 +127,12 @@ def search_churches_by_name(name_query: str, max_results=15) -> list:
     # Sanitise for Overpass regex
     safe = name_query.replace('"', '').replace("'", "").replace("\\", "")
     query = f"""
-[out:json][timeout:25];
+[out:json][timeout:30];
 (
   node["amenity"="place_of_worship"]["name"~"{safe}",i];
   way["amenity"="place_of_worship"]["name"~"{safe}",i];
 );
-out body {max_results};
+out center {max_results};
 """
     elements = _overpass(query)
     # Filter to likely-Catholic results
