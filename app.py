@@ -60,25 +60,35 @@ pg = st.navigation(
 # ── Sidebar footer ────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("""
-<div style="margin-top:1rem;padding:0.75rem;background:rgba(201,168,76,0.1);
-     border-radius:8px;border:1px solid rgba(201,168,76,0.25);text-align:center;">
+<div style="margin-top:1rem;padding:0.75rem;background:rgba(201,168,76,0.08);
+     border-radius:8px;border:1px solid rgba(201,168,76,0.2);text-align:center;">
   <div style="font-size:0.65rem;color:rgba(201,168,76,0.75);text-transform:uppercase;
-       letter-spacing:0.08em;margin-bottom:0.25rem;">Any phone in Kenya</div>
+       letter-spacing:0.08em;margin-bottom:0.25rem;">Basic phone access</div>
   <div style="font-family:monospace;font-size:1.1rem;color:white;font-weight:600;">*384*248724#</div>
-  <div style="font-size:0.65rem;color:rgba(255,255,255,0.4);margin-top:0.2rem;">No internet needed</div>
+  <div style="font-size:0.65rem;color:rgba(255,255,255,0.5);margin-top:0.25rem;line-height:1.4;">
+    Available once your diocese<br>registers with Africa's Talking
+  </div>
+  <a href="/Set_Up_USSD" target="_self" style="display:inline-block;margin-top:0.4rem;
+     font-size:0.65rem;color:rgba(201,168,76,0.8);text-decoration:none;">
+    How to activate →
+  </a>
 </div>
 """, unsafe_allow_html=True)
 
-# ── Hide broken sidebar collapse text, use clean arrow instead ───────────────
+# ── Fix broken Material Symbols icon in sidebar collapse button ───────────────
 st.markdown("""
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=block" rel="stylesheet">
 <style>
-/* Hide the raw ligature text in the collapse button */
-[data-testid="collapsedControl"] span,
-[data-testid="baseButton-header"] span { font-size: 0 !important; }
-
-/* Replace with a clean CSS arrow */
-[data-testid="collapsedControl"]::after { content: "›"; font-size: 1.4rem; }
-[data-testid="baseButton-header"]::after { content: "‹"; font-size: 1.4rem; }
+/* Apply Material Symbols font to ALL elements that might show the icon */
+[data-testid="collapsedControl"],
+[data-testid="collapsedControl"] *,
+[data-testid="baseButton-header"],
+[data-testid="baseButton-header"] * {
+  font-family: "Material Symbols Rounded", sans-serif !important;
+  font-feature-settings: "liga" !important;
+  -webkit-font-feature-settings: "liga" !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
