@@ -384,22 +384,32 @@ with tab1:
 
                         col_a, col_b = st.columns(2)
                         if col_a.button("➕ Save to our directory", key=f"save_{hash(r['name']+r['address'])}"):
+                            from services.sheets import _save
                             new_id = max((p["id"] for p in
                                 st.session_state.confirmed_parishes +
                                 st.session_state.submitted_parishes), default=0) + 1
                             addr_parts = r["address"].split(",")
-                            city  = addr_parts[1].strip() if len(addr_parts) > 1 else ""
+                            city    = addr_parts[1].strip() if len(addr_parts) > 1 else ""
                             country = addr_parts[-1].strip() if addr_parts else ""
-                            st.session_state.submitted_parishes.append({
+                            parish_data = {
                                 "id": new_id, "name": r["name"],
                                 "city": city, "country": country,
                                 "address": r["address"], "phone": r["phone"],
                                 "mass_times": r["opening_hours"],
+                                "website": r.get("website", ""),
+                                "maps_link": r.get("maps_link", ""),
                                 "verified": False, "confirmations": 1,
                                 "submitted_by": "OSM import",
+                                "source": "OpenStreetMap",
                                 "added": str(date.today()),
-                            })
-                            st.success("Added to Pending — needs 2 more confirmations.")
+                            }
+                            st.session_state.submitted_parishes.append(parish_data)
+                            _ok = _save("parish_submission", parish_data)
+                            show_save_status("parish_submission", _ok)
+                            if _ok:
+                                st.success(f"✅ **{r['name']}** saved to parish register. Needs 2 more confirmations to go live.")
+                            else:
+                                st.success("Added to Pending — needs 2 more confirmations.")
 
             else:
                 tip = ""
