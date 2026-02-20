@@ -139,7 +139,7 @@ with c1:
   <div class="cps-card-title">Find a Church</div>
   <div class="cps-card-desc">Search 40,000+ Catholic churches worldwide by name, city, or region.</div>
   <div class="cps-card-examples">
-    <span>Nairobi</span><span>Samburu</span><span>Consolata Shrine</span>
+    <span>Nairobi</span><span>São Paulo</span><span>Manila</span><span>Rome</span>
   </div>
 </div>
 """, unsafe_allow_html=True)

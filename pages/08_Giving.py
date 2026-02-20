@@ -1,4 +1,4 @@
-"""Parish Giving — M-Pesa STK Push (Sandbox Active / Live Rails)"""
+"""Parish Giving — M-Pesa (Kenya/East Africa) + international guidance"""
 import streamlit as st
 try:
     from services.save_indicator import mark_saved, show_save_status
@@ -27,8 +27,8 @@ if "user_location" not in st.session_state:
         st.session_state.user_location = detect_location()
     except Exception:
         st.session_state.user_location = {
-            "country": "Unknown", "currency": "USD", "detected": False,
-            "mpesa_relevant": False, "is_vpn": False, "city": "Unknown",
+            "country": "Kenya", "currency": "KES", "detected": False,
+            "mpesa_relevant": True, "is_vpn": False, "city": "Unknown",
         }
 
 loc = st.session_state.user_location
