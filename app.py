@@ -4,6 +4,7 @@ A complete spiritual OS for parishes worldwide.
 """
 
 import streamlit as st
+from services.i18n import lang_selector
 
 st.set_page_config(
     page_title="Catholic Parish Steward",
@@ -71,7 +72,7 @@ with st.sidebar:
 </div>
 """, unsafe_allow_html=True)
 
-lang_selector()
 # sidebar collapse button icon left as Streamlit default
+    lang_selector()
 
 pg.run()
