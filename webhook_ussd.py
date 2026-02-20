@@ -82,7 +82,7 @@ async def ussd(request: Request):
 # ── WhatsApp — Meta Cloud API ──────────────────────────────────────────────────
 
 import hashlib
-import hmac as _hmac
+
 
 WA_TOKEN        = os.getenv("WHATSAPP_TOKEN", "")
 WA_PHONE_ID     = os.getenv("WHATSAPP_PHONE_ID", "")
