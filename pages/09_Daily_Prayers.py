@@ -10,8 +10,7 @@ st.caption("Essential Catholic prayers · Rosary · Chaplets · Multilingual")
 
 # ── Today's Readings Banner ────────────────────────────────────────────────────
 try:
-    from services.lectionary import get_reading, liturgical_color
-    from datetime import date
+    from services.lectionary import get_reading
     r = get_reading()
     season_color = {"Advent": "#6B21A8", "Lent": "#7C3AED", "Easter": "#D97706",
                     "Christmas": "#FFFFFF", "Ordinary": "#15803D"}.get(r["season"], "#15803D")
@@ -24,7 +23,7 @@ try:
      border-radius:0 8px 8px 0;padding:0.9rem 1.2rem;margin-bottom:1.5rem;">
   <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;
        letter-spacing:0.1em;color:#6B7280;margin-bottom:0.3rem;">
-    TODAY · {r["season"].upper()} WEEK {r["week"]} · YEAR {r["cycle"]}
+    TODAY · {r["season"].upper()} — WEEK {r["week"]} · LITURGICAL YEAR {r["cycle"]}
   </div>
   <div style="font-size:1rem;color:#1F2937;line-height:1.5;">
     {feast_line}{refs}
@@ -223,8 +222,8 @@ with tab4:
     for i, station in enumerate(STATIONS, 1):
         with st.expander(f"Station {i}: {station}"):
             st.markdown(
-                f"_We adore You, O Christ, and we praise You._\n\n"
-                f"_Because by Your holy cross You have redeemed the world._"
+                "_We adore You, O Christ, and we praise You._\n\n"
+                "_Because by Your holy cross You have redeemed the world._"
             )
             if i < 14:
                 st.caption(f"Meditate on {station.lower()} · Pray: Our Father, Hail Mary, Glory Be")
