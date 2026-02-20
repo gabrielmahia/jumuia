@@ -29,8 +29,20 @@ GLOBAL_CSS = """
    GOOGLE FONTS — DM Serif Display + DM Sans
    Loaded async, fallback to Georgia/system
 ═══════════════════════════════════════════════════════════ */
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block');
+/* Fonts loaded async — app is fully usable before they arrive */
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap&font-display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block&font-display=block');
+
+/* Font-stack fallbacks apply instantly — no FOIT even on 2G */
+body, .stApp {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont,
+                 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+                 'Noto Sans', 'Liberation Sans', sans-serif !important;
+}
+h1, h2, h3, .cnt-hero-title, .cnt-stat-num, .cps-home-title {
+    font-family: 'DM Serif Display', Georgia, 'Times New Roman',
+                 'Noto Serif', serif !important;
+}
 
 /* ═══════════════════════════════════════════════════════════
    DESIGN TOKENS
@@ -75,9 +87,90 @@ section[data-testid="stSidebar"] {
     border-right: 1px solid rgba(201,168,76,0.20);
 }
 
-section[data-testid="stSidebar"] * {
+/* Sidebar text — explicit selectors, NOT wildcard */
+section[data-testid="stSidebar"] p,
+section[data-testid="stSidebar"] span,
+section[data-testid="stSidebar"] label,
+section[data-testid="stSidebar"] li,
+section[data-testid="stSidebar"] div.stMarkdown,
+section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"],
+section[data-testid="stSidebar"] small,
+section[data-testid="stSidebar"] .stCaption,
+section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] p {
     color: #E8E4DC !important;
     font-family: 'DM Sans', system-ui, sans-serif !important;
+}
+
+/* Sidebar inputs — always light bg + dark text for readability */
+section[data-testid="stSidebar"] input,
+section[data-testid="stSidebar"] textarea {
+    background-color: #ffffff !important;
+    color: #0B1F3A !important;
+    border: 1px solid rgba(201,168,76,0.45) !important;
+    border-radius: 6px !important;
+    font-family: 'DM Sans', system-ui, sans-serif !important;
+}
+section[data-testid="stSidebar"] input::placeholder,
+section[data-testid="stSidebar"] textarea::placeholder {
+    color: #9CA3AF !important;
+}
+section[data-testid="stSidebar"] input:focus,
+section[data-testid="stSidebar"] textarea:focus {
+    border-color: var(--gold) !important;
+    box-shadow: 0 0 0 2px rgba(201,168,76,0.25) !important;
+    outline: none !important;
+}
+
+/* Sidebar primary buttons — gold bg, navy text */
+section[data-testid="stSidebar"] .stButton > button[kind="primary"] {
+    background: var(--gold) !important;
+    color: var(--navy) !important;
+    border: none !important;
+}
+section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
+    background: #B8953E !important;
+}
+
+/* Sidebar secondary/default buttons — visible border + light text */
+section[data-testid="stSidebar"] .stButton > button:not([kind="primary"]) {
+    background: rgba(255,255,255,0.08) !important;
+    color: #E8E4DC !important;
+    border: 1.5px solid rgba(201,168,76,0.55) !important;
+    border-radius: 6px !important;
+}
+section[data-testid="stSidebar"] .stButton > button:not([kind="primary"]):hover {
+    background: rgba(201,168,76,0.15) !important;
+    color: var(--gold-lt) !important;
+    border-color: var(--gold) !important;
+}
+
+/* Sidebar expander — readable header */
+section[data-testid="stSidebar"] .streamlit-expanderHeader {
+    background: rgba(255,255,255,0.06) !important;
+    border: 1px solid rgba(201,168,76,0.20) !important;
+    border-radius: 8px !important;
+    color: #E8E4DC !important;
+    font-size: 0.85rem !important;
+}
+section[data-testid="stSidebar"] .streamlit-expanderContent {
+    background: rgba(255,255,255,0.03) !important;
+    border: 1px solid rgba(201,168,76,0.15) !important;
+    border-top: none !important;
+    border-radius: 0 0 8px 8px !important;
+    padding: 0.5rem !important;
+}
+
+/* Sidebar selectbox (language selector) */
+section[data-testid="stSidebar"] .stSelectbox div[data-baseweb="select"] > div {
+    background: rgba(255,255,255,0.09) !important;
+    border: 1px solid rgba(201,168,76,0.35) !important;
+    color: #E8E4DC !important;
+}
+section[data-testid="stSidebar"] .stSelectbox svg { fill: #E8E4DC !important; }
+
+/* Sidebar toggle (Data Saver Mode) */
+section[data-testid="stSidebar"] .stToggle label span {
+    color: #E8E4DC !important;
 }
 
 /* Sidebar logo area */
@@ -383,13 +476,39 @@ section[data-testid="stSidebar"] .stToggle label {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   DARK MODE OVERRIDES
+   DARK MODE — system preference + Streamlit dark theme
 ═══════════════════════════════════════════════════════════ */
 @media (prefers-color-scheme: dark) {
     [data-testid="stMetricValue"] { color: var(--gold-lt) !important; }
     .cnt-stat-card { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); }
     .cnt-stat-num { color: var(--gold-lt); }
     .cnt-quota-notice { background: rgba(201,168,76,0.08); color: var(--gold-lt); }
+
+    /* Inputs in dark mode — keep readable */
+    .stTextInput > div > div > input,
+    .stTextArea > div > div > textarea {
+        background-color: rgba(255,255,255,0.08) !important;
+        color: #F0EDE8 !important;
+        border-color: rgba(201,168,76,0.35) !important;
+    }
+    .stTextInput > div > div > input::placeholder,
+    .stTextArea > div > div > textarea::placeholder {
+        color: rgba(240,237,232,0.45) !important;
+    }
+
+    /* Tab text in dark mode */
+    .stTabs [data-baseweb="tab"] {
+        color: rgba(240,237,232,0.65) !important;
+    }
+    .stTabs [aria-selected="true"][data-baseweb="tab"] {
+        color: var(--gold-lt) !important;
+    }
+
+    /* Expanders in dark mode */
+    .streamlit-expanderHeader {
+        background: rgba(255,255,255,0.04) !important;
+        color: #E8E4DC !important;
+    }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -403,7 +522,31 @@ section[data-testid="stSidebar"] .stToggle label {
 }
 @media (prefers-contrast: high) {
     .stButton > button { border: 2px solid currentColor !important; }
+    section[data-testid="stSidebar"] * { border-color: rgba(255,255,255,0.6) !important; }
 }
+
+/* High-contrast / forced-colors mode (Windows, some Android accessibility) */
+@media (forced-colors: active) {
+    .stButton > button { border: 2px solid ButtonText !important; }
+    section[data-testid="stSidebar"] input { border: 2px solid ButtonText !important; }
+}
+
+/* Ensure no text falls below WCAG AA threshold in sidebar (4.5:1 ratio) */
+section[data-testid="stSidebar"] .stCaption,
+section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] * {
+    font-size: 0.75rem !important;
+    color: rgba(255,255,255,0.65) !important;
+}
+
+/* Minimum touch target for all interactive sidebar elements */
+section[data-testid="stSidebar"] .stButton > button,
+section[data-testid="stSidebar"] select,
+section[data-testid="stSidebar"] input[type="checkbox"],
+section[data-testid="stSidebar"] input[type="radio"] {
+    min-height: 44px !important;
+    min-width: 44px !important;
+}
+
 [data-testid="stDataFrame"] { overflow-x: auto !important; }
 </style>
 """

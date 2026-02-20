@@ -47,13 +47,13 @@ def sidebar_widget():
 
     if identity.get("configured"):
         st.markdown(
-            f"<div style='font-size:0.65rem;color:rgba(255,255,255,0.45);"
+            f"<div style='font-size:0.68rem;color:rgba(201,168,76,0.7);"
             f"text-transform:uppercase;letter-spacing:0.08em;"
             f"margin-bottom:0.15rem;margin-top:0.75rem;'>Your Parish</div>"
             f"<div style='font-size:0.82rem;color:rgba(240,217,138,0.9);"
             f"font-weight:600;margin-bottom:0.1rem;line-height:1.3;'>"
             f"{identity['parish_name']}</div>"
-            f"<div style='font-size:0.68rem;color:rgba(255,255,255,0.4);'>"
+            f"<div style='font-size:0.72rem;color:rgba(255,255,255,0.58);'>"
             f"{identity.get('city','')}{',' if identity.get('city') and identity.get('country') else ''}"
             f" {identity.get('country','')}</div>",
             unsafe_allow_html=True
@@ -64,30 +64,11 @@ def sidebar_widget():
             st.rerun()
     else:
         st.markdown(
-            "<div style='font-size:0.65rem;color:rgba(255,255,255,0.45);"
+            "<div style='font-size:0.68rem;color:rgba(201,168,76,0.7);"
             "text-transform:uppercase;letter-spacing:0.08em;"
             "margin-bottom:0.3rem;margin-top:0.75rem;'>Your Parish</div>",
             unsafe_allow_html=True
         )
-        # Force sidebar inputs to be readable — dark sidebar overrides defaults
-        st.markdown("""
-<style>
-[data-testid="stSidebar"] [data-testid="stTextInput"] input {
-    background-color: #ffffff !important;
-    color: #0B1F3A !important;
-    border: 1px solid rgba(201,168,76,0.4) !important;
-    border-radius: 6px !important;
-}
-[data-testid="stSidebar"] [data-testid="stTextInput"] input::placeholder {
-    color: #9CA3AF !important;
-}
-[data-testid="stSidebar"] [data-testid="stExpander"] {
-    border: 1px solid rgba(201,168,76,0.25) !important;
-    border-radius: 8px !important;
-    background: rgba(255,255,255,0.04) !important;
-}
-</style>
-""", unsafe_allow_html=True)
         with st.expander("Set up →", expanded=True):
             name = st.text_input("Parish name", placeholder="e.g. Holy Family Basilica",
                                   key="pi_name", label_visibility="collapsed")

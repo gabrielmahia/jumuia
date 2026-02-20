@@ -19,7 +19,7 @@ except Exception:
 
 _hero_html = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap');
+/* Fonts loaded via global theme in app.py — fallback stack applies instantly */
 
 .cps-home-hero {
     background: linear-gradient(135deg, #0B1F3A 0%, #1a3a6b 100%);

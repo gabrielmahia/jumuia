@@ -72,11 +72,11 @@ with st.sidebar:
   <div style="font-size:0.65rem;color:rgba(201,168,76,0.75);text-transform:uppercase;
        letter-spacing:0.08em;margin-bottom:0.25rem;">Basic phone access</div>
   <div style="font-family:monospace;font-size:1.1rem;color:white;font-weight:600;">*384*248724#</div>
-  <div style="font-size:0.65rem;color:rgba(255,255,255,0.5);margin-top:0.25rem;line-height:1.4;">
+  <div style="font-size:0.68rem;color:rgba(255,255,255,0.62);margin-top:0.25rem;line-height:1.4;">
     Available once your diocese<br>registers with Africa's Talking.<br>See <em>More Tools → Set Up USSD</em>
   </div>
 </div>
-<div style="font-size:0.58rem;color:rgba(255,255,255,0.25);text-align:center;margin-top:0.75rem;line-height:1.5;padding:0 0.5rem;">
+<div style="font-size:0.68rem;color:rgba(255,255,255,0.42);text-align:center;margin-top:0.75rem;line-height:1.5;padding:0 0.5rem;">
   Parish data stays in your Google Sheet.<br>Nothing shared with third parties.
 </div>
 """, unsafe_allow_html=True)
