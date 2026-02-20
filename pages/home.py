@@ -118,15 +118,11 @@ _hero_html = (
 )
 st.markdown(_hero_html, unsafe_allow_html=True)
 
-st.markdown("""
+st.markdown(f"""
 <div class="cps-home-hero">
   <div class="cps-home-title">Catholic Parish Steward</div>
-  <div class="cps-home-sub">
-    Find your church · Follow the daily readings · Ask a question in any language
-  </div>
-  <div class="cps-home-verse">
-    "Whatever you did for the least of these, you did for me." — Matthew 25:40
-  </div>
+  <div class="cps-home-sub">{_i18n_subtitle}</div>
+  <div class="cps-home-verse">{_i18n_verse}</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -169,7 +165,7 @@ with c3:
   <div class="cps-card-title">Ask the Assistant</div>
   <div class="cps-card-desc">Questions about Mass, sacraments, translate a bulletin into Kiswahili.</div>
   <div class="cps-card-examples">
-    <span>Mass times</span><span>Translation</span><span>Homily prep</span>
+    <span>Mass times</span><span>Translation</span><span>Any language</span>
   </div>
 </div>
 """, unsafe_allow_html=True)
@@ -181,7 +177,7 @@ st.markdown("""
 <div class="cps-stats">
   <div><span class="cps-stat-num">40,000+</span><span class="cps-stat-label">Churches searchable</span></div>
   <div><span class="cps-stat-num">150+</span><span class="cps-stat-label">Countries</span></div>
-  <div><span class="cps-stat-num">6</span><span class="cps-stat-label">Languages</span></div>
+  <div><span class="cps-stat-num">13</span><span class="cps-stat-label">Languages</span></div>
   <div><span class="cps-stat-num">1.3B</span><span class="cps-stat-label">Catholics worldwide</span></div>
 </div>
 """, unsafe_allow_html=True)

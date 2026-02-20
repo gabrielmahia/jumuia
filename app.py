@@ -5,6 +5,7 @@ A complete spiritual OS for parishes worldwide.
 
 import streamlit as st
 from services.i18n import lang_selector
+from services.parish_identity import sidebar_widget as _parish_widget
 
 st.set_page_config(
     page_title="Catholic Parish Steward",
@@ -58,8 +59,9 @@ pg = st.navigation(
     expanded=False,
 )
 
-# ── Language selector — above nav, below logo ─────────────────────────────────
+# ── Parish identity + language selector ──────────────────────────────────────
 with st.sidebar:
+    _parish_widget()
     lang_selector()
 
 # ── Sidebar footer ────────────────────────────────────────────────────────────
@@ -73,6 +75,9 @@ with st.sidebar:
   <div style="font-size:0.65rem;color:rgba(255,255,255,0.5);margin-top:0.25rem;line-height:1.4;">
     Available once your diocese<br>registers with Africa's Talking.<br>See <em>More Tools → Set Up USSD</em>
   </div>
+</div>
+<div style="font-size:0.58rem;color:rgba(255,255,255,0.25);text-align:center;margin-top:0.75rem;line-height:1.5;padding:0 0.5rem;">
+  Parish data stays in your Google Sheet.<br>Nothing shared with third parties.
 </div>
 """, unsafe_allow_html=True)
 

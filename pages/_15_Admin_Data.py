@@ -28,7 +28,14 @@ tab1, tab2, tab3 = st.tabs(["⬇️ Export Data", "⬆️ Import Data", "🗑️
 # ── EXPORT ─────────────────────────────────────────────────────────────────────
 with tab1:
     st.subheader("⬇️ Export to CSV / Excel")
-    st.info("All data is from the current session. Connect a database (Google Sheets or SQLite) for persistence.")
+    try:
+        from services.sheets import is_live as _sheets_live
+        if _sheets_live():
+            st.success("🟢 Google Sheets connected — exported data reflects your current session. Download from your sheet for full history.", icon=None)
+        else:
+            st.info("📋 Showing records from this session. Connect Google Sheets (below) to accumulate records across sessions.")
+    except Exception:
+        pass
 
     for key, (label, parent) in MODULES.items():
         if parent == "sacrament_records":
