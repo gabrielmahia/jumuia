@@ -58,6 +58,10 @@ pg = st.navigation(
     expanded=False,
 )
 
+# ── Language selector — above nav, below logo ─────────────────────────────────
+with st.sidebar:
+    lang_selector()
+
 # ── Sidebar footer ────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("""
