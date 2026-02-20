@@ -98,11 +98,13 @@ def require_role(minimum_role: str, page_name: str = "") -> None:
     icon = ROLE_ICONS.get(minimum_role, "🔒")
     label = ROLE_LABELS.get(minimum_role, minimum_role.title())
 
-    st.warning(
-        f"{icon} **{page_name or 'This page'} requires {label} access.**\n\n"
-        "Ask your parish coordinator to set your access level in the sidebar, "
-        "or select your role below.",
-        icon=None,
+    st.info(
+        f"**{page_name or 'This section'} is for parish office staff.**\n\n"
+        "This area is used by authorised coordinators to manage confidential parish records "
+        "(baptisms, confirmations, marriages, and more). "
+        "If you're looking for your own sacramental certificate, please contact your parish office directly.\n\n"
+        "If you *are* a parish coordinator, select your role below and enter your PIN to continue.",
+        icon="📂",
     )
     _role_upgrade_widget()
     st.stop()
@@ -133,13 +135,19 @@ def _role_upgrade_widget():
     cols = st.columns(3)
     visible_roles = ["parishioner", "catechist", "coordinator"]
 
+    role_descriptions = {
+        "parishioner":  "I'm a parishioner or visitor",
+        "catechist":    "I teach faith formation / catechism",
+        "coordinator":  "I manage parish records (office staff)",
+    }
+
     for i, role in enumerate(visible_roles):
         with cols[i % 3]:
             icon = ROLE_ICONS[role]
-            label = ROLE_LABELS[role]
+            desc = role_descriptions[role]
             is_current = current_role() == role
             if st.button(
-                f"{icon} {label}",
+                f"{icon} {desc}",
                 key=f"role_btn_{role}",
                 type="primary" if is_current else "secondary",
                 use_container_width=True,
@@ -154,16 +162,36 @@ def _role_upgrade_widget():
     pending = st.session_state.get("_pending_role")
     if pending in ("catechist", "coordinator"):
         pending_label = ROLE_LABELS[pending]
-        st.info(
-            f"Your coordinator can provide the **{pending_label} PIN** — "
-            "set when the parish first connects Google Sheets.",
-            icon="🔑"
-        )
+        st.markdown("---")
+
+        if pending == "coordinator":
+            st.info(
+                "**Your parish coordinator PIN** was created when your parish first connected Google Sheets. "
+                "Check with your pastor, parish secretary, or whoever set up this app.",
+                icon="🔑",
+            )
+        else:
+            st.info(
+                "**Your catechist PIN** is provided by your parish coordinator or pastor.",
+                icon="🎓",
+            )
+
+        with st.expander("❓ I don't have a PIN — what do I do?"):
+            st.markdown(
+                "**If your parish is new to this app:**\n"
+                "- Go to **Admin & Data** in the sidebar to connect your Google Sheet and set up your PIN.\n\n"
+                "**If your parish already uses this app:**\n"
+                "- Ask your pastor, parish secretary, or the person who manages the parish Google Sheet.\n"
+                "- The PIN is configured in your parish's Streamlit secrets by whoever set up the app.\n\n"
+                "**No coordinator in your parish yet?**\n"
+                "- Any non-empty PIN (4+ characters) works in demo mode until a PIN is officially configured."
+            )
+
         pin = st.text_input(
             f"{pending_label} PIN",
             type="password",
             key="role_pin_input",
-            placeholder="Enter PIN from your coordinator",
+            placeholder="Enter the PIN provided by your coordinator",
         )
         c1, c2 = st.columns(2)
         if c1.button("Confirm", key="role_confirm", type="primary"):
@@ -173,7 +201,7 @@ def _role_upgrade_widget():
                 st.success(f"✅ Access granted: {pending_label}")
                 st.rerun()
             else:
-                st.error("Incorrect PIN. Ask your parish coordinator.")
+                st.error("❌ That PIN didn't match. Check with your parish coordinator and try again.")
         if c2.button("Cancel", key="role_cancel"):
             st.session_state.pop("_pending_role", None)
             st.rerun()
