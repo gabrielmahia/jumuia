@@ -1,3 +1,9 @@
+try:
+    from services.settings import get as _get_setting
+    _SCRIPTURE_TRANSLATION = _get_setting('scripture_translation') or 'RSVCE'
+except Exception:
+    _SCRIPTURE_TRANSLATION = 'RSVCE'
+
 """Daily Prayers — Complete Catholic Prayer Library
 Rosary (all 4 mysteries), essential prayers, multilingual."""
 

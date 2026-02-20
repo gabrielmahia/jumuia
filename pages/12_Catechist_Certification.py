@@ -9,6 +9,12 @@ except Exception:
 from datetime import date, timedelta
 
 st.set_page_config(page_title="Catechist Certification", page_icon="📚", layout="wide")
+try:
+    from services.roles import require_role as _require_role
+    _require_role("catechist", "Catechist Certification")
+except Exception:
+    pass
+
 
 st.title("📚 Catechist Certification")
 st.caption("Multi-level certification tracking · Renewal cycles · Diocesan standards")

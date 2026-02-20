@@ -225,7 +225,13 @@ with tab1:
     except Exception:
         st.markdown("**Search our directory**")
 
+    try:
+        from services.settings import get as _get_setting
+        _diocese_pref = _get_setting("diocese") or ""
+    except Exception:
+        _diocese_pref = ""
     query = st.text_input("Search by name, city, or country",
+                          value=_diocese_pref,
                           placeholder="Consolata · Nairobi · Uganda · Samburu",
                           label_visibility="collapsed")
     c1, c2 = st.columns(2)
