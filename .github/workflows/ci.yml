@@ -9,14 +9,16 @@ on:
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
         python-version: ["3.11"]
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
@@ -24,14 +26,12 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          pip install -r requirements.txt || true
           pip install ruff pytest pytest-cov
-          pip install streamlit anthropic requests pandas
 
-      - name: Lint with ruff
+      - name: Lint with Ruff
         run: |
-          ruff check services/ tests/ app.py pages/ \
-            --ignore E501,E402,E701,E702,E711,E712,E721,E722,E741,F841,F401,W291,W293 \
-            --exclude "**/__pycache__"
+          ruff check .
 
       - name: Run tests
         env:
@@ -40,7 +40,7 @@ jobs:
         run: |
           pytest tests/ -v --cov=services --cov-report=term-missing
 
-      - name: Verify app imports
+      - name: Verify service imports
         run: |
           python -c "from services.ai_service import SUPPORTED_LANGUAGES; print('AI service OK')"
           python -c "from services.directory_service import init_db; print('Directory service OK')"
