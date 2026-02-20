@@ -35,6 +35,7 @@ jobs:
           flags: --allow-unauthenticated --memory=256Mi --timeout=10
           env_vars: |
             AFRICASTALKING_USERNAME=sandbox
+            WHATSAPP_VERIFY_TOKEN=cps_webhook_2026
             AFRICASTALKING_API_KEY=${{ secrets.AT_API_KEY }}
 
       - name: Verify deployment
