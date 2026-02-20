@@ -4,14 +4,22 @@ on:
   push:
     branches: [main]
     paths:
-      - 'webhook_ussd.py'
-      - 'services/ussd_service.py'
-      - 'services/lectionary.py'
-      - 'services/__init__.py'
-      - 'requirements-webhook.txt'
-      - 'Dockerfile'
-      - '.github/workflows/deploy-ussd.yml'
-  workflow_dispatch:  # allow manual trigger from GitHub UI
+      - "webhook_ussd.py"
+      - "services/ussd_service.py"
+      - "services/lectionary.py"
+      - "services/__init__.py"
+      - "requirements-webhook.txt"
+      - "Dockerfile"
+      - ".github/workflows/deploy-ussd.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-ussd-cloudrun
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -30,24 +38,23 @@ jobs:
       - name: Set up gcloud
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Ensure IAM permissions
+      - name: Sanity check auth
         run: |
-          gcloud projects add-iam-policy-binding gen-lang-client-0500961286 \
-            --member="serviceAccount:github-deploy@gen-lang-client-0500961286.iam.gserviceaccount.com" \
-            --role="roles/run.admin" \
-            --condition=None 2>/dev/null || true
-          gcloud projects add-iam-policy-binding gen-lang-client-0500961286 \
-            --member="serviceAccount:github-deploy@gen-lang-client-0500961286.iam.gserviceaccount.com" \
-            --role="roles/cloudbuild.builds.builder" \
-            --condition=None 2>/dev/null || true
+          gcloud auth list
+          gcloud config set project gen-lang-client-0500961286
+          gcloud config set run/region africa-south1
 
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: cnt-ussd
+          project_id: gen-lang-client-0500961286
           region: africa-south1
           source: .
-          flags: --allow-unauthenticated --memory=256Mi --timeout=10
+          flags: >-
+            --allow-unauthenticated
+            --memory=256Mi
+            --timeout=10
           env_vars: |
             AFRICASTALKING_USERNAME=sandbox
             WHATSAPP_VERIFY_TOKEN=cps_webhook_2026
@@ -58,4 +65,4 @@ jobs:
           sleep 10
           curl -sf https://cnt-ussd-860570427256.africa-south1.run.app/health \
             && echo "✅ Service healthy" \
-            || echo "❌ Health check failed"
+            || (echo "❌ Health check failed" && exit 1)
