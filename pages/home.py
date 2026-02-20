@@ -1,7 +1,23 @@
+from services.i18n import t as _t, get_lang
 """Catholic Parish Steward — Homepage"""
 import streamlit as st
 
-st.markdown("""
+# ── i18n: compute before render ───────────────────────────────────────────────
+try:
+    _i18n_subtitle = _t("home_subtitle")
+    _i18n_verse    = _t("verse")
+    _i18n_find     = _t("find_church")
+    _i18n_prayers  = _t("daily_prayers")
+    _i18n_ai       = _t("ai_assistant")
+except Exception:
+    _i18n_subtitle = "Find your church · Follow the daily readings · Ask a question in any language"
+    _i18n_verse    = '"Whatever you did for the least of these, you did for me." — Matthew 25:40'
+    _i18n_find     = "Find a Church"
+    _i18n_prayers  = "Daily Readings & Prayers"
+    _i18n_ai       = "AI Assistant"
+
+
+_hero_html = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap');
 
@@ -94,7 +110,13 @@ st.markdown("""
     .cps-home-hero { padding:2rem 1.5rem; }
 }
 </style>
-""", unsafe_allow_html=True)
+"""
+_hero_html = (
+    _hero_html
+    .replace("Find your church · Follow the daily readings · Ask a question in any language", _i18n_subtitle)
+    .replace('"Whatever you did for the least of these, you did for me." — Matthew 25:40', _i18n_verse)
+)
+st.markdown(_hero_html, unsafe_allow_html=True)
 
 st.markdown("""
 <div class="cps-home-hero">
@@ -122,7 +144,7 @@ with c1:
 </div>
 """, unsafe_allow_html=True)
     st.write("")
-    if st.button("🗺️ Find a Church", type="primary", use_container_width=True):
+    if st.button(f"🗺️ {_i18n_find}", type="primary", use_container_width=True):
         st.switch_page("pages/07_Parish_Directory.py")
 
 with c2:
@@ -137,7 +159,7 @@ with c2:
 </div>
 """, unsafe_allow_html=True)
     st.write("")
-    if st.button("📖 Daily Readings & Prayers", type="primary", use_container_width=True):
+    if st.button(f"📖 {_i18n_prayers}", type="primary", use_container_width=True):
         st.switch_page("pages/09_Daily_Prayers.py")
 
 with c3:
@@ -152,7 +174,7 @@ with c3:
 </div>
 """, unsafe_allow_html=True)
     st.write("")
-    if st.button("🤖 AI Parish Assistant", type="primary", use_container_width=True):
+    if st.button(f"🤖 {_i18n_ai}", type="primary", use_container_width=True):
         st.switch_page("pages/06_AI_Assistant.py")
 
 st.markdown("""
