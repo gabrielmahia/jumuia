@@ -1,7 +1,10 @@
 """Admin — Data Management: bulk import/export CSV for all modules."""
 
 import streamlit as st
-import pandas as pd
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
 from datetime import datetime, UTC
 
 st.set_page_config(page_title="Admin — Data Management", page_icon="⚙️", layout="wide")

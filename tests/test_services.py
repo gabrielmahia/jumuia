@@ -426,3 +426,107 @@ def test_roles_all_roles_have_labels():
     for role in ROLES:
         assert role in ROLE_LABELS, f"Missing label for {role}"
         assert role in ROLE_ICONS, f"Missing icon for {role}"
+
+
+# ── Liturgical Engine & Obligations Tests ─────────────────────────────────────
+
+def test_liturgical_engine_lent_season():
+    """Ash Wednesday 2026 is Lent, not Ordinary Time."""
+    from datetime import date
+    from services.liturgical_engine import get_liturgical_day
+    ld = get_liturgical_day(date(2026, 2, 18))
+    assert ld.season == "Lent"
+    assert ld.feast == "Ash Wednesday"
+    assert ld.color == "Purple"
+
+
+def test_liturgical_engine_year_a_2026():
+    """2025-26 liturgical year should be Year A (Matthew)."""
+    from datetime import date
+    from services.liturgical_engine import get_liturgical_day
+    ld = get_liturgical_day(date(2026, 3, 1))  # 2nd Sunday of Lent
+    assert ld.liturgical_year == "A", f"Expected A, got {ld.liturgical_year}"
+
+
+def test_obligations_fasting_ash_wednesday():
+    """Ash Wednesday requires both fasting and abstinence."""
+    from datetime import date
+    from services.liturgical_engine import get_obligations
+    obs = get_obligations(date(2026, 2, 18), "KE")
+    assert obs.fasting is True
+    assert obs.abstinence is True
+
+
+def test_obligations_good_friday():
+    """Good Friday 2026 requires fasting and abstinence."""
+    from datetime import date
+    from services.liturgical_engine import get_obligations
+    obs = get_obligations(date(2026, 4, 3), "KE")
+    assert obs.fasting is True
+    assert obs.abstinence is True
+
+
+def test_obligations_christmas_kenya():
+    """Christmas is obligatory in Kenya."""
+    from datetime import date
+    from services.liturgical_engine import get_obligations
+    obs = get_obligations(date(2026, 12, 25), "KE")
+    assert obs.is_holy_day is True
+    assert obs.mass_obligation == "Obligatory"
+    assert obs.source == "KCCB"
+
+
+def test_obligations_usccb_dispensation():
+    """USCCB dispenses Assumption when it falls on Saturday or Monday."""
+    from datetime import date
+    from services.liturgical_engine import get_obligations
+    # Aug 15 2026 is a Saturday — should be dispensed for US
+    obs_us = get_obligations(date(2026, 8, 15), "US")
+    assert obs_us.mass_obligation == "Dispensed", f"Expected Dispensed, got {obs_us.mass_obligation}"
+    # Same date in Kenya — not dispensed
+    obs_ke = get_obligations(date(2026, 8, 15), "KE")
+    assert obs_ke.mass_obligation == "Obligatory"
+
+
+def test_obligations_source_codes():
+    """Source codes match the correct episcopal conferences."""
+    from datetime import date
+    from services.liturgical_engine import get_obligations
+    assert get_obligations(date(2026, 12, 25), "US").source == "USCCB"
+    assert get_obligations(date(2026, 12, 25), "PH").source == "CBCP"
+    assert get_obligations(date(2026, 12, 25), "NG").source == "CBCN"
+
+
+def test_lectionary_cycle_2026():
+    """lectionary._sunday_cycle(2026) must return 'A' (Year A = 2025-26)."""
+    from services.lectionary import _sunday_cycle
+    assert _sunday_cycle(2026) == "A", f"Expected A, got {_sunday_cycle(2026)}"
+    assert _sunday_cycle(2027) == "B"
+    assert _sunday_cycle(2025) == "C"  # Jan-Nov 2025 is still LY 2024-25 = Year C
+
+
+def test_mass_readings_sunday_correct_cycle():
+    """Mass readings for 2nd Sunday of Lent 2026 (Year A) = Mt 17:1-9."""
+    from datetime import date
+    from services.mass_readings import get_daily_readings
+    data = get_daily_readings(date(2026, 3, 1))
+    assert data["readings"] is not None
+    gospel = data["readings"]["gospel"]["citation"]
+    assert "17" in gospel, f"Expected Matthew 17, got {gospel}"
+
+
+def test_ai_service_language_coverage():
+    """AI service should support all 14 i18n languages."""
+    from services.ai_service import SUPPORTED_LANGUAGES
+    expected = {"en", "sw", "fr", "es", "pt", "lg", "ig", "tl", "hi", "it", "de", "pl", "ar", "sv"}
+    missing = expected - set(SUPPORTED_LANGUAGES.keys())
+    assert not missing, f"Missing languages in AI service: {missing}"
+
+
+def test_obligations_result_has_explanation():
+    """All ObligationsResult instances must include a non-empty explanation."""
+    from datetime import date
+    from services.liturgical_engine import get_obligations
+    for cc in ["KE", "US", "PH", "NG", "BR"]:
+        obs = get_obligations(date(2026, 12, 25), cc)
+        assert obs.explanation, f"Empty explanation for {cc}"

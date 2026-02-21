@@ -11,9 +11,9 @@ from datetime import date, timedelta
 st.set_page_config(page_title="Catechist Certification", page_icon="📚", layout="wide")
 try:
     from services.roles import require_role as _require_role
-    _require_role("catechist", "Catechist Certification")
-except Exception:
-    pass
+except ImportError:
+    def _require_role(r, p=""): pass
+_require_role("catechist", "Catechist Certification")
 
 
 st.title("📚 Catechist Certification")
@@ -87,7 +87,7 @@ with tab1:
 
     st.divider()
     with st.expander("➕ Add New Catechist"):
-        with st.form("cat_form"):
+        with st.form("cat_form", clear_on_submit=True):
             c1, c2 = st.columns(2)
             with c1:
                 name = st.text_input("Full Name *")
@@ -167,7 +167,7 @@ with tab3:
         st.session_state.training_log = []
 
     with st.expander("➕ Log Training / Course Completion"):
-        with st.form("training_form"):
+        with st.form("training_form", clear_on_submit=True):
             c1, c2 = st.columns(2)
             with c1:
                 cat_names = [c["Name"] for c in st.session_state.catechists] or ["No catechists yet"]

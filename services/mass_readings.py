@@ -101,19 +101,37 @@ _ADVENT_SUNDAYS_A: dict[int, tuple] = {
 def _get_readings_citation(lit_day: LiturgicalDay) -> Optional[tuple]:
     """
     Return (first_reading, psalm, second_reading, gospel) citation strings for the given day.
-    Only covers Sundays for now; weekdays return None.
+    Uses the correct A/B/C cycle from the liturgical engine.
+    Weekdays return None (links to external sources instead).
     """
-    season = lit_day.season
-    week = lit_day.week
-    dow = 6 if lit_day.weekday_name == "Sunday" else list(
-        ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
-    ).index(lit_day.weekday_name)
-
-    if dow != 6:  # Not Sunday
+    if lit_day.weekday_name != "Sunday":
         return None
 
-    # For simplicity, use Year A table regardless of cycle for now
-    # (A full implementation would branch on lit_day.liturgical_year)
+    season = lit_day.season
+    week = lit_day.week
+    cycle = lit_day.liturgical_year  # "A", "B", or "C" — from liturgical_engine
+
+    # Delegate to lectionary.SUNDAY_READINGS which has all three cycles
+    try:
+        from services.lectionary import SUNDAY_READINGS
+        cycle_data = SUNDAY_READINGS.get(cycle, SUNDAY_READINGS.get("A", {}))
+        season_data = cycle_data.get(season, {})
+        if season_data:
+            available = sorted(season_data.keys())
+            closest = min(available, key=lambda w: abs(w - week)) if available else None
+            if closest:
+                entry = season_data[closest]
+                # lectionary format: (first, second, gospel) — no psalm
+                # mass_readings format: (first, psalm, second, gospel)
+                # Map accordingly
+                if len(entry) == 3:
+                    first, second, gospel = entry
+                    return (first, "", second, gospel)
+                return entry
+    except Exception:
+        pass
+
+    # Fallback to Year A local tables
     if season == "Ordinary Time":
         return _SUNDAY_LECTIONARY_A.get((season, week, 6))
     elif season == "Lent":
@@ -122,9 +140,6 @@ def _get_readings_citation(lit_day: LiturgicalDay) -> Optional[tuple]:
         return _EASTER_SUNDAYS_A.get(week)
     elif season == "Advent":
         return _ADVENT_SUNDAYS_A.get(week)
-    elif season in ("Christmas", "Holy Week"):
-        return None
-
     return None
 
 

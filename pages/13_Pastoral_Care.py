@@ -11,9 +11,9 @@ from datetime import date
 st.set_page_config(page_title="Pastoral Care", page_icon="🤝", layout="wide")
 try:
     from services.roles import require_role as _require_role
-    _require_role("coordinator", "Pastoral Care")
-except Exception:
-    pass
+except ImportError:
+    def _require_role(r, p=""): pass
+_require_role("coordinator", "Pastoral Care")
 
 
 st.title("🤝 Pastoral Care")
@@ -57,7 +57,7 @@ with tab1:
                 st.caption(p["Notes"])
 
     with st.expander("➕ Add Homebound / Sick Person"):
-        with st.form("homebound_form"):
+        with st.form("homebound_form", clear_on_submit=True):
             c1, c2 = st.columns(2)
             with c1:
                 name = st.text_input("Full Name *")
@@ -85,7 +85,7 @@ with tab1:
                 st.success(f"✅ {name} added to homebound register.")
 
     with st.expander("📋 Record a Visit"):
-        with st.form("visit_form"):
+        with st.form("visit_form", clear_on_submit=True):
             names = [p["Name"] for p in st.session_state.homebound] or ["No entries yet"]
             visited = st.selectbox("Person visited", names)
             visit_date = st.date_input("Visit Date")
@@ -122,7 +122,7 @@ with tab2:
         st.info("No grief support records yet.")
 
     with st.expander("➕ Add Grief Support Case"):
-        with st.form("grief_form"):
+        with st.form("grief_form", clear_on_submit=True):
             c1, c2 = st.columns(2)
             with c1:
                 name = st.text_input("Person's Name *")
@@ -171,7 +171,7 @@ with tab3:
             c2.markdown(f"**Focus:** {m['Focus']}\n\n**Meet Frequency:** {m['Frequency']}\n\n**Status:** {m['Status']}")
 
     with st.expander("➕ Create Mentorship Pair"):
-        with st.form("mentor_form"):
+        with st.form("mentor_form", clear_on_submit=True):
             c1, c2 = st.columns(2)
             with c1:
                 mentor = st.text_input("Mentor Name *")
@@ -215,7 +215,7 @@ with tab4:
             c2.markdown(f"**Welcome sponsor:** {nm['Sponsor']}\n\n**Follow-up:** {nm['Follow-up']}")
 
     with st.expander("➕ Register New Member"):
-        with st.form("new_member_form"):
+        with st.form("new_member_form", clear_on_submit=True):
             c1, c2 = st.columns(2)
             with c1:
                 name = st.text_input("Full Name *")

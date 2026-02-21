@@ -11,9 +11,9 @@ from datetime import date
 st.set_page_config(page_title="Formation", page_icon="🎓", layout="wide")
 try:
     from services.roles import require_role as _require_role
-    _require_role("catechist", "Formation & RCIA")
-except Exception:
-    pass
+except ImportError:
+    def _require_role(r, p=""): pass
+_require_role("catechist", "Formation & RCIA")
 
 st.title("🎓 Formation & Spiritual Education")
 st.caption("RCIA · Adult faith · Youth · Bible study · Retreats · Vocations")
