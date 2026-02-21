@@ -437,7 +437,7 @@ with tab1:
                         if st.session_state.get(_save_key):
                             col_a.success("✓ Saved to directory", icon=None)
                         elif col_a.button("➕ Save to our directory", key=f"save_{hash(r['name']+r['address'])}"):
-                            from services.sheets import _save as _do_save, is_live as _sheets_live
+                            from services.sheets import _save as _do_save
                             new_id = max((p["id"] for p in
                                 st.session_state.confirmed_parishes +
                                 st.session_state.submitted_parishes), default=0) + 1
@@ -581,7 +581,7 @@ with tab2:
         submitted = st.form_submit_button("Submit Parish", type="primary")
 
     if submitted and name and city and country:
-        from services.sheets import _save as _do_save, is_live as _sheets_live
+        from services.sheets import _save as _do_save
         new_id = max((p["id"] for p in st.session_state.confirmed_parishes +
                       st.session_state.submitted_parishes), default=0) + 1
         parish_data = {
