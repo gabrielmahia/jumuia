@@ -37,7 +37,6 @@ LANGUAGES = {
     "hi": "हिन्दी",
     "pl": "Polski",
     "it": "Italiano",
-        "de": "Kirche finden",
     "de": "Deutsch",
     "ar": "العربية",
     "lg": "Luganda",

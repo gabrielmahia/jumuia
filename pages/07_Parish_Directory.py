@@ -331,7 +331,7 @@ with tab1:
     )
     osm_place = osm_col1.text_input(
         "Location — city, region, or country",
-        placeholder="Samburu Kenya · Nairobi · Manassas Virginia · Lagos Nigeria",
+        placeholder="Samburu Kenya · Nairobi · Manassas Virginia · Lagos Nigeria · Manila · São Paulo",
         key="osm_place",
     )
     search_mode = osm_col2.radio(

@@ -29,8 +29,19 @@ except Exception:
     def _log_sensitive(*a): pass
 
 SUPPORTED_LANGUAGES = {
-    "en": "English", "sw": "Kiswahili", "fr": "French",
-    "es": "Spanish",  "pt": "Portuguese", "lg": "Luganda",
+    "en": "English",
+    "sw": "Kiswahili",
+    "fr": "Français",
+    "es": "Español",
+    "pt": "Português",
+    "lg": "Luganda",
+    "ig": "Igbo",
+    "tl": "Tagalog",
+    "pl": "Polski",
+    "it": "Italiano",
+    "de": "Deutsch",
+    "ar": "العربية",
+    "hi": "हिन्दी",
 }
 _BASE = "https://generativelanguage.googleapis.com"
 
@@ -174,13 +185,48 @@ with tab_chat:
     lang_sel = st.selectbox("Language", lang_vals, label_visibility="collapsed", key="chat_lang")
     lang_code = lang_keys[lang_vals.index(lang_sel)]
 
-    user_msg = st.text_input("Message", placeholder="Ask anything about your parish…",
-                              label_visibility="collapsed",
-                              key=f"chat_input_{st.session_state.chat_input_counter}")
+    # ── History ABOVE input (natural chat flow) ───────────────────────────────
+    if not st.session_state.chat_history:
+        st.markdown(
+            "<div style='text-align:center;padding:2rem 0;color:#9CA3AF;font-size:0.9rem;'>"
+            "✝️ Ask about Mass times, sacraments, prayers, or your parish…</div>",
+            unsafe_allow_html=True,
+        )
 
-    if st.button("Send ↑", type="primary", key="chat_send") and user_msg.strip():
+    for msg in st.session_state.chat_history:
+        if msg["role"] == "user":
+            st.markdown(f"""<div style="display:flex;gap:.75rem;margin:.6rem 0;">
+  <span style="font-size:1.4rem">😊</span>
+  <div style="background:rgba(11,31,58,0.06);border-radius:12px;padding:.6rem 1rem;flex:1;font-size:0.95rem;">{msg['content']}</div>
+</div>""", unsafe_allow_html=True)
+        else:
+            badge = "" if _live else " <small style='color:#C9A84C;font-size:.68rem'>(demo)</small>"
+            st.markdown(f"""<div style="display:flex;gap:.75rem;margin:.6rem 0;">
+  <span style="font-size:1.4rem">✝️</span>
+  <div style="background:rgba(201,168,76,.08);border-left:3px solid #C9A84C;border-radius:0 12px 12px 0;padding:.6rem 1rem;flex:1;font-size:0.95rem;">{msg['content']}{badge}</div>
+</div>""", unsafe_allow_html=True)
+
+    if st.session_state.chat_history:
+        st.markdown("<div style='text-align:right;margin-top:0.25rem;'>", unsafe_allow_html=True)
+        if st.button("Clear conversation", key="clear_chat"):
+            st.session_state.chat_history = []
+            st.session_state.chat_input_counter += 1
+            st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("<div style='height:0.5rem;'></div>", unsafe_allow_html=True)
+
+    # ── Input at bottom ───────────────────────────────────────────────────────
+    col_input, col_btn = st.columns([6, 1])
+    with col_input:
+        user_msg = st.text_input("Message", placeholder="Ask anything about your parish…",
+                                  label_visibility="collapsed",
+                                  key=f"chat_input_{st.session_state.chat_input_counter}")
+    with col_btn:
+        send_pressed = st.button("Send ↑", type="primary", key="chat_send", use_container_width=True)
+
+    if send_pressed and user_msg.strip():
         st.session_state.chat_history.append({"role": "user", "content": user_msg.strip()})
-        # Magisterial classification — log sensitive topics before model call
         _cls = _classify(user_msg.strip())
         if _cls.get("sensitive"):
             _log_sensitive(user_msg.strip()[:30] + "...", _cls)
@@ -210,27 +256,8 @@ with tab_chat:
         else:
             reply = _demo(user_msg)
         st.session_state.chat_history.append({"role": "assistant", "content": reply})
-        st.session_state.chat_input_counter += 1  # clears the input field
+        st.session_state.chat_input_counter += 1
         st.rerun()
-
-    for msg in st.session_state.chat_history:
-        if msg["role"] == "user":
-            st.markdown(f"""<div style="display:flex;gap:.75rem;margin:.6rem 0;">
-  <span style="font-size:1.5rem">😊</span>
-  <div style="background:rgba(11,31,58,0.06);border-radius:12px;padding:.6rem 1rem;flex:1;">{msg['content']}</div>
-</div>""", unsafe_allow_html=True)
-        else:
-            badge = "" if _live else " <small style='color:#C9A84C;font-size:.68rem'>(demo)</small>"
-            st.markdown(f"""<div style="display:flex;gap:.75rem;margin:.6rem 0;">
-  <span style="font-size:1.5rem">✝️</span>
-  <div style="background:rgba(201,168,76,.08);border-left:3px solid #C9A84C;border-radius:0 12px 12px 0;padding:.6rem 1rem;flex:1;">{msg['content']}{badge}</div>
-</div>""", unsafe_allow_html=True)
-
-    if st.session_state.chat_history:
-        if st.button("Clear", key="clear_chat"):
-            st.session_state.chat_history = []
-            st.session_state.chat_input_counter += 1
-            st.rerun()
 
 # ── Translation ───────────────────────────────────────────────────────────────
 with tab_translate:
