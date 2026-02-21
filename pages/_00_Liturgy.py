@@ -166,16 +166,41 @@ if readings:
         st.caption("Enable AI features (ANTHROPIC_API_KEY) for personalised reflection questions.")
 
 else:
-    # Not a Sunday with lectionary readings
-    st.info(f"""
-**Today ({data['display']}) is not a Sunday.**
-
-Sunday readings are displayed with full text from the lectionary.
-For weekday readings, visit:
-- [USCCB Daily Readings](https://bible.usccb.org/daily-bible-reading)
-- [Universalis](https://universalis.com/today.htm) (global, multi-language)
-- [Vatican Daily Readings](https://www.vaticannews.va/en/liturgy-of-the-day.html)
-""")
+    # Weekday — no full text computed, but show references and season info
+    st.info(
+        f"**{data['display']}** — {data['season']}"
+        + (f", {data['feast']}" if data.get('feast') else "")
+        + f"  ·  Liturgical Year {data.get('liturgical_year', '')}",
+        icon="📖"
+    )
+    st.markdown(
+        "Full weekday reading text requires a complete lectionary database. "
+        "Find today's readings at any of the links below — they all follow the same Roman Rite cycle worldwide:"
+    )
+    c1, c2, c3 = st.columns(3)
+    c1.link_button("📖 USCCB (US)", "https://bible.usccb.org/daily-bible-reading", use_container_width=True)
+    c2.link_button("🌐 Universalis", "https://universalis.com/today.htm", use_container_width=True)
+    c3.link_button("🕊️ Vatican", "https://www.vaticannews.va/en/liturgy-of-the-day.html", use_container_width=True)
+    st.markdown("")
+    # Static reflection prompts based on season (same as Sunday path)
+    prompts = {
+        "Lent":         ["Where is God calling me to conversion this Lenten season?",
+                         "What attachments do I need to let go of?",
+                         "How can I practice fasting, prayer, and almsgiving this week?"],
+        "Advent":       ["How am I preparing my heart for Christ's coming?",
+                         "Where do I see hope in my community?",
+                         "What does it mean to wait in joyful expectation?"],
+        "Easter":       ["How does the Resurrection change the way I live today?",
+                         "Where do I see new life emerging around me?",
+                         "How can I be a witness to the Risen Christ this week?"],
+        "Ordinary Time": ["What is God saying to me through today's readings?",
+                           "How does this Gospel challenge me to grow?",
+                           "What one concrete action can I take this week?"],
+    }
+    seasonal_prompts = prompts.get(data["season"], prompts["Ordinary Time"])
+    st.markdown("**Questions for personal reflection:**")
+    for pr in seasonal_prompts:
+        st.markdown(f"- {pr}")
 
 st.divider()
 

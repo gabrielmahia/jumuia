@@ -20,7 +20,7 @@ try:
 except Exception as _mpesa_err:
     def init_giving_db(): pass
     def initiate_stk_push(*a, **k): return {"success": False, "message": "M-Pesa not configured"}
-    def get_giving_summary(): return {}
+    def get_giving_summary(sandbox_only=True): return {"total_kes": 0, "transaction_count": 0, "label": "[No data]", "sandbox": sandbox_only}
     def live_activation_checklist(): return []
     MPESA_ENV = "sandbox"
     _MPESA_OK = False

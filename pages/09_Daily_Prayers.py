@@ -110,7 +110,131 @@ PRAYERS = {
             "tubeelangirire ffe abalyamu,\nnoolwanda ne ku luzzi lwa okufa kwaffe. Amen."
         ),
     },
+    "fr": {
+        "our_father": (
+            "Notre Père, qui es aux cieux,\nque ton nom soit sanctifié;\nque ton règne vienne;\n"
+            "que ta volonté soit faite sur la terre comme au ciel.\nDonne-nous aujourd'hui notre pain quotidien;\n"
+            "pardonne-nous nos offenses,\ncomme nous pardonnons à ceux qui nous ont offensés;\n"
+            "et ne nous laisse pas entrer en tentation,\nmais délivre-nous du mal. Amen."
+        ),
+        "hail_mary": (
+            "Je vous salue, Marie, pleine de grâce,\nle Seigneur est avec vous;\nvous êtes bénie entre toutes les femmes,\n"
+            "et Jésus, le fruit de vos entrailles, est béni.\nSainte Marie, Mère de Dieu,\n"
+            "priez pour nous, pauvres pécheurs,\nmaintenant et à l'heure de notre mort. Amen."
+        ),
+        "glory_be": (
+            "Gloire au Père, et au Fils, et au Saint-Esprit;\n"
+            "comme il était au commencement, maintenant et toujours,\ndans les siècles des siècles. Amen."
+        ),
+    },
+    "es": {
+        "our_father": (
+            "Padre nuestro, que estás en el cielo,\nsantificado sea tu nombre;\nvenga a nosotros tu reino;\n"
+            "hágase tu voluntad en la tierra como en el cielo.\nDanos hoy nuestro pan de cada día;\n"
+            "y perdona nuestras ofensas,\ncomo también nosotros perdonamos a los que nos ofenden;\n"
+            "y no nos dejes caer en la tentación,\ny líbranos del mal. Amén."
+        ),
+        "hail_mary": (
+            "Dios te salve, María, llena eres de gracia,\nel Señor es contigo;\nbendita tú eres entre todas las mujeres,\n"
+            "y bendito es el fruto de tu vientre, Jesús.\nSanta María, Madre de Dios,\n"
+            "ruega por nosotros, los pecadores,\nahora y en la hora de nuestra muerte. Amén."
+        ),
+        "glory_be": (
+            "Gloria al Padre, y al Hijo, y al Espíritu Santo;\n"
+            "como era en el principio, ahora y siempre,\npor los siglos de los siglos. Amén."
+        ),
+    },
+    "pt": {
+        "our_father": (
+            "Pai nosso, que estais no céu,\nsantificado seja o vosso nome;\nvenha a nós o vosso reino;\n"
+            "seja feita a vossa vontade,\nassim na terra como no céu.\nO pão nosso de cada dia nos dai hoje;\n"
+            "e perdoai as nossas ofensas,\nassim como nós perdoamos a quem nos tem ofendido;\n"
+            "e não nos deixeis cair em tentação,\nmas livrai-nos do mal. Amém."
+        ),
+        "hail_mary": (
+            "Ave Maria, cheia de graça,\no Senhor é convosco;\nbendita sois vós entre as mulheres,\n"
+            "e bendito é o fruto do vosso ventre, Jesus.\nSanta Maria, Mãe de Deus,\n"
+            "rogai por nós pecadores,\nagora e na hora de nossa morte. Amém."
+        ),
+        "glory_be": (
+            "Glória ao Pai, ao Filho e ao Espírito Santo,\n"
+            "como era no princípio, agora e sempre,\npor todos os séculos dos séculos. Amém."
+        ),
+    },
+    "de": {
+        "our_father": (
+            "Vater unser im Himmel,\ngeheiligt werde dein Name.\nDein Reich komme.\n"
+            "Dein Wille geschehe, wie im Himmel, so auf Erden.\nUnser tägliches Brot gib uns heute.\n"
+            "Und vergib uns unsere Schuld, wie auch wir vergeben unsern Schuldigern.\n"
+            "Und führe uns nicht in Versuchung,\nsondern erlöse uns von dem Bösen. Amen."
+        ),
+        "hail_mary": (
+            "Gegrüßet seist du, Maria, voll der Gnade,\nder Herr ist mit dir;\ndu bist gebenedeit unter den Frauen,\n"
+            "und gebenedeit ist die Frucht deines Leibes, Jesus.\nHeilige Maria, Mutter Gottes,\n"
+            "bitte für uns Sünder,\njetzt und in der Stunde unseres Todes. Amen."
+        ),
+        "glory_be": (
+            "Ehre sei dem Vater und dem Sohn und dem Heiligen Geist,\n"
+            "wie es war im Anfang, jetzt und in Ewigkeit,\nvon Ewigkeit zu Ewigkeit. Amen."
+        ),
+    },
+    "tl": {
+        "our_father": (
+            "Ama namin, sumasalangit ka,\nsambahin ang ngalan mo.\nMapasakamin ang kaharian mo.\n"
+            "Sundin ang loob mo, dito sa lupa para nang sa langit.\nBigyan mo kami ngayon ng aming kakanin sa araw-araw.\n"
+            "At patawarin mo kami sa aming mga sala,\npara nang pagpapatawad namin sa nagkakasala sa amin.\n"
+            "At huwag mo kaming ipahintulot sa tukso,\nkundi iligtas mo kami sa lahat ng masama. Amen."
+        ),
+        "hail_mary": (
+            "Aba Ginoong Maria, napupuno ka ng grasya,\nang Panginoon ay nasa iyo;\nbukod kang pinagpala sa babaeng lahat,\n"
+            "at pinagpala rin ang iyong anak na si Hesus.\nSanta Mariang Ina ng Diyos,\n"
+            "ipanalangin mo kaming mga makasalanan,\ngayon at kung kami'y mamamatay. Amen."
+        ),
+        "glory_be": (
+            "Luwalhati sa Ama, at sa Anak, at sa Espiritu Santo;\n"
+            "kagaya noong una, ngayon at magpakailan man,\nmagpakailanman. Amen."
+        ),
+    },
+    "it": {
+        "our_father": (
+            "Padre nostro, che sei nei cieli,\nsia santificato il tuo nome;\nvenga il tuo regno;\n"
+            "sia fatta la tua volontà, come in cielo così in terra.\nDacci oggi il nostro pane quotidiano;\n"
+            "e rimetti a noi i nostri debiti,\ncome noi li rimettiamo ai nostri debitori;\n"
+            "e non indurci in tentazione,\nma liberaci dal male. Amen."
+        ),
+        "hail_mary": (
+            "Ave Maria, piena di grazia,\nil Signore è con te;\ntu sei benedetta fra le donne\n"
+            "e benedetto è il frutto del tuo seno, Gesù.\nSanta Maria, Madre di Dio,\n"
+            "prega per noi peccatori,\nadesso e nell'ora della nostra morte. Amen."
+        ),
+        "glory_be": (
+            "Gloria al Padre e al Figlio e allo Spirito Santo,\n"
+            "come era nel principio e ora e sempre,\nnei secoli dei secoli. Amen."
+        ),
+    },
+    "ig": {
+        "our_father": (
+            "Nna anyị, biri n'elu igwe,\nka aha gị dị nsọ;\nka alaeze gị bịa;\n"
+            "ka ọchịchọ gị mee n'ụwa, dị ka ọ dị n'elu igwe.\nNye anyị taa nri anyị nke ụbọchị a;\n"
+            "wepụ mmehie anyị,\ndị ka anyị si ewepụ nke ndị metụtara anyị;\n"
+            "ekwela ka anyị banye n'ọnọdụ nnwale,\nkama zọpụta anyị n'ihe ọjọọ. Amen."
+        ),
+        "hail_mary": (
+            "Nsọpụrụ gị, Mariam, ọ zụ gị ojii ọma,\nOnye Nwe anyị nọ n'ebe i nọ;\nọ dụọ gị ngọzi n'etiti ụmụnwanyị nile,\n"
+            "a họpụtara ọ dụọ ngọzi mkpụrụ afọ gị, Jizọs.\nOnye nso Mariam, Nne Chukwu,\n"
+            "biko kpee anyị ndị nwere mmehie ekpere,\nugbu a na n'oge ọnwụ anyị. Amen."
+        ),
+        "glory_be": (
+            "Otuto dị ka Nna, na Nwa, na Mmụọ Nsọ;\n"
+            "dị ka ọ dị n'oge mbido, ugbu a na mgbe nile,\nwe rue mgbe ebighi ebi. Amen."
+        ),
+    },
 }
+
+def _fmt(text: str) -> str:
+    """Render prayer text as readable italic markdown with line breaks."""
+    lines = text.strip().split("\n")
+    return "\n\n".join(f"*{line}*" if line.strip() else "" for line in lines)
 
 ROSARY_MYSTERIES = {
     "Joyful Mysteries (Monday & Saturday)": [
@@ -173,7 +297,18 @@ STATIONS = [
 ]
 
 # ── Language selector ─────────────────────────────────────────────────────────
-lang_map = {"English": "en", "Kiswahili": "sw", "Luganda": "lg"}
+lang_map = {
+    "English": "en",
+    "Kiswahili": "sw",
+    "Luganda": "lg",
+    "Français": "fr",
+    "Español": "es",
+    "Português": "pt",
+    "Deutsch": "de",
+    "Tagalog": "tl",
+    "Italiano": "it",
+    "Igbo": "ig",
+}
 lang_display = st.sidebar.selectbox("🌍 Language / Lugha", list(lang_map.keys()))
 lang = lang_map[lang_display]
 prayers = PRAYERS.get(lang, PRAYERS["en"])
@@ -183,18 +318,32 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs(
 )
 
 with tab1:
-    st.subheader(f"Essential Catholic Prayers — {lang_display}")
+    lang_native = {
+        "English": "Essential Catholic Prayers",
+        "Kiswahili": "Sala za Kikatoliki",
+        "Luganda": "Emiwoowo egy'Ekikatoli",
+        "Français": "Prières Catholiques Essentielles",
+        "Español": "Oraciones Católicas Esenciales",
+        "Português": "Orações Católicas Essenciais",
+        "Deutsch": "Grundlegende Katholische Gebete",
+        "Tagalog": "Mga Pangunahing Panalangin",
+        "Italiano": "Preghiere Cattoliche Fondamentali",
+        "Igbo": "Ekpere Ndị Katọlik",
+    }.get(lang_display, "Essential Catholic Prayers")
+    st.subheader(f"{lang_native}")
+    if lang_display != "English":
+        st.caption(f"Prayers in {lang_display} · Rosary, Divine Mercy and Stations shown in English")
     with st.expander("🙏 Our Father (Pater Noster)", expanded=True):
-        st.markdown(f"```\n{prayers.get('our_father', PRAYERS['en']['our_father'])}\n```")
+        st.markdown(_fmt(prayers.get('our_father', PRAYERS['en']['our_father'])))
     with st.expander("🌹 Hail Mary (Ave Maria)"):
-        st.markdown(f"```\n{prayers.get('hail_mary', PRAYERS['en']['hail_mary'])}\n```")
+        st.markdown(_fmt(prayers.get('hail_mary', PRAYERS['en']['hail_mary'])))
     with st.expander("✨ Glory Be (Gloria Patri)"):
-        st.markdown(f"```\n{prayers.get('glory_be', PRAYERS['en']['glory_be'])}\n```")
+        st.markdown(_fmt(prayers.get('glory_be', PRAYERS['en']['glory_be'])))
     if lang == "en":
         with st.expander("📜 Apostles' Creed"):
-            st.markdown(f"```\n{PRAYERS['en']['apostles_creed']}\n```")
+            st.markdown(_fmt(PRAYERS['en']['apostles_creed']))
         with st.expander("👑 Hail Holy Queen (Salve Regina)"):
-            st.markdown(f"```\n{PRAYERS['en']['hail_holy_queen']}\n```")
+            st.markdown(_fmt(PRAYERS['en']['hail_holy_queen']))
 
 with tab2:
     st.subheader("📿 The Most Holy Rosary")
