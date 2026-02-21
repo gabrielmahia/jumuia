@@ -22,7 +22,7 @@ import urllib.request
 import urllib.error
 import logging
 import streamlit as st
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional
 
 logger = logging.getLogger(__name__)
@@ -62,7 +62,7 @@ def submit(form_type: str, data: dict) -> bool:
 
     payload = {
         "form_type": form_type,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         **{k: (str(v) if not isinstance(v, (str, int, float, bool)) else v)
            for k, v in data.items()}
     }
