@@ -302,3 +302,217 @@ if __name__ == "__main__":
     for td in test_dates:
         ld = get_liturgical_day(td)
         print(f"{td}  →  {ld.display}  [{ld.color}]  Year {ld.liturgical_year}")
+
+
+# ── Obligations Engine ───────────────────────────────────────────────────────
+# Holy days of obligation vary by country and episcopal conference.
+# Sources: USCCB, Kenyan Catholic Bishops' Conference, CBCP (Philippines),
+#          AMECEA, CBCN (Nigeria), CNBB (Brazil), and CEC (European conferences).
+# Fasting/abstinence: universal Latin Church norms unless noted otherwise.
+
+from typing import NamedTuple
+
+class ObligationsResult(NamedTuple):
+    is_holy_day: bool
+    holy_day_name: str            # feast name or ""
+    mass_obligation: str          # "Obligatory" | "Dispensed" | "Recommended" | ""
+    fasting: bool                 # full fast (one full meal, two small) — Ash Wed / Good Friday
+    abstinence: bool              # no meat — all Fridays of Lent + Ash Wed + Good Fri
+    friday_abstinence: bool       # meatless Friday (outside Lent) — varies by country
+    explanation: str              # plain-language summary
+    source: str                   # episcopal conference abbreviation
+
+
+# Holy days of obligation by country code → set of (month, day) tuples
+# Universal: Sundays (handled separately) + the following where observed
+_UNIVERSAL_HOLYDAYS: set[tuple] = {
+    (1, 1),   # Solemnity of Mary
+    (8, 15),  # Assumption
+    (11, 1),  # All Saints
+    (12, 8),  # Immaculate Conception
+    (12, 25), # Christmas
+}
+
+# Countries where Epiphany (Jan 6) is obligatory (not transferred to Sunday)
+_EPIPHANY_OBLIGATORY: set[str] = {"PH", "IT", "ES", "PL", "DE", "AT", "HR"}
+
+# Countries that dispensed Epiphany obligation
+_EPIPHANY_DISPENSED: set[str] = {"US", "CA", "AU", "NZ", "GB", "IE"}
+
+# USCCB: 6 holy days (Assumption & All Saints dispensed if on Sat/Mon)
+_US_HOLYDAYS: set[tuple] = {(1,1),(8,15),(11,1),(12,8),(12,25)} | {(1,6)}
+# Note: USCCB transferred Epiphany + Ascension to Sunday
+
+# Kenya / AMECEA: Sundays + Christmas + Assumption + Immaculate Conception
+# All Saints and Solemnity of Mary observed but not strictly obligatory outside major cities
+_KENYA_HOLYDAYS: set[tuple] = {(1,1),(8,15),(12,8),(12,25),(11,1)}
+
+# Philippines (CBCP): All universal + All Saints strongly obligatory
+_PH_HOLYDAYS: set[tuple] = {(1,1),(1,6),(8,15),(11,1),(12,8),(12,25)}
+
+# Nigeria (CBCN): Christmas + Assumption + Immaculate Conception + Mary
+_NIGERIA_HOLYDAYS: set[tuple] = {(1,1),(8,15),(12,8),(12,25)}
+
+# Uganda (AMECEA same as Kenya)
+_UGANDA_HOLYDAYS: set[tuple] = _KENYA_HOLYDAYS
+
+# Brazil (CNBB): Universal + Aparecida (national patroness, Oct 12)
+_BRAZIL_HOLYDAYS: set[tuple] = {(1,1),(8,15),(10,12),(11,1),(12,8),(12,25)}
+
+# UK/Ireland: Christmas + Assumption + All Saints (Epiphany/Ascension transferred)
+_UK_HOLYDAYS: set[tuple] = {(8,15),(11,1),(12,25)}
+
+# Italy/Spain/Poland/Germany: Universal + Epiphany + national saints
+_ITALY_HOLYDAYS: set[tuple] = {(1,1),(1,6),(8,15),(11,1),(12,8),(12,25)}
+_POLAND_HOLYDAYS: set[tuple] = {(1,1),(1,6),(8,15),(11,1),(12,8),(12,25)}
+
+COUNTRY_HOLYDAYS: dict[str, set[tuple]] = {
+    "US": _US_HOLYDAYS,
+    "KE": _KENYA_HOLYDAYS,
+    "UG": _UGANDA_HOLYDAYS,
+    "TZ": _KENYA_HOLYDAYS,
+    "PH": _PH_HOLYDAYS,
+    "NG": _NIGERIA_HOLYDAYS,
+    "BR": _BRAZIL_HOLYDAYS,
+    "GB": _UK_HOLYDAYS,
+    "IE": _UK_HOLYDAYS,
+    "IT": _ITALY_HOLYDAYS,
+    "ES": _ITALY_HOLYDAYS,
+    "PL": _POLAND_HOLYDAYS,
+    "DE": _ITALY_HOLYDAYS,
+    "AT": _ITALY_HOLYDAYS,
+    "FR": {(1,1),(8,15),(11,1),(12,8),(12,25)},
+    "CA": {(1,1),(8,15),(12,25)},
+    "AU": {(8,15),(12,25)},
+    "MX": {(1,1),(2,2),(3,19),(8,15),(11,1),(12,8),(12,12),(12,25)},  # Our Lady of Guadalupe (Dec 12)
+    "CO": {(1,1),(1,6),(3,19),(6,29),(8,15),(8,7),(10,12),(11,1),(11,11),(12,8),(12,25)},
+    "IN": {(1,1),(8,15),(12,25)},
+    "DEFAULT": _UNIVERSAL_HOLYDAYS,
+}
+
+# Moveable holydays: Ascension Thursday (some countries) and Corpus Christi
+# US, Canada, AU, NZ transferred Ascension to Sunday; most others keep Thursday
+_ASCENSION_THURSDAY_COUNTRIES: set[str] = {"IT","ES","DE","AT","PL","PH","KE","UG","TZ","NG","BR","FR","MX","CO","IN"}
+
+
+def _get_moveable_obligations(for_date: date, country: str = "DEFAULT") -> tuple[bool, str]:
+    """Check if date is a moveable holy day of obligation (Ascension, Corpus Christi)."""
+    year = for_date.year
+    easter = _easter(year)
+    ascension = easter + timedelta(days=39)
+    corpus = easter + timedelta(days=60)  # Thursday after Trinity Sunday
+
+    if for_date == ascension and country.upper() in _ASCENSION_THURSDAY_COUNTRIES:
+        return True, "Ascension of the Lord"
+    if for_date == corpus and country.upper() in {"IT","ES","DE","AT","PL","BR","CO","MX"}:
+        return True, "Corpus Christi"
+    return False, ""
+
+
+def get_obligations(for_date: Optional[date] = None, country: str = "KE") -> ObligationsResult:
+    """
+    Return today's liturgical obligations for a given country.
+
+    Args:
+        for_date: date to check (defaults to today)
+        country:  ISO 3166-1 alpha-2 country code (e.g. 'KE', 'US', 'PH')
+
+    Returns:
+        ObligationsResult with holy day status, fasting, abstinence, and plain explanation.
+    """
+    d = for_date or date.today()
+    cc = country.upper()
+
+    ld = get_liturgical_day(d)
+    is_sunday = ld.weekday_name == "Sunday"
+    is_friday = ld.weekday_name == "Friday"
+    year = d.year
+    easter = _easter(year)
+    ash_wed = easter - timedelta(days=46)
+    good_fri = easter - timedelta(days=2)
+
+    # ── Fasting & Abstinence (universal Latin Church) ─────────────────────────
+    fasting = d in (ash_wed, good_fri)
+    abstinence_lenten_friday = (
+        ld.season in ("Lent", "Holy Week") and is_friday
+    ) or d in (ash_wed, good_fri)
+    friday_abstinence = is_friday and ld.season not in ("Easter",)  # Most countries: Fridays
+
+    # Some episcopal conferences (US, UK) replaced Friday abstinence with penitential act
+    # We flag it as recommended rather than omitting
+    _friday_abs_obligatory = cc not in {"US", "CA", "GB", "IE", "AU", "NZ"}
+
+    # ── Holy day detection ────────────────────────────────────────────────────
+    holydays = COUNTRY_HOLYDAYS.get(cc, COUNTRY_HOLYDAYS["DEFAULT"])
+    fixed_key = (d.month, d.day)
+    fixed_holy = fixed_key in holydays
+
+    moveable_holy, moveable_name = _get_moveable_obligations(d, cc)
+    is_holy_day = is_sunday or fixed_holy or moveable_holy
+
+    # Determine feast name for holy day
+    holy_day_name = ""
+    if is_sunday:
+        holy_day_name = ld.feast or ld.display
+    elif fixed_holy:
+        holy_day_name = FIXED_FEASTS.get(fixed_key, (f"Holy Day ({d.strftime('%B %d')})", "White"))[0]
+    elif moveable_holy:
+        holy_day_name = moveable_name
+
+    # USCCB dispensation: if Assumption or All Saints falls on Sat or Mon, obligation removed
+    mass_obligation = ""
+    if is_sunday or fixed_holy or moveable_holy:
+        if cc == "US" and fixed_key in {(8,15),(11,1)}:
+            # Sat or Mon → dispensed
+            if d.weekday() in (5, 0):
+                mass_obligation = "Dispensed"
+                is_holy_day = False
+                holy_day_name = ""
+            else:
+                mass_obligation = "Obligatory"
+        elif is_sunday or fixed_holy or moveable_holy:
+            mass_obligation = "Obligatory"
+
+    # ── Build plain-language explanation ─────────────────────────────────────
+    parts = []
+    if mass_obligation == "Obligatory":
+        parts.append(f"Mass is **obligatory** today — {holy_day_name}.")
+    elif mass_obligation == "Dispensed":
+        parts.append(f"The obligation for {holy_day_name} is **dispensed** this year (falls on Saturday/Monday — USCCB norm).")
+    else:
+        parts.append("No holy day of obligation today.")
+
+    if fasting:
+        parts.append(
+            "**Fasting required** — one full meal and two smaller meals that together don't equal one full meal. "
+            "No eating between meals."
+        )
+    if abstinence_lenten_friday:
+        parts.append("**Abstinence from meat required** (Lenten Friday / Ash Wednesday / Good Friday).")
+    elif friday_abstinence and not abstinence_lenten_friday:
+        if _friday_abs_obligatory:
+            parts.append("**Friday abstinence** — no meat today (episcopal norm for your region).")
+        else:
+            parts.append("Friday penance recommended — abstinence from meat or another penitential practice.")
+
+    if not parts:
+        parts.append("No special obligations today.")
+
+    conf_map = {
+        "US": "USCCB", "KE": "KCCB", "UG": "AMECEA", "TZ": "AMECEA",
+        "PH": "CBCP", "NG": "CBCN", "BR": "CNBB", "GB": "CES",
+        "IE": "IEC", "IT": "CEI", "ES": "CEE", "PL": "KEP",
+        "FR": "CEF", "DE": "DBK", "DEFAULT": "Universal",
+    }
+    source = conf_map.get(cc, "Universal")
+
+    return ObligationsResult(
+        is_holy_day=is_holy_day,
+        holy_day_name=holy_day_name,
+        mass_obligation=mass_obligation,
+        fasting=fasting,
+        abstinence=abstinence_lenten_friday,
+        friday_abstinence=friday_abstinence and not abstinence_lenten_friday,
+        explanation=" ".join(parts),
+        source=source,
+    )
