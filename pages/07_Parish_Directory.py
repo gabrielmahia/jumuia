@@ -429,17 +429,20 @@ with tab1:
                         if r["maps_link"]: st.markdown(f"[📍 Open in Google Maps]({r['maps_link']})")
 
                         col_a, col_b = st.columns(2)
-                        if col_a.button("➕ Save to our directory", key=f"save_{hash(r['name']+r['address'])}"):
-                            from services.sheets import _save
+                        _save_key = f"saved_osm_{hash(r['name']+r['address'])}"
+                        if st.session_state.get(_save_key):
+                            col_a.success("✓ Saved to directory", icon=None)
+                        elif col_a.button("➕ Save to our directory", key=f"save_{hash(r['name']+r['address'])}"):
+                            from services.sheets import _save as _do_save, is_live as _sheets_live
                             new_id = max((p["id"] for p in
                                 st.session_state.confirmed_parishes +
                                 st.session_state.submitted_parishes), default=0) + 1
                             addr_parts = r["address"].split(",")
-                            city    = addr_parts[1].strip() if len(addr_parts) > 1 else ""
-                            country = addr_parts[-1].strip() if addr_parts else ""
+                            _city    = addr_parts[1].strip() if len(addr_parts) > 1 else ""
+                            _country = addr_parts[-1].strip() if addr_parts else ""
                             parish_data = {
                                 "id": new_id, "name": r["name"],
-                                "city": city, "country": country,
+                                "city": _city, "country": _country,
                                 "address": r["address"], "phone": r["phone"],
                                 "mass_times": r["opening_hours"],
                                 "website": r.get("website", ""),
@@ -450,12 +453,22 @@ with tab1:
                                 "added": str(date.today()),
                             }
                             st.session_state.submitted_parishes.append(parish_data)
-                            _ok = _save("parish_submission", parish_data)
-                            show_save_status("parish_submission", _ok)
+                            _ok = _do_save("parish_submission", parish_data)
+                            st.session_state[_save_key] = True
                             if _ok:
-                                st.success(f"✅ **{r['name']}** saved to parish register. Needs 2 more confirmations to go live.")
+                                st.success(
+                                    f"✅ **{r['name']}** saved to your parish register in Google Sheets. "
+                                    "Needs 2 more community confirmations to go live.",
+                                    icon=None
+                                )
                             else:
-                                st.success("Added to Pending — needs 2 more confirmations.")
+                                st.info(
+                                    f"**{r['name']}** added to your session directory. "
+                                    "To keep this permanently, connect Google Sheets — "
+                                    "see **More Tools → Admin & Data**.",
+                                    icon="💾"
+                                )
+                            st.rerun()
 
             else:
                 _geocode_failed = any("geocode" in e for e in osm_errors)
@@ -524,22 +537,35 @@ with tab2:
         submitted = st.form_submit_button("Submit Parish", type="primary")
 
     if submitted and name and city and country:
-        from services.sheets import _save
+        from services.sheets import _save as _do_save, is_live as _sheets_live
         new_id = max((p["id"] for p in st.session_state.confirmed_parishes +
                       st.session_state.submitted_parishes), default=0) + 1
         parish_data = {
             "id": new_id, "name": name, "city": city, "country": country,
             "diocese": diocese, "address": address, "phone": phone,
-            "mass_times": mass_times, "verified": False, "confirmations": 0,
-            "submitted_by": submitter_role, "added": str(date.today()),
+            "mass_languages": ", ".join(langs) if langs else "",
+            "confession_times": confession,
+            "mass_times": mass_times,
+            "notes": notes,
+            "verified": False, "confirmations": 0,
+            "submitted_by": submitter_role,
+            "source": "community",
+            "added": str(date.today()),
         }
         st.session_state.submitted_parishes.append(parish_data)
-        _ok = _save("parish_submission", parish_data)
-        show_save_status("parish_submission", _ok)
-        st.success(
-            f"✅ **{name}** submitted. It will appear in the directory once "
-            "3 parishioners confirm it, or a parish coordinator verifies it."
-        )
+        _ok = _do_save("parish_submission", parish_data)
+        if _ok:
+            st.success(
+                f"\u2705 **{name}** saved to Google Sheets. "
+                "It will go live once 3 parishioners confirm it or a coordinator verifies it."
+            )
+        else:
+            st.info(
+                f"**{name}** submitted for this session. "
+                "To keep it permanently, connect Google Sheets "
+                "\u2014 see More Tools \u2192 Admin & Data.",
+                icon="\U0001f4be"
+            )
         st.balloons()
 
 
