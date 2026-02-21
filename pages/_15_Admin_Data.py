@@ -2,7 +2,7 @@
 
 import streamlit as st
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, UTC
 
 st.set_page_config(page_title="Admin — Data Management", page_icon="⚙️", layout="wide")
 try:
@@ -27,6 +27,7 @@ MODULES = {
     "new_members": ("🆕 New Members", None),
     "formation_programmes": ("🎓 Formation Programmes", None),
     "formation_participants": ("🎓 Participants", None),
+    "training_log": ("📚 Training Log", None),
 }
 
 tab1, tab2, tab3 = st.tabs(["⬇️ Export Data", "⬆️ Import Data", "🗑️ Data Hygiene"])
@@ -68,7 +69,7 @@ with tab1:
     # Full backup as JSON
     import json
     backup = {
-        "exported_at": datetime.utcnow().isoformat(),
+        "exported_at": datetime.now(UTC).isoformat(),
         "sacrament_records": st.session_state.get("sacrament_records", {}),
         "sccs": st.session_state.get("sccs", []),
         "catechists": st.session_state.get("catechists", []),
@@ -78,6 +79,7 @@ with tab1:
         "new_members": st.session_state.get("new_members", []),
         "formation_programmes": st.session_state.get("formation_programmes", []),
         "formation_participants": st.session_state.get("formation_participants", []),
+        "training_log": st.session_state.get("training_log", []),
     }
     json_bytes = json.dumps(backup, indent=2, default=str).encode("utf-8")
     st.download_button(
@@ -191,8 +193,8 @@ with tab3:
 **For production use, connect one of these backends:**
 
 🔵 **Google Sheets** — free, collaborative, no server needed
-- Add `GOOGLE_SHEETS_URL` to Streamlit secrets
-- Use `gspread` library (add to requirements.txt)
+- Add `SHEETS_ENDPOINT` to Streamlit secrets (copy the Apps Script URL)
+- Already wired — see More Tools → Admin & Data
 
 🟢 **SQLite** — local file database, no external service
 - Use `sqlite3` (built into Python)
