@@ -348,6 +348,7 @@ with tab1:
         if not osm_name.strip() and not osm_place.strip():
             st.warning("Please enter a church name, a location, or both.")
         else:
+            st.session_state["_osm_search_ran"] = True
             osm_results = []
             osm_errors = []
 
@@ -408,13 +409,16 @@ with tab1:
                     except Exception as _loc_err:
                         osm_errors.append(f"location_search: {str(_loc_err)[:80]}")
 
-            # ── DEDUPLICATE ──────────────────────────────────────────────
+            # ── DEDUPLICATE & CACHE ──────────────────────────────────────
             seen, unique = set(), []
             for r in osm_results:
                 key = r["name"].lower()[:30] + r["address"][:20]
                 if key not in seen:
                     seen.add(key)
                     unique.append(r)
+            # Cache results so they survive st.rerun()
+            st.session_state["_osm_last_results"] = unique
+            st.session_state["_osm_last_max"] = osm_max
 
             # ── DISPLAY ──────────────────────────────────────────────────
             if unique:
@@ -456,18 +460,9 @@ with tab1:
                             _ok = _do_save("parish_submission", parish_data)
                             st.session_state[_save_key] = True
                             if _ok:
-                                st.success(
-                                    f"✅ **{r['name']}** saved to your parish register in Google Sheets. "
-                                    "Needs 2 more community confirmations to go live.",
-                                    icon=None
-                                )
+                                col_a.success("✓ Saved to Google Sheets", icon=None)
                             else:
-                                st.info(
-                                    f"**{r['name']}** added to your session directory. "
-                                    "To keep this permanently, connect Google Sheets — "
-                                    "see **More Tools → Admin & Data**.",
-                                    icon="💾"
-                                )
+                                col_a.info("Saved for this session", icon="💾")
                             st.rerun()
 
             else:
@@ -497,6 +492,55 @@ with tab1:
                         "Turkana, Marsabit, and other remote dioceses are still being mapped. "
                         "You can **add your parish** using the tab below."
                     )
+
+    st.session_state["_osm_search_ran"] = False  # allow cache render on next pass
+    # ── Render cached results (visible after save button reruns page) ──────────
+    if not st.session_state.get("_osm_search_ran"):  # only if we didn't just run a search
+        _cached = st.session_state.get("_osm_last_results")
+        _cached_max = st.session_state.get("_osm_last_max", 15)
+        if _cached:
+            st.success(f"Found {len(_cached)} church{'es' if len(_cached)>1 else ''}")
+            for r in _cached[:_cached_max]:
+                with st.expander(f"⛪ {r['name']}"):
+                    c1, c2 = st.columns(2)
+                    if r["address"]:   c1.markdown(f"📍 {r['address'][:120]}")
+                    if r["phone"]:     c1.markdown(f"📞 {r['phone']}")
+                    if r.get("opening_hours"): c2.markdown(f"🕐 {r['opening_hours']}")
+                    if r.get("website"):   c2.markdown(f"🔗 [{r['website'][:40]}]({r['website']})")
+                    if r.get("maps_link"): st.markdown(f"[📍 Open in Google Maps]({r['maps_link']})")
+
+                    col_a, col_b = st.columns(2)
+                    _save_key = f"saved_osm_{hash(r['name']+r['address'])}"
+                    if st.session_state.get(_save_key):
+                        col_a.success("✓ Saved to directory", icon=None)
+                    elif col_a.button("➕ Save to our directory", key=f"save_c_{hash(r['name']+r['address'])}"):
+                        from services.sheets import _save as _do_save
+                        new_id = max((pp["id"] for pp in
+                            st.session_state.confirmed_parishes +
+                            st.session_state.submitted_parishes), default=0) + 1
+                        addr_parts = r["address"].split(",")
+                        _city    = addr_parts[1].strip() if len(addr_parts) > 1 else ""
+                        _country = addr_parts[-1].strip() if addr_parts else ""
+                        parish_data = {
+                            "id": new_id, "name": r["name"],
+                            "city": _city, "country": _country,
+                            "address": r["address"], "phone": r["phone"],
+                            "mass_times": r.get("opening_hours", ""),
+                            "website": r.get("website", ""),
+                            "maps_link": r.get("maps_link", ""),
+                            "verified": False, "confirmations": 1,
+                            "submitted_by": "OSM import",
+                            "source": "OpenStreetMap",
+                            "added": str(date.today()),
+                        }
+                        st.session_state.submitted_parishes.append(parish_data)
+                        _ok = _do_save("parish_submission", parish_data)
+                        st.session_state[_save_key] = True
+                        if _ok:
+                            col_a.success("✓ Saved to Google Sheets", icon=None)
+                        else:
+                            col_a.info("Saved for this session", icon="💾")
+                        st.rerun()
 
     st.caption(
         "Church data from [OpenStreetMap](https://www.openstreetmap.org) contributors "
