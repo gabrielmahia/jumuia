@@ -10,9 +10,9 @@ except Exception:
 st.set_page_config(page_title="SCCs — Catholic Network Tools", page_icon="👥", layout="wide")
 try:
     from services.roles import require_role as _require_role
-    _require_role("catechist", "Small Christian Communities")
-except Exception:
-    pass
+except ImportError:
+    def _require_role(r, p=""): pass
+_require_role("catechist", "Small Christian Communities")
 
 
 st.title("👥 Small Christian Communities (SCCs)")
@@ -68,7 +68,7 @@ with tab1:
 
     st.divider()
     with st.expander("➕ Add New SCC", expanded=not st.session_state.sccs):
-        with st.form("scc_form"):
+        with st.form("scc_form", clear_on_submit=True):
             c1, c2 = st.columns(2)
             with c1:
                 name = st.text_input("SCC Name *", placeholder="St. Joseph's SCC")
@@ -110,7 +110,7 @@ with tab2:
     st.caption("The Lumko method: See → Judge → Act — developed for African SCCs")
 
     with st.expander("➕ Record a Meeting"):
-        with st.form("meeting_form"):
+        with st.form("meeting_form", clear_on_submit=True):
             c1, c2 = st.columns(2)
             with c1:
                 scc_names = [s["Name"] for s in st.session_state.sccs] or ["No SCCs yet"]

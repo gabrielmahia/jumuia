@@ -22,13 +22,20 @@ from typing import Tuple
 # ── YEAR CYCLE ────────────────────────────────────────────────────────────────
 
 def _sunday_cycle(year: int) -> str:
-    """Returns 'A', 'B', or 'C' for the liturgical year starting in Advent."""
-    # Liturgical year starts in Advent (late Nov/early Dec)
-    # Year A: 2023-24, 2026-27, 2029-30 (year % 3 == 1 for the calendar year of Advent start)
-    # Simple rule: liturgical year N uses cycle based on N % 3
-    # 2025-26 = Year C, 2026-27 = Year A, 2027-28 = Year B
-    cycles = {0: "B", 1: "C", 2: "A"}
-    return cycles[year % 3]
+    """Returns 'A', 'B', or 'C' for the liturgical year starting in Advent.
+    
+    The liturgical year begins in Advent. The cycle letter is determined by
+    the year in which Advent starts:
+      Year A: 2022-23, 2025-26, 2028-29  (advent_year % 3 == 0, 1969 base)
+      Year B: 2023-24, 2026-27, 2029-30
+      Year C: 2024-25, 2027-28, 2030-31
+    Formula matches liturgical_engine._liturgical_year().
+    """
+    # Determine whether this calendar year is still in the previous LY
+    # (Jan–Nov) or has started a new LY (Dec Advent onwards).
+    # For simplicity, use calendar year as proxy for advent_start year.
+    # (2025 Advent → LY 2025-26 → Year A)
+    return ["A", "B", "C"][(year - 1) % 3]
 
 
 def _weekday_cycle(year: int) -> str:

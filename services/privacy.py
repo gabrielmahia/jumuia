@@ -21,7 +21,7 @@ Hard exclusions (NEVER collected regardless of user request):
 import hashlib
 import logging
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timezone, UTC
 
 logger = logging.getLogger(__name__)
 
@@ -73,13 +73,13 @@ def data_deletion_request(identifier: str, reason: str = "") -> dict:
     Log a data deletion request and return a reference token.
     In production: triggers Sheets row deletion + session clear.
     """
-    ref = anonymise(f"{identifier}{datetime.utcnow().isoformat()}")
+    ref = anonymise(f"{identifier}{datetime.now(UTC).isoformat()}")
     logger.warning("DATA_DELETION_REQUEST ref=%s", ref)
     try:
         from services.sheets import _save
         _save("gdpr_deletion_request", {
             "ref": ref,
-            "requested_at": datetime.utcnow().isoformat(),
+            "requested_at": datetime.now(UTC).isoformat(),
             "reason": scrub_pii(reason[:200]),
         })
     except Exception:

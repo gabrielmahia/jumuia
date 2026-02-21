@@ -12,9 +12,9 @@ from datetime import date
 st.set_page_config(page_title="Sacraments", page_icon="✝️", layout="wide")
 try:
     from services.roles import require_role as _require_role
-    _require_role("coordinator", "Sacramental Records")
-except Exception:
-    pass
+except ImportError:
+    def _require_role(r, p=""): pass
+_require_role("coordinator", "Sacramental Records")
 
 
 st.title("✝️ Sacramental Records")
@@ -46,7 +46,7 @@ with tabs[0]:
         st.info("No baptism records yet. Add one below.")
 
     with st.expander("➕ Record a Baptism", expanded=not records):
-        with st.form("baptism_form"):
+        with st.form("baptism_form", clear_on_submit=True):
             c1, c2 = st.columns(2)
             with c1:
                 child_name = st.text_input("Full Name of Person Baptised *")
@@ -100,7 +100,7 @@ with tabs[1]:
         st.info("No confirmation records yet.")
 
     with st.expander("➕ Record a Confirmation"):
-        with st.form("conf_form"):
+        with st.form("conf_form", clear_on_submit=True):
             c1, c2 = st.columns(2)
             with c1:
                 cand_name = st.text_input("Full Name of Candidate *")
@@ -139,7 +139,7 @@ with tabs[2]:
         st.info("No First Communion records yet.")
 
     with st.expander("➕ Record First Holy Communion"):
-        with st.form("eucharist_form"):
+        with st.form("eucharist_form", clear_on_submit=True):
             c1, c2 = st.columns(2)
             with c1:
                 child_name = st.text_input("Full Name *")
@@ -173,7 +173,7 @@ with tabs[3]:
         st.info("No marriage records yet.")
 
     with st.expander("➕ Record a Marriage", expanded=not records):
-        with st.form("marriage_form"):
+        with st.form("marriage_form", clear_on_submit=True):
             st.markdown("**Bride & Groom**")
             c1, c2 = st.columns(2)
             with c1:
@@ -249,7 +249,7 @@ with tabs[4]:
     st.info("Individual confessional records are kept under the seal — only aggregate statistics are stored here.")
 
     with st.expander("📊 Record Aggregate Confession Statistics"):
-        with st.form("rec_form"):
+        with st.form("rec_form", clear_on_submit=True):
             c1, c2 = st.columns(2)
             with c1:
                 period = st.text_input("Period (e.g. Lent 2026, Easter 2026)")
@@ -276,7 +276,7 @@ with tabs[5]:
     st.subheader("✝️ Holy Orders & Religious Profession")
 
     with st.expander("➕ Record Ordination / Profession"):
-        with st.form("orders_form"):
+        with st.form("orders_form", clear_on_submit=True):
             c1, c2 = st.columns(2)
             with c1:
                 person = st.text_input("Full Name *")
@@ -308,7 +308,7 @@ with tabs[6]:
     st.caption("Can. 1004 — Given to those in danger of death from illness or old age")
 
     with st.expander("➕ Record Anointing"):
-        with st.form("anoint_form"):
+        with st.form("anoint_form", clear_on_submit=True):
             c1, c2 = st.columns(2)
             with c1:
                 person = st.text_input("Full Name *")

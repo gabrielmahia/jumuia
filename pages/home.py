@@ -177,7 +177,7 @@ st.markdown("""
 <div class="cps-stats">
   <div><span class="cps-stat-num">40,000+</span><span class="cps-stat-label">Churches searchable</span></div>
   <div><span class="cps-stat-num">150+</span><span class="cps-stat-label">Countries</span></div>
-  <div><span class="cps-stat-num">13+</span><span class="cps-stat-label">Languages</span></div>
+  <div><span class="cps-stat-num">14</span><span class="cps-stat-label">Languages</span></div>
   <div><span class="cps-stat-num">1.3B</span><span class="cps-stat-label">Catholics worldwide</span></div>
 </div>
 """, unsafe_allow_html=True)

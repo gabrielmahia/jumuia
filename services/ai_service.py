@@ -20,8 +20,11 @@ import urllib.error
 logger = logging.getLogger(__name__)
 
 SUPPORTED_LANGUAGES = {
-    "en": "English", "sw": "Kiswahili", "fr": "French",
+    "en": "English",  "sw": "Kiswahili", "fr": "French",
     "es": "Spanish",  "pt": "Portuguese", "lg": "Luganda",
+    "ig": "Igbo",     "tl": "Tagalog",    "hi": "Hindi",
+    "it": "Italiano", "de": "Deutsch",    "pl": "Polski",
+    "ar": "Arabic",   "sv": "Svenska",
 }
 
 _MODELS = [
