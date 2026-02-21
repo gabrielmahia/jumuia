@@ -211,9 +211,14 @@ else:
         "Find today's readings at any of the links below — they all follow the same Roman Rite cycle worldwide:"
     )
     c1, c2, c3 = st.columns(3)
+    from datetime import date as _date
+    _today = _date.today()
+    _vatican_url = f"https://www.vaticannews.va/en/word-of-the-day/{_today.year}/{_today.month:02d}/{_today.day:02d}.html"
+    c1, c2, c3, c4 = st.columns(4)
     c1.link_button("📖 USCCB (US)", "https://bible.usccb.org/daily-bible-reading", use_container_width=True)
     c2.link_button("🌐 Universalis", "https://universalis.com/today.htm", use_container_width=True)
-    c3.link_button("🕊️ Vatican", "https://www.vaticannews.va/en/liturgy-of-the-day.html", use_container_width=True)
+    c3.link_button("📺 EWTN", "https://www.ewtn.com/catholicism/daily-readings", use_container_width=True)
+    c4.link_button("🕊️ Vatican News", _vatican_url, use_container_width=True)
     st.markdown("")
     # Static reflection prompts based on season (same as Sunday path)
     prompts = {
