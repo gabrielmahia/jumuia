@@ -59,14 +59,29 @@ def _http_get(url: str, timeout=15) -> dict:
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.loads(r.read().decode("utf-8"))
 
-def _overpass(query: str, timeout=30) -> list:
-    url = "https://overpass-api.de/api/interpreter"
+_OVERPASS_ENDPOINTS = [
+    "https://overpass-api.de/api/interpreter",
+    "https://maps.mail.ru/osm/tools/overpass/api/interpreter",  # fallback mirror
+    "https://overpass.openstreetmap.ru/api/interpreter",        # 2nd fallback
+]
+
+def _overpass(query: str, timeout=35) -> list:
+    """Try multiple Overpass endpoints — returns first successful result."""
     body = query.encode("utf-8")
-    req = urllib.request.Request(url, data=body,
-                                 headers={"Content-Type": "text/plain", "User-Agent": _UA},
-                                 method="POST")
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        return json.loads(r.read().decode("utf-8")).get("elements", [])
+    last_err = None
+    for endpoint in _OVERPASS_ENDPOINTS:
+        try:
+            req = urllib.request.Request(
+                endpoint, data=body,
+                headers={"Content-Type": "text/plain", "User-Agent": _UA},
+                method="POST"
+            )
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return json.loads(r.read().decode("utf-8")).get("elements", [])
+        except Exception as e:
+            last_err = e
+            continue  # try next endpoint
+    raise last_err  # re-raise so caller can handle / log
 
 def geocode_place(place_name: str) -> dict | None:
     """Convert a place name to coordinates + bounding box via Nominatim.
@@ -119,29 +134,49 @@ def search_churches_by_place(geo: dict, max_results=20) -> list:
     """
     Search for Catholic churches within a bounding box.
     Expands the box for sparse/rural areas automatically.
+    Tier 1: dense city — use bbox as-is
+    Tier 2: town/suburb — small pad
+    Tier 3: village — moderate expansion (~17km)
+    Tier 4: remote/nomadic — large expansion (~55km, for Turkana-scale areas)
     """
     s, n, w, e = geo["s"], geo["n"], geo["w"], geo["e"]
-    # Expand sparse boxes: if the area is small, widen it for rural contexts
     lat_span = n - s
     lon_span = e - w
-    if lat_span < 0.1 and lon_span < 0.1:
-        # Very small area (single street/village) — expand by 0.15 degrees
-        pad = 0.15
-        s -= pad; n += pad; w -= pad; e += pad
-    elif lat_span < 0.3 and lon_span < 0.3:
-        # Small town — modest expansion
-        pad = 0.05
-        s -= pad; n += pad; w -= pad; e += pad
 
-    query = f"""
-[out:json][timeout:30];
-(
-  node["amenity"="place_of_worship"]["denomination"~"catholic",i]({s},{w},{n},{e});
-  way["amenity"="place_of_worship"]["denomination"~"catholic",i]({s},{w},{n},{e});
-  node["amenity"="place_of_worship"]["religion"="christian"]["name"~"catholic|saint|holy|our lady|blessed|sacred heart|katolsk|katolska|catolica|católica|eglise|église|cattolica|katolik",i]({s},{w},{n},{e});
-);
-out center {max_results};
-"""
+    if lat_span < 0.05 and lon_span < 0.05:
+        # Tiny (single road/hamlet) — remote nomadic area: 0.5° ≈ 55km
+        pad = 0.5
+    elif lat_span < 0.15 and lon_span < 0.15:
+        # Small village: 0.2° ≈ 22km
+        pad = 0.2
+    elif lat_span < 0.3 and lon_span < 0.3:
+        # Small town: 0.08° ≈ 9km
+        pad = 0.08
+    else:
+        pad = 0.0  # City or larger — use bbox as returned by Nominatim
+
+    s -= pad; n += pad; w -= pad; e += pad
+
+    # Comprehensive query covering all OSM Catholic church tagging patterns:
+    # - denomination=catholic OR roman_catholic (most tagged churches)
+    # - religion=christian + catholic name patterns (English, Swahili, French, Spanish, Portuguese)
+    # - relation type catches cathedrals and basilicas (large buildings often tagged as relations)
+    # Build query parts separately to avoid f-string + backslash conflicts
+    bbox = f"{s},{w},{n},{e}"
+    denom_pat = "^(catholic|roman_catholic)$"
+    name_pat = "catholic|saint|st[.] |holy|our lady|blessed|sacred|consolata|assumption|immaculate|annunciation|resurrection|corpus christi|kanisa|parokia|paroisse|iglesia|igreja"
+    name_pat_way = "catholic|saint|holy|our lady|blessed|sacred|consolata|assumption|immaculate"
+    big_pat = "catholic|cathedral|basilica|shrine"
+    query = (
+        "[out:json][timeout:40];\n("
+        f'\n  node["amenity"="place_of_worship"]["denomination"~"{denom_pat}",i]({bbox});'
+        f'\n  way["amenity"="place_of_worship"]["denomination"~"{denom_pat}",i]({bbox});'
+        f'\n  relation["amenity"="place_of_worship"]["denomination"~"{denom_pat}",i]({bbox});'
+        f'\n  node["amenity"="place_of_worship"]["religion"="christian"]["name"~"{name_pat}",i]({bbox});'
+        f'\n  way["amenity"="place_of_worship"]["religion"="christian"]["name"~"{name_pat_way}",i]({bbox});'
+        f'\n  relation["amenity"="place_of_worship"]["religion"="christian"]["name"~"{big_pat}",i]({bbox});'
+        f'\n);\nout center {max_results};'
+    )
     return _overpass(query)
 
 def search_churches_by_name(name_query: str, max_results=15) -> list:
@@ -342,8 +377,8 @@ with tab1:
                             r = format_osm_result(el)
                             if r["name"].lower() != "unnamed church":
                                 osm_results.append(r)
-                    except Exception:
-                        osm_errors.append("name_search")
+                    except Exception as _name_err:
+                        osm_errors.append(f"name_search: {str(_name_err)[:80]}")
 
                 # ── LOCATION-BASED SEARCH ─────────────────────────────────
                 if search_mode in ("📍 By location", "🌐 Both") and osm_place.strip():
@@ -361,12 +396,17 @@ with tab1:
                             if len(_dn_parts) > 1:
                                 area_label += f", {_dn_parts[1].strip()}"
                             for el in els:
+                                # Filter out non-Catholic churches that leaked through name matching
+                                tags = el.get("tags", {})
+                                denom = tags.get("denomination", "").lower()
+                                if denom and denom not in ("catholic", "roman_catholic", ""):
+                                    continue  # skip confirmed non-Catholic
                                 r = format_osm_result(el)
                                 osm_results.append(r)
                         else:
                             osm_errors.append("geocode")
-                    except Exception:
-                        osm_errors.append("location_search")
+                    except Exception as _loc_err:
+                        osm_errors.append(f"location_search: {str(_loc_err)[:80]}")
 
             # ── DEDUPLICATE ──────────────────────────────────────────────
             seen, unique = set(), []
@@ -418,17 +458,32 @@ with tab1:
                                 st.success("Added to Pending — needs 2 more confirmations.")
 
             else:
-                tip = ""
-                if "geocode" in osm_errors:
-                    tip = "Try a nearby larger town or region name."
-                elif "name_search" in osm_errors:
-                    tip = "Try a simpler name — e.g. just 'Consolata' or 'Sacred Heart'."
-                st.info(
-                    "No churches found for this search. "
-                    f"{tip} "
-                    "Church mapping coverage varies by region — rural areas worldwide are still being added. "
-                    "You can add your parish using the 'Add a Parish' tab below."
-                )
+                _geocode_failed = any("geocode" in e for e in osm_errors)
+                _search_failed  = any("location_search" in e or "name_search" in e for e in osm_errors)
+                _has_err_detail = any(":" in e for e in osm_errors)
+
+                if _geocode_failed:
+                    st.warning(
+                        "**Location not recognised.** Try a nearby larger town — "
+                        "e.g. 'Marsabit Kenya' instead of a remote village name. "
+                        "For very remote areas, search the county or region name."
+                    )
+                elif _search_failed:
+                    # Overpass timed out or all endpoints failed — give user a retry hint
+                    err_detail = " | ".join(e for e in osm_errors if ":" in e)[:120]
+                    st.warning(
+                        "**The worldwide church database is temporarily busy.** "
+                        "Please wait 10 seconds and try again. "
+                        "Coverage is good for Nairobi, Mombasa, Kisumu, Kampala, Lagos, Manila, São Paulo and most cities."
+                        + (("\n\n*Detail: " + err_detail + "*") if err_detail else "")
+                    )
+                else:
+                    st.info(
+                        "No Catholic churches found in this area yet. "
+                        "OpenStreetMap coverage is dense in cities and growing in rural regions — "
+                        "Turkana, Marsabit, and other remote dioceses are still being mapped. "
+                        "You can **add your parish** using the tab below."
+                    )
 
     st.caption(
         "Church data from [OpenStreetMap](https://www.openstreetmap.org) contributors "

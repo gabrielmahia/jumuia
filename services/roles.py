@@ -110,17 +110,24 @@ def require_role(minimum_role: str, page_name: str = "") -> None:
     st.stop()
 
 
-def set_role(role: str) -> None:
+def set_role(role: str, redirect_home: bool = False) -> None:
     """Set role in session. In production: call only after JWT verification."""
     import streamlit as st
     if role in ROLES:
         st.session_state["_user_role"] = role
         logger.info("Role set: %s", role)
-        try:
-            from services.privacy import audit_log
-            audit_log("role_set", role, f"Role elevated to {role}")
-        except Exception:
-            pass
+        # Only audit-log elevations — not demotions (avoids cluttering coordinator's Sheet)
+        if role != "parishioner":
+            try:
+                from services.privacy import audit_log
+                audit_log("role_set", role, f"Role set to {role}")
+            except Exception:
+                pass
+        if redirect_home:
+            try:
+                st.switch_page("pages/home.py")
+            except Exception:
+                st.rerun()
 
 
 def _role_upgrade_widget():
@@ -154,6 +161,10 @@ def _role_upgrade_widget():
             ):
                 if role in ("catechist", "coordinator"):
                     st.session_state["_pending_role"] = role
+                elif role == "parishioner":
+                    # Clear any pending role and go to home — don't clutter coordinator page
+                    st.session_state.pop("_pending_role", None)
+                    set_role("parishioner", redirect_home=True)
                 else:
                     set_role(role)
                     st.rerun()
