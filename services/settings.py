@@ -13,6 +13,7 @@ DEFAULTS: dict[str, Any] = {
     "language": "en",
     "scripture_translation": "RSVCE",
     "timezone": "UTC",
+    "country_code": "KE",
     "diocese": "",
     "rite": "Roman",
     "large_text": False,
@@ -125,6 +126,28 @@ def settings_page() -> None:
                              format_func=lambda k: RITES[k],
                              index=rite_idx, key="set_rite")
         set_val("rite", rite)
+
+        # Country code — used by obligations engine for holy days & fasting rules
+        COUNTRY_OPTIONS = {
+            "KE": "Kenya", "UG": "Uganda", "TZ": "Tanzania", "NG": "Nigeria",
+            "US": "United States", "PH": "Philippines", "BR": "Brazil",
+            "GB": "United Kingdom", "IE": "Ireland", "IT": "Italy",
+            "ES": "Spain", "FR": "France", "DE": "Germany", "PL": "Poland",
+            "AT": "Austria", "MX": "Mexico", "CO": "Colombia", "IN": "India",
+            "CA": "Canada", "AU": "Australia",
+        }
+        cur_cc = get("country_code") or "KE"
+        cc_keys = list(COUNTRY_OPTIONS.keys())
+        cc_idx = cc_keys.index(cur_cc) if cur_cc in cc_keys else 0
+        cc = c3.selectbox(
+            "Country (for holy days & obligations)",
+            options=cc_keys,
+            format_func=lambda k: f"{COUNTRY_OPTIONS[k]} ({k})",
+            index=cc_idx,
+            key="set_country_code",
+            help="Determines which holy days of obligation apply to you",
+        )
+        set_val("country_code", cc)
 
     with st.expander("♿ Accessibility", expanded=False):
         c1, c2 = st.columns(2)

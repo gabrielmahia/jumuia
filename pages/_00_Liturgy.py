@@ -76,6 +76,39 @@ season_descriptions = {
 if data["season"] in season_descriptions:
     st.caption(season_descriptions[data["season"]])
 
+# ── Obligations Panel ────────────────────────────────────────────────────────
+try:
+    from services.liturgical_engine import get_obligations
+    from services.settings import get as _get_setting
+
+    _country = _get_setting("country_code") or "KE"
+    _obs = get_obligations(country=_country)
+
+    _obs_parts = []
+    if _obs.mass_obligation == "Obligatory":
+        _obs_parts.append(f"⛪ **Mass obligatory** — {_obs.holy_day_name}")
+    elif _obs.mass_obligation == "Dispensed":
+        _obs_parts.append(f"ℹ️ Obligation dispensed — {_obs.holy_day_name} (falls on Sat/Mon this year)")
+    if _obs.fasting:
+        _obs_parts.append("🌾 **Fast day** — one full meal, two smaller meals")
+    if _obs.abstinence:
+        _obs_parts.append("🐟 **Abstinence from meat required**")
+    elif _obs.friday_abstinence:
+        _obs_parts.append("🐟 Friday penance — abstinence from meat (or penitential practice)")
+
+    if _obs_parts:
+        with st.container():
+            st.markdown(
+                "<div style='background:rgba(107,33,168,0.07);border-left:4px solid #6b21a8;"
+                "border-radius:0 8px 8px 0;padding:0.8rem 1.2rem;margin-bottom:1rem;'>"
+                + "<br>".join(_obs_parts)
+                + f"<div style='font-size:0.72rem;opacity:0.55;margin-top:0.4rem;'>"
+                + f"Source: {_obs.source} · Change country in Settings</div></div>",
+                unsafe_allow_html=True,
+            )
+except Exception:
+    pass
+
 st.divider()
 
 # ── Readings ──────────────────────────────────────────────────────────────────

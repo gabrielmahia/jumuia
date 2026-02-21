@@ -162,9 +162,9 @@ _live = bool(model)
 if not _live:
     st.info("The assistant is responding with suggested answers while we restore full service. All other parish tools are working normally.", icon="✝️")
 
-tab_chat, tab_translate, tab_homily, tab_insights = st.tabs([
+tab_chat, tab_translate, tab_homily, tab_insights, tab_comms = st.tabs([
     # tabs intentionally kept simple
-    "💬 Chat", "🌍 Translation", "📖 Homily Helper", "📊 Parish Insights"
+    "💬 Chat", "🌍 Translation", "📖 Homily Helper", "📊 Parish Insights", "📣 Announcements"
 ])
 
 # ── Chat ──────────────────────────────────────────────────────────────────────
@@ -360,6 +360,137 @@ with tab_insights:
                 st.warning("Daily quota reached — available again later today.")
             else:
                 st.info("Insights not available right now. Please try again shortly.")
+
+# ── Announcements & Crisis Composer ──────────────────────────────────────────
+with tab_comms:
+    st.markdown("**Parish Announcements & Crisis Drafts**")
+    st.caption(
+        "Template-based drafts only — always reviewed and signed by parish leadership before sending. "
+        "No announcement is issued directly from this tool."
+    )
+    st.info(
+        "⚠️ **DRAFT MODE** — All output is a starting draft. "
+        "Final language, facts, and approval rest with the priest or coordinator.",
+        icon="✏️",
+    )
+
+    ANNOUNCEMENT_TEMPLATES = {
+        "Mass cancellation / reschedule": {
+            "icon": "⛪",
+            "fields": ["Date/time cancelled", "Reason (optional)", "Alternative arrangement"],
+            "prompt": (
+                "Write a brief, clear parish announcement that Mass on [Date/time cancelled] is cancelled. "
+                "Reason: [Reason]. Alternative: [Alternative arrangement]. "
+                "Warm, pastoral tone. 60–90 words. Include a closing blessing. "
+                "Start with 'Dear Parishioners,' — no subject line needed here."
+            ),
+        },
+        "Priest transfer / departure": {
+            "icon": "✝️",
+            "fields": ["Priest name", "Effective date", "Successor (if known)"],
+            "prompt": (
+                "Write a warm, grateful parish announcement that Fr. [Priest name] will be transferring "
+                "effective [Effective date]. Acknowledge their ministry without being effusive. "
+                "[Successor]. 80–120 words. Pastoral and dignified."
+            ),
+        },
+        "Emergency appeal": {
+            "icon": "🚨",
+            "fields": ["Nature of emergency", "Amount needed / goal", "How to give"],
+            "prompt": (
+                "Write an urgent but calm parish appeal. Emergency: [Nature of emergency]. "
+                "Goal: [Amount needed / goal]. How to give: [How to give]. "
+                "Urgent but not alarmist. Trust-building. 80–100 words. Include gratitude."
+            ),
+        },
+        "Public clarification": {
+            "icon": "📋",
+            "fields": ["Topic being clarified", "The correct position", "Who to contact with questions"],
+            "prompt": (
+                "Write a calm, clear parish clarification on [Topic being clarified]. "
+                "Correct position: [The correct position]. Contact: [Who to contact with questions]. "
+                "Non-defensive, factual, brief. 60–80 words. No apologies, no defensiveness."
+            ),
+        },
+        "Event postponement": {
+            "icon": "📅",
+            "fields": ["Event name", "Original date", "New date / TBD", "Reason (optional)"],
+            "prompt": (
+                "Write a short announcement that [Event name], originally scheduled for [Original date], "
+                "has been postponed to [New date / TBD]. Reason: [Reason]. "
+                "Clear, brief, friendly. 50–70 words."
+            ),
+        },
+        "New parish programme": {
+            "icon": "🌱",
+            "fields": ["Programme name", "Who it's for", "Start date and time", "How to join"],
+            "prompt": (
+                "Write an inviting parish announcement for a new programme: [Programme name]. "
+                "For: [Who it's for]. Starts: [Start date and time]. Join: [How to join]. "
+                "Enthusiastic but not hyperbolic. 70–90 words. Welcoming tone."
+            ),
+        },
+    }
+
+    template_name = st.selectbox(
+        "Announcement type",
+        list(ANNOUNCEMENT_TEMPLATES.keys()),
+        format_func=lambda k: f"{ANNOUNCEMENT_TEMPLATES[k]['icon']} {k}",
+        key="comms_template",
+    )
+
+    tmpl = ANNOUNCEMENT_TEMPLATES[template_name]
+    st.markdown(f"**Fill in the details below — the AI will draft from these:**")
+
+    field_values = {}
+    for field in tmpl["fields"]:
+        field_values[field] = st.text_input(field, key=f"comms_{field}", placeholder=f"Enter {field.lower()}")
+
+    col_lang, col_btn = st.columns([2, 1])
+    comms_lang = col_lang.selectbox(
+        "Draft in",
+        ["English", "Kiswahili", "French", "Spanish", "Portuguese", "Luganda", "Igbo"],
+        key="comms_lang",
+    )
+
+    if col_btn.button("✏️ Generate Draft", type="primary", key="comms_gen"):
+        if not any(field_values.values()):
+            st.warning("Fill in at least one field to generate a draft.")
+        else:
+            prompt_text = tmpl["prompt"]
+            for field, val in field_values.items():
+                prompt_text = prompt_text.replace(f"[{field}]", val or f"[{field}]")
+
+            lang_instruction = "" if comms_lang == "English" else f" Write the draft in {comms_lang}."
+            full_prompt = (
+                "You are a parish communications assistant. Produce a single draft only — "
+                "clear, pastoral, dignified. No preamble, no options, no commentary after. "
+                "Mark the top line as: DRAFT - FOR REVIEW BY PARISH LEADERSHIP\n\n"
+                + prompt_text + lang_instruction
+            )
+
+            if not _live:
+                st.info("Requires live AI connection. Try again shortly.")
+            else:
+                with st.spinner("Drafting…"):
+                    ok, result = _safe_gen(full_prompt, api_key, model)
+                if ok:
+                    st.markdown("---")
+                    st.markdown(result)
+                    st.download_button(
+                        "📥 Download draft",
+                        result,
+                        file_name=f"draft_{template_name.replace(' ', '_').lower()}.txt",
+                        key="comms_dl",
+                    )
+                    st.caption(
+                        "This is a draft only. Verify all facts, dates, and names before publishing. "
+                        "All parish communications require approval from the priest or coordinator."
+                    )
+                elif result == "quota":
+                    st.warning("Daily quota reached — available again later today.")
+                else:
+                    st.info("Draft not available right now. Please try again shortly.")
 
 # ── Admin-only status (hidden unless ?admin=1 in URL) ─────────────────────────
 _params = st.query_params
