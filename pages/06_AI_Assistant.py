@@ -43,6 +43,28 @@ SUPPORTED_LANGUAGES = {
     "ar": "العربية",
     "hi": "हिन्दी",
 }
+
+from datetime import date as _date
+
+def _current_catholic_facts() -> str:
+    """Return time-sensitive Catholic facts for injection into every system prompt.
+    Keeps the AI grounded in the actual present, not its training-data snapshot.
+    Update this block whenever significant Church facts change.
+    """
+    today = _date.today()
+    # Liturgical year 2025-26 = Year A (Matthew); cycle restarts 1st Sunday of Advent ~Nov 30
+    liturigcal_year = "A" if today < _date(today.year, 11, 30) else "B"
+    return (
+        f"TODAY'S DATE: {today.strftime('%B %d, %Y')}. "
+        f"CURRENT POPE: Pope Leo XIV (Robert Francis Prevost), elected May 8, 2025 — "
+        f"he succeeded Pope Francis, who died April 21, 2025. "
+        f"Pope Leo XIV is the 267th pope, the first American-born pope, and the first from the Order of Saint Augustine. "
+        f"His episcopal motto is 'In Illo uno unum' (In the One, we are one). "
+        f"LITURGICAL YEAR: {today.year}-{today.year+1 if today.month >= 9 else today.year}, Year {liturigcal_year} of the three-year Sunday cycle. "
+        f"Do NOT refer to Pope Francis as the current pope — he has passed away. "
+        f"Do NOT fabricate papal statements, encyclicals, or magisterial documents — only cite ones you are certain exist."
+    )
+
 _BASE = "https://generativelanguage.googleapis.com"
 
 def _get_key():
@@ -137,6 +159,8 @@ _DEMO = [
     (["pray","prayer","petition","intercession"], "The Daily Prayers page has the Rosary, Divine Mercy Chaplet, Stations of the Cross, and daily scripture readings. Prayer intentions can also be shared with your SCC or parish community."),
     (["hello","hi","jambo","habari","hola","bonjour","ciao","oi","kumusta"], "Hello! I'm here to help with parish questions — Mass times, sacraments, liturgical calendar, prayers, or translations. How can I help you today?"),
     (["thank","asante","gracias","merci","obrigado"], "You are welcome. May God bless you and your parish community."),
+    (["pope","pontiff","papa","holy father","baba mtakatifu","pape","papa"], "The current Pope is Pope Leo XIV (Robert Francis Prevost), elected May 8, 2025. He is the 267th pope, the first American-born pope, and the first from the Order of Saint Augustine. He succeeded Pope Francis, who passed away on April 21, 2025."),
+    (["francis","bergoglio"], "Pope Francis (Jorge Mario Bergoglio) served as the 266th pope from 2013 until his passing on April 21, 2025. He was succeeded by Pope Leo XIV (Robert Francis Prevost), elected May 8, 2025."),
 ]
 
 def _demo(msg):
@@ -234,6 +258,8 @@ with tab_chat:
             lang_name = SUPPORTED_LANGUAGES.get(lang_code, "English")
             sys = (f"You are a Catholic parish assistant serving parishioners worldwide. "
                    f"{_parish_context()} "
+                   f"CURRENT FACTS (take these as ground truth, they override your training data): "
+                   f"{_current_catholic_facts()} "
                    f"MAGISTERIAL BOUNDARY: "
                    f"1. Never speculate on doctrine — cite the Catechism (CCC) when answering theological questions. "
                    f"2. Never endorse political positions, parties, or candidates. "
