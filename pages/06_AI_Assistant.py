@@ -113,23 +113,77 @@ def _discover_model(api_key: str):
 
 _mem_cache: dict = {}
 
-def _generate(prompt: str, api_key: str, model: str) -> str:
-    key = f"{model}:{hash(prompt)}"
+def _search_tool_for(model: str) -> list:
+    """Return the correct Google Search grounding tool block for a given model.
+    - gemini-2.0-*: uses the new {google_search: {}} format
+    - gemini-1.5-*: uses google_search_retrieval with dynamic mode
+    - others / unknown: no tool (safe fallback)
+    Search grounding lets the model query Google in real-time when it needs
+    current information — current pope, today's readings, recent Vatican news, etc.
+    Cached responses skip grounding (ttl=3600) so we don't burn quota on repeats.
+    """
+    if model.startswith("gemini-2."):
+        return [{"google_search": {}}]
+    if model.startswith("gemini-1.5"):
+        return [{"google_search_retrieval": {
+            "dynamic_retrieval_config": {
+                "mode": "MODE_DYNAMIC",
+                "dynamic_threshold": 0.4,  # only search when model judges it necessary
+            }
+        }}]
+    return []  # older models: no tool
+
+
+def _extract_text(data: dict) -> tuple[str, bool]:
+    """Extract (text, was_grounded) from a generateContent response.
+    was_grounded=True means the model used Google Search to answer.
+    """
+    candidate = data["candidates"][0]
+    parts = candidate["content"]["parts"]
+    text = " ".join(p["text"] for p in parts if "text" in p).strip()
+    # groundingMetadata present = model actually queried Google
+    grounded = bool(candidate.get("groundingMetadata", {}).get("webSearchQueries"))
+    return text, grounded
+
+
+def _generate(prompt: str, api_key: str, model: str, use_search: bool = True) -> str:
+    """Call Gemini generateContent. Enables Google Search grounding by default.
+
+    Search grounding gives the model real-time access to Google Search results,
+    which keeps answers current (today's pope, Vatican news, daily readings, etc.)
+    without any scraping or manual data maintenance.
+
+    Responses with search enabled are NOT cached (grounding = live data = don't cache).
+    Responses without search (fallback models) ARE cached for 1 hour.
+    """
+    tools = _search_tool_for(model) if use_search else []
+    cache_key = f"{model}:{hash(prompt)}" if not tools else None  # no cache for live searches
     now = time.time()
-    if key in _mem_cache and now - _mem_cache[key]["ts"] < 3600:
-        return _mem_cache[key]["val"]
-    data = _post(
-        f"/v1beta/models/{model}:generateContent",
-        {"contents": [{"parts": [{"text": prompt}]}],
-         "generationConfig": {"maxOutputTokens": 1024, "temperature": 0.7}},
-        api_key,
-    )
-    text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
-    _mem_cache[key] = {"val": text, "ts": now}
-    return text
+    if cache_key and cache_key in _mem_cache and now - _mem_cache[cache_key]["ts"] < 3600:
+        return _mem_cache[cache_key]["val"]
+
+    payload: dict = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {"maxOutputTokens": 1024, "temperature": 0.7},
+    }
+    if tools:
+        payload["tools"] = tools
+
+    data = _post(f"/v1beta/models/{model}:generateContent", payload, api_key)
+    text, grounded = _extract_text(data)
+
+    if cache_key:
+        _mem_cache[cache_key] = {"val": text, "ts": now}
+    return text, grounded
 
 def _safe_gen(prompt, api_key, primary_model):
-    """Try primary model, cascade to fallbacks on quota (429). Each has separate daily pool."""
+    """Try primary model with Google Search grounding, cascade to fallbacks on quota (429).
+
+    Attempt order for each model:
+    1. With search grounding (real-time Google access)
+    2. Without grounding (if model rejects the tool block with 400)
+    3. Next model in fallback list (on 429 quota exhaustion)
+    """
     FALLBACKS = [
         "gemini-1.5-flash-8b",
         "gemini-1.5-flash",
@@ -137,18 +191,39 @@ def _safe_gen(prompt, api_key, primary_model):
     ]
     candidates = [primary_model] + [m for m in FALLBACKS if m != primary_model]
     for model in candidates:
+        # --- Attempt 1: with search grounding ---
         try:
-            return True, _generate(prompt, api_key, model)
+            text, grounded = _generate(prompt, api_key, model, use_search=True)
+            return True, text, grounded
         except urllib.error.HTTPError as e:
             body = e.read()[:300].decode("utf-8", "ignore")
             if e.code == 429:
-                continue  # quota hit — try next model
+                continue  # quota — try next model
+            if e.code == 400:
+                # Model may not support the tool block — retry without grounding
+                pass
+            else:
+                try: msg = json.loads(body).get("error", {}).get("message", body[:100])
+                except Exception: msg = body[:100]
+                return False, msg, False
+        except Exception as e:
+            return False, str(e)[:100], False
+
+        # --- Attempt 2: without grounding (graceful degradation) ---
+        try:
+            text, _ = _generate(prompt, api_key, model, use_search=False)
+            return True, text, False
+        except urllib.error.HTTPError as e:
+            body = e.read()[:300].decode("utf-8", "ignore")
+            if e.code == 429:
+                continue
             try: msg = json.loads(body).get("error", {}).get("message", body[:100])
             except Exception: msg = body[:100]
-            return False, msg
+            return False, msg, False
         except Exception as e:
-            return False, str(e)[:100]
-    return False, "quota"  # all models exhausted
+            return False, str(e)[:100], False
+
+    return False, "quota", False  # all models exhausted
 
 _DEMO = [
     (["what are you","who are you"], "I'm the Catholic Parish Steward assistant — here to help with Mass times, sacraments, the liturgical calendar, prayers, and parish questions in any language. For pastoral counseling, please speak with your priest or deacon."),
@@ -275,8 +350,11 @@ with tab_chat:
             hist = "".join(f"{'User' if m['role']=='user' else 'Assistant'}: {m['content']}\n"
                            for m in st.session_state.chat_history[-6:])
             with st.spinner("…"):
-                ok, result = _safe_gen(f"{sys}\n\n{hist}Assistant:", api_key, model)
-            if ok: reply = result
+                ok, result, was_grounded = _safe_gen(f"{sys}\n\n{hist}Assistant:", api_key, model)
+            if ok:
+                reply = result
+                if was_grounded:
+                    reply += "\n\n<small style='color:#9CA3AF;'>🔍 Live search used</small>"
             elif result == "quota": reply = "The assistant is taking a short break and will be back later today. In the meantime, your priest or parish coordinator can help with any urgent questions."
             else: reply = _demo(user_msg)
         else:
@@ -309,7 +387,7 @@ with tab_translate:
             prompt = (f"Translate from {src_sel} to {tgt_sel}. Context: {ctx_sel}. "
                       "Preserve liturgical terms and saint names. Return ONLY the translated text.\n\nText:\n" + tr_text.strip())
             with st.spinner(f"Translating to {tgt_sel}…"):
-                ok, result = _safe_gen(prompt, api_key, model)
+                ok, result, _ = _safe_gen(prompt, api_key, model)
             if ok:
                 st.success(f"**{tgt_sel}:**")
                 st.markdown(f"> {result}")
@@ -345,7 +423,7 @@ with tab_homily:
                       "3. 2-3 life-application points\n4. Opening image\n5. Closing prayer prompt\n"
                       "Clear headers. Pastoral not academic.")
             with st.spinner("Preparing notes…"):
-                ok, result = _safe_gen(prompt, api_key, model)
+                ok, result, _ = _safe_gen(prompt, api_key, model)
             if ok:
                 st.markdown(result)
                 st.caption("⚠️ Preparation aid only — does not replace personal prayer or the priest's own discernment.")
@@ -378,7 +456,7 @@ with tab_insights:
             st.info("Requires live AI connection. Please try again shortly.")
         else:
             with st.spinner("Analysing…"):
-                ok, result = _safe_gen(f"{PROMPTS[ins_type]}\n\nData:\n{parish_data.strip()}", api_key, model)
+                ok, result, _ = _safe_gen(f"{PROMPTS[ins_type]}\n\nData:\n{parish_data.strip()}", api_key, model)
             if ok:
                 st.markdown(result)
                 st.download_button("Download", result, file_name="parish_insights.txt")
@@ -499,7 +577,7 @@ with tab_comms:
                 st.info("Requires live AI connection. Try again shortly.")
             else:
                 with st.spinner("Drafting…"):
-                    ok, result = _safe_gen(full_prompt, api_key, model)
+                    ok, result, _ = _safe_gen(full_prompt, api_key, model)
                 if ok:
                     st.markdown("---")
                     st.markdown(result)
