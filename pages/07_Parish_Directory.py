@@ -228,8 +228,10 @@ def format_osm_result(el: dict) -> dict:
     lat = el.get("lat") or (el.get("center", {}) or {}).get("lat")
     lon = el.get("lon") or (el.get("center", {}) or {}).get("lon")
     maps_link = f"https://www.google.com/maps?q={lat},{lon}" if lat and lon else ""
+    osm_id = str(el.get("id", ""))
     return {"name": name, "address": address, "phone": phone,
-            "website": website, "opening_hours": opening, "maps_link": maps_link}
+            "website": website, "opening_hours": opening, "maps_link": maps_link,
+            "osm_id": osm_id, "_lat": lat, "_lon": lon}
 
 import urllib.parse
 
@@ -364,12 +366,15 @@ with tab1:
                         nom = _http_get(nom_url, timeout=10)
                         for r in nom[:5]:
                             dn = r.get("display_name", "")
+                            _nlat, _nlon = r.get("lat"), r.get("lon")
                             osm_results.append({
                                 "name": osm_name.strip(),
                                 "address": dn[:120],
                                 "phone": "", "website": "",
                                 "opening_hours": "",
-                                "maps_link": f"https://www.google.com/maps?q={r['lat']},{r['lon']}",
+                                "maps_link": f"https://www.google.com/maps?q={_nlat},{_nlon}",
+                                "osm_id": str(r.get("osm_id", r.get("place_id", ""))),
+                                "_lat": _nlat, "_lon": _nlon,
                             })
                         # Also search Overpass by name
                         time.sleep(0.5)  # Nominatim rate limit
@@ -412,7 +417,13 @@ with tab1:
             # ── DEDUPLICATE & CACHE ──────────────────────────────────────
             seen, unique = set(), []
             for r in osm_results:
-                key = r["name"].lower()[:30] + r["address"][:20]
+                # Priority: OSM element ID (exact) → rounded coords (±50m) → name+address prefix
+                if r.get("osm_id") and r["osm_id"] != "0":
+                    key = f"osm:{r['osm_id']}"
+                elif r.get("_lat") and r.get("_lon"):
+                    key = f"geo:{round(float(r['_lat']),4)}:{round(float(r['_lon']),4)}"
+                else:
+                    key = r["name"].lower()[:40] + r["address"][:30]
                 if key not in seen:
                     seen.add(key)
                     unique.append(r)
@@ -493,9 +504,8 @@ with tab1:
                         "You can **add your parish** using the tab below."
                     )
 
-    st.session_state["_osm_search_ran"] = False  # allow cache render on next pass
-    # ── Render cached results (visible after save button reruns page) ──────────
-    if not st.session_state.get("_osm_search_ran"):  # only if we didn't just run a search
+    # ── Render cached results (only on rerun after save — not on the same pass as search) ──
+    if not st.session_state.pop("_osm_search_ran", False):  # pop clears flag after reading
         _cached = st.session_state.get("_osm_last_results")
         _cached_max = st.session_state.get("_osm_last_max", 15)
         if _cached:
