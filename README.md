@@ -1,162 +1,139 @@
 # ✝️ Catholic Network Tools
 
-Decision support infrastructure for the global Catholic Church.
+**Decision support infrastructure for the global Catholic Church.**
 
-[![CI](https://github.com/your-org/catholic-network-tools/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/catholic-network-tools/actions)
+[![CI](https://github.com/gabrielmahia/catholic-network-tools/actions/workflows/ci.yml/badge.svg)](https://github.com/gabrielmahia/catholic-network-tools/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/tests-56%20passing-brightgreen)](#testing)
 [![License: CC BY-NC-ND 4.0](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-lightgrey.svg)](LICENSE)
+[![Live](https://img.shields.io/badge/live-catholicparishsteward.streamlit.app-gold)](https://catholicparishsteward.streamlit.app)
+
+**[→ Open the live platform](https://catholicparishsteward.streamlit.app)**
 
 ---
 
-## What This Is
+## What it is
 
-A Streamlit platform serving parishes, coordinators, priests, and diocesan leaders with:
+A unified platform serving parishioners, parish coordinators, catechists, priests, and diocesan administrators. Built for communities across East Africa and globally — including those with basic phones and limited internet connectivity.
 
-| Module | Status | Description |
-|--------|--------|-------------|
-| 🤖 **AI Assistant** | ✅ Active | Translation, homily prep, insights, chat bot |
-| 🗺️ **Parish Directory** | ✅ Active (seed) | Search 30+ seeded parishes; GCatholic rails ready |
-| 🤝 **M-Pesa Giving** | 🧪 Sandbox | STK push giving; live activation in docs/ |
-| 💬 **WhatsApp Bot** | 🔧 Framework | Full bot logic ready; webhook deployment required |
-
-**Trust integrity:** All sandbox/demo data is clearly labeled. No simulated data is presented as real.
+The platform follows Catholic principles of **subsidiarity** (decisions at the lowest appropriate level) and **synodality** (coordination across levels with transparency). Privacy-first design: individuals control data visibility; coordinators see aggregated data voluntarily shared upward.
 
 ---
 
-## Quick Start
+## Platform map
 
-```bash
-git clone https://github.com/your-org/catholic-network-tools
-cd catholic-network-tools
-
-pip install -r requirements.txt
-
-cp .env.example .env
-# Add ANTHROPIC_API_KEY to .env
-
-streamlit run app.py
-```
-
-The app runs at `http://localhost:8501`. AI features activate immediately with a valid API key.
-
----
-
-## Feature Details
-
-### AI Assistant (4 tools)
-Built on Claude (Anthropic). Model tier per task:
-
-| Tool | Model | Cost tier | What it does |
-|------|-------|-----------|--------------|
-| Translation | Haiku | Low | 6 languages, preserves liturgical terms |
-| Homily Helper | Sonnet | Medium | Preparation notes — not finished homilies |
-| Parish Insights | Haiku | Low | Plain-language summary from parish data |
-| Chat Bot | Haiku | Low | Multilingual parish assistant |
-
-### Parish Directory
-- Local SQLite with seed data (Africa-focused sample)
-- Schema supports 100K+ rows
-- GCatholic integration: rails only — see `docs/GCATHOLIC_INTEGRATION_GUIDE.md`
-- Fastest open-data path: OpenStreetMap via Overpass API (~40K parishes, free)
-
-### M-Pesa Giving
-- Safaricom Daraja API — sandbox active immediately
-- STK Push (Lipa na M-Pesa prompt on customer phone)
-- Transaction log with sandbox/live separation
-- Live activation: 3–10 day Safaricom approval — see `docs/MPESA_INTEGRATION_GUIDE.md`
-
-### WhatsApp Bot
-- Full AI pipeline implemented (language detect → Claude Haiku → send reply)
-- 6-language support with keyword-based language detection
-- Multi-turn conversation store (SQLite)
-- **Activation required:** Deploy FastAPI webhook companion service
-- Full guide: `docs/WHATSAPP_BOT_GUIDE.md`
-- Estimated time to sandbox-live: ~1 hour
+| Page | Role | What it does |
+|------|------|--------------|
+| 🏠 Home | All | Parish identity, SMS access number, language selector |
+| 🔍 Find a Church | Parishioners | OpenStreetMap search — any city globally, real-time |
+| 🙏 Daily Prayers | Parishioners | Rosary, Divine Mercy, Stations, liturgical readings |
+| 🤖 AI Assistant | All | Chat, translation (14 languages), homily prep, parish insights |
+| ⛪ Sacraments | Coordinators | Baptism, Confirmation, Eucharist, Marriage, Anointing records |
+| 👥 Small Communities | Coordinators | SCC roster, meeting records, attendance tracking |
+| 📚 Catechists | Coordinators | Certification tracking, training records |
+| 🫶 Pastoral Care | Coordinators | Homebound visits, grief support, mentoring, new members |
+| 📖 Formation & RCIA | Coordinators | RCIA cohorts, formation tracks |
+| 💝 Parish Giving | All | Contribution tracking, campaign management |
+| 📅 Liturgy & Calendar | All | Liturgical engine: season, readings, fasting rules by country |
+| 🏥 Parish Health | Coordinators | Pastoral Crisis Index, health metrics |
+| ⚖️ Justice & Care | All | Social justice campaigns, advocacy coordination |
+| 🌍 Global Diaspora | All | Community connection across diaspora networks |
+| 🔍 Transparency | Diocese | Accountability dashboard |
+| ⚙️ Admin & Data | Admin | Export, governance, data management |
+| 📱 Set Up USSD | Admin | SMS/USSD configuration for basic phone access |
 
 ---
 
-## Languages Supported
+## Technical highlights
 
-English · Kiswahili · French · Spanish · Portuguese · Luganda
+**Liturgical engine** — Correct Sunday cycle (A/B/C), season detection, colour, fasting and abstinence rules per episcopal conference (US, Kenya, Philippines, Nigeria, and others). Fixes the common bug of hardcoding Year A regardless of actual cycle.
+
+**AI assistant with real-time search grounding** — Gemini 2.0 Flash with Google Search grounding enabled. The model searches Google in real-time when questions need current information (current pope, today's readings, recent Vatican news). Falls back to Gemini 1.5 with dynamic retrieval threshold, then to demo responses. Maintains a `_current_catholic_facts()` context block so the model is always grounded in the actual present.
+
+**Role-based access** — Five roles (parishioner → coordinator → catechist → priest → diocese). Role gates use `require_role()` via `services/roles.py`. A fixed vulnerability: the original gates wrapped `st.stop()` in broad `except Exception` clauses, silently swallowing the stop signal. All 5 gated pages now use narrow `ImportError`-only guards.
+
+**Multilingual** — 14 languages: English, Kiswahili, French, Spanish, Portuguese, Luganda, Igbo, Tagalog, Polish, Italian, German, Arabic, Hindi, Swedish. AI translation covers all 14.
+
+**SMS / USSD** — Africa's Talking integration for basic phone access. Parish data synced; alert thresholds configurable per diocese.
+
+**Parish directory** — Dual-source: OpenStreetMap Overpass API (global, real-time) + community-verified local database. 3-tier deduplication: OSM element ID → coordinate rounding (±11m) → name+address prefix.
 
 ---
 
 ## Architecture
 
 ```
-app.py  (Streamlit entry)
-│
-├── pages/
-│   ├── 01_AI_Assistant.py     ← Chat, translation, homily, insights
-│   ├── 02_Parish_Directory.py ← Search + GCatholic status
-│   ├── 03_Giving.py           ← M-Pesa STK push
-│   └── 04_Bot_Setup.py        ← WhatsApp activation guide
-│
-├── services/
-│   ├── ai_service.py          ← Claude API (Haiku + Sonnet)
-│   ├── directory_service.py   ← SQLite + GCatholic rails
-│   ├── mpesa_service.py       ← Daraja API
-│   └── whatsapp_service.py    ← AT/Twilio bot pipeline
-│
-├── data/
-│   ├── parishes.db            ← SQLite (gitignored)
-│   └── parishes_seed.csv      ← 30-parish seed (Africa)
-│
-└── docs/
-    ├── WHATSAPP_BOT_GUIDE.md
-    ├── MPESA_INTEGRATION_GUIDE.md
-    └── GCATHOLIC_INTEGRATION_GUIDE.md
+pages/                    ← 17 Streamlit pages (named to control sidebar order)
+  home.py
+  _01_Find_Church.py      ← OSM Overpass + Nominatim, 3-tier dedup
+  06_AI_Assistant.py      ← Gemini + Google Search grounding, 14 languages
+  07_Parish_Directory.py
+  10_Sacraments.py        ← Role-gated (coordinator+)
+  _00_Liturgy.py          ← Liturgical engine UI
+  ...
+
+services/
+  ai_service.py           ← Gemini API, model discovery, quota cascade
+  lectionary.py           ← Sunday cycle (A/B/C), mass readings
+  liturgical_engine.py    ← Season, colour, fasting by episcopal conference
+  roles.py                ← Role definitions and enforcement
+  privacy.py              ← Privacy-first data visibility controls
+  i18n.py                 ← 14-language translation strings
+  sheets.py               ← Google Sheets sync
+  magisterial.py          ← Query classification, sensitive topic logging
+  ...
+
+gospelmap/
+  church_search.py        ← Overpass API multi-strategy search with failover
+  lectionary.py
+
+tests/
+  test_services.py        ← 56 tests: liturgy, lectionary, AI, roles, privacy
+
+.github/
+  workflows/ci.yml        ← Ruff lint + pytest on push/PR
 ```
 
 ---
 
-## Environment Variables
-
-See `.env.example` for all required variables. Minimum to run:
-```
-ANTHROPIC_API_KEY=your_key
-```
-
-For M-Pesa sandbox:
-```
-MPESA_CONSUMER_KEY=...
-MPESA_CONSUMER_SECRET=...
-MPESA_PASSKEY=...
-MPESA_ENV=sandbox
-```
-
----
-
-## Development
+## Quick start
 
 ```bash
-# Lint
-ruff check services/ pages/ app.py --ignore E501,E402
+git clone https://github.com/gabrielmahia/catholic-network-tools
+cd catholic-network-tools
+pip install -r requirements.txt
+streamlit run home.py
+```
 
-# Test
-pytest tests/ -v --cov=services
+The app runs at `http://localhost:8501`. AI features require a `GOOGLE_API_KEY` (Gemini) in Streamlit secrets or environment.
 
-# Run
-streamlit run app.py
+**Streamlit secrets (`.streamlit/secrets.toml`):**
+```toml
+GOOGLE_API_KEY = "your-gemini-key"
+GOOGLE_SHEETS_KEY = "your-sheets-key"  # optional
+AFRICAS_TALKING_KEY = "your-at-key"    # optional, for SMS
 ```
 
 ---
 
-## IP & Collaboration
+## Testing
 
-This project is licensed under **CC BY-NC-ND 4.0**.
-Commercial use and derivative works are not permitted without explicit written permission.
-
-For licensing inquiries or partnership: contact@aikungfu.dev
-
-See `docs/architecture/IP_POLICY.md` for full IP policy.
-
----
-
-## Security
-
-See [SECURITY.md](SECURITY.md). Do not open public issues for vulnerabilities.
+```bash
+pytest tests/ -v
+# 56 tests: liturgical cycle, lectionary readings, AI language coverage,
+#           role enforcement, privacy controls, magisterial classification
+```
 
 ---
 
-*Built with institutional leverage and subsidiarity as design principles.*
+## Governance
+
+- **License:** CC BY-NC-ND 4.0 — study and fork permitted; commercial use and redistribution of modified versions require written permission
+- **Security:** See [SECURITY.md](SECURITY.md) — report via email, not public issues
+- **Contributing:** See [CONTRIBUTING.md](CONTRIBUTING.md)
+- **IP policy:** See [docs/architecture/IP_POLICY.md](docs/architecture/IP_POLICY.md)
+- **Contact:** contact@aikungfu.dev
+
+---
+
+*Built with subsidiarity and synodality as design principles.*
 *Serving 1.3 billion Catholics — one parish at a time.*
