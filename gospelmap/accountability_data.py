@@ -2,6 +2,10 @@
 GospelMap Accountability Data
 Real publicly available statistics + community-submitted data.
 
+IMPORTANT: Leadership data (bishop/archbishop names) changes on appointment,
+transfer, death, or resignation. This file was last reviewed March 2026.
+If a leader has changed, report via the feedback form or open a GitHub issue.
+
 Sources:
   - Vatican Annuarium Statisticum Ecclesiae (annual)
   - CARA (Georgetown) — Center for Applied Research in the Apostolate
@@ -39,7 +43,7 @@ DIOCESES = {
         "data_quality": "EST",
     },
     "Archdiocese of Kampala, Uganda": {
-        "leader": "Archbishop Cyprian Kizito Lwanga (†2021) → Cardinal-designate vacancy", 
+        "leader": "Msgr. John Baptist Kauta (Apostolic Administrator, 2021–present)", 
         "established": 1894,
         "catholics": 2_100_000,        # REAL — Vatican Yearbook 2022
         "parishes": 95,                # REAL — Uganda Catholic Secretariat

@@ -1,6 +1,15 @@
 """Formation & Spiritual Education — Programmes, enrolment, curriculum, progress tracking."""
 
 import streamlit as st
+
+# ── Mobile CSS ──────────────────────────────────────────────────────────────
+import sys as _sys
+_sys.path.insert(0, ".")
+try:
+    from services.mobile_ux import inject_mobile_css as _inj; _inj()
+except Exception:
+    pass
+
 try:
     from services.save_indicator import show_save_status, trust_banner
 except Exception:

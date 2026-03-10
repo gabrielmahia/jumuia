@@ -1,5 +1,14 @@
 try:
     from services.settings import get as _get_setting
+
+# ── Mobile CSS ──────────────────────────────────────────────────────────────
+import sys as _sys
+_sys.path.insert(0, ".")
+try:
+    from services.mobile_ux import inject_mobile_css as _inj; _inj()
+except Exception:
+    pass
+
     _SCRIPTURE_TRANSLATION = _get_setting('scripture_translation') or 'RSVCE'
 except Exception:
     _SCRIPTURE_TRANSLATION = 'RSVCE'

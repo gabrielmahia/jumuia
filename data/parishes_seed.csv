@@ -1,50 +1,24 @@
-name,country,region,city,diocese,address,latitude,longitude,phone,email,website,mass_times,languages
-Holy Family Basilica,Kenya,Nairobi,Nairobi,Archdiocese of Nairobi,Wabera Street Nairobi,-1.2833,36.8167,+254202228959,info@holyfamilynairobi.org,holyfamilynairobi.org,"Sun: 7am 9am 11am 6pm",English|Kiswahili
-St. Paul's Parish Nairobi,Kenya,Nairobi,Nairobi,Archdiocese of Nairobi,University Way Nairobi,-1.2890,36.8220,,,,,"Sun: 8am 10am",English|Kiswahili
-Our Lady Queen of Peace,Kenya,Nairobi,Nairobi,Archdiocese of Nairobi,South B Nairobi,-1.3100,36.8200,,,,,"Sun: 7am 9am 11am",English|Kiswahili
-Christ the King Parish,Kenya,Nairobi,Nairobi,Archdiocese of Nairobi,Westlands Nairobi,-1.2670,36.8028,,,,,"Sun: 7am 9am 11am",English
-Holy Trinity Nakuru,Kenya,Rift Valley,Nakuru,Diocese of Nakuru,Nakuru Town,-0.2800,36.0700,,,,,"Sun: 8am 10am",English|Kiswahili
-St. Peter's Eldoret,Kenya,Rift Valley,Eldoret,Diocese of Eldoret,Uganda Road Eldoret,0.5167,35.2667,,,,,"Sun: 7am 9am",English|Kiswahili
-St. Joseph's Cathedral Kisumu,Kenya,Nyanza,Kisumu,Diocese of Kisumu,Oginga Odinga Road,-0.1022,34.7617,,,,,"Sun: 7am 9am 11am",English|Kiswahili|Dholuo
-Sacred Heart Cathedral Mombasa,Kenya,Coast,Mombasa,Diocese of Mombasa,Nkrumah Road Mombasa,-4.0435,39.6682,,,,,"Sun: 7am 9am 11am",English|Kiswahili
-St. Teresa's Kiambu,Kenya,Central,Kiambu,Archdiocese of Nairobi,Kiambu Road,-1.1711,36.8350,,,,,"Sun: 8am 10am",English|Kiswahili|Kikuyu
-Cathedral of the Holy Family Kisii,Kenya,Nyanza,Kisii,Diocese of Kisii,Kisii Town,-0.6817,34.7667,,,,,"Sun: 7am 9am",English|Kiswahili|Ekegusii
-St. Patrick's Cathedral Mzuzu,Malawi,Northern,Mzuzu,Diocese of Mzuzu,Mzuzu City,-11.4590,34.0180,,,,,"Sun: 8am 10am",English|Tumbuka
-Our Lady of Lourdes Blantyre,Malawi,Southern,Blantyre,Archdiocese of Blantyre,Blantyre,-15.7861,35.0058,,,,,"Sun: 7am 9am",English|Chichewa
-St. Mary's Cathedral Kampala,Uganda,Central,Kampala,Archdiocese of Kampala,Rubaga Hill Kampala,0.3162,32.5562,,,,,"Sun: 7am 9am 11am",English|Luganda
-Christ the King Parish Kampala,Uganda,Central,Kampala,Archdiocese of Kampala,Kampala,0.3136,32.5811,,,,,"Sun: 8am 10am",English|Luganda
-St. Francis Chapel Makerere,Uganda,Central,Kampala,Archdiocese of Kampala,Makerere University,0.3337,32.5680,,,,,"Sun: 9am 11am",English
-St. Michael Cathedral Arusha,Tanzania,Northern,Arusha,Diocese of Arusha,-3.3869,36.6830,,,,,"Sun: 7am 9am",English|Kiswahili
-Our Lady of Usambara Lushoto,Tanzania,Northern,Lushoto,Diocese of Same,-4.7820,38.2880,,,,,"Sun: 8am",Kiswahili|German
-Cathedral Basilica Dar es Salaam,Tanzania,Dar es Salaam,Dar es Salaam,Archdiocese of Dar es Salaam,Sokoine Drive,-6.8160,39.2803,,,,,"Sun: 7am 9am 11am",English|Kiswahili
-St. Joseph's Cathedral Kigali,Rwanda,Kigali,Kigali,Archdiocese of Kigali,Avenue de la Paix,-1.9441,30.0619,,,,,"Sun: 7am 9am 11am",French|Kinyarwanda
-Notre Dame Parish Butare,Rwanda,Southern,Butare,Diocese of Butare,-2.5975,29.7394,,,,,"Sun: 8am 10am",French|Kinyarwanda
-St. Peter's Cathedral Lusaka,Zambia,Lusaka,Lusaka,Archdiocese of Lusaka,Independence Avenue,-15.4166,28.2833,,,,,"Sun: 7am 9am 11am",English
-Holy Cross Parish Harare,Zimbabwe,Harare,Harare,Archdiocese of Harare,Harare,-17.8252,31.0335,,,,,"Sun: 8am 10am",English|Shona
-Sacred Heart Addis Ababa,Ethiopia,Addis Ababa,Addis Ababa,Archdiocese of Addis Ababa,Addis Ababa,9.0250,38.7469,,,,,"Sun: 7am 9am",English|Amharic
-St. George Cathedral Accra,Ghana,Greater Accra,Accra,Archdiocese of Accra,Independence Avenue,5.5502,-0.2174,,,,,"Sun: 7am 9am 11am",English|Twi
-Holy Spirit Cathedral Lagos,Nigeria,Lagos,Lagos,Archdiocese of Lagos,Catholic Mission Street,6.4530,3.3958,,,,,"Sun: 7am 9am 11am 5pm",English|Yoruba
-St. Francis Xavier Dakar,Senegal,Dakar,Dakar,Archdiocese of Dakar,Avenue Jean XXIII,14.6928,-17.4467,,,,,"Sun: 9am 11am",French|Wolof
-Notre Dame Cathedral Abidjan,Ivory Coast,Abidjan,Abidjan,Archdiocese of Abidjan,Plateau District,5.3599,-4.0083,,,,,"Sun: 7am 9am 11am",French|Dioula
-St. Anne's Cathedral Brazzaville,Republic of Congo,Brazzaville,Brazzaville,Archdiocese of Brazzaville,Avenue des Trois Martyrs,-4.2661,15.2832,,,,,"Sun: 8am 10am",French|Lingala
-Sacred Heart Kinshasa,DR Congo,Kinshasa,Kinshasa,Archdiocese of Kinshasa,Kinshasa,-4.3276,15.3136,,,,,"Sun: 7am 9am 11am",French|Lingala
-St. Therese Khartoum,Sudan,Khartoum,Khartoum,Diocese of Khartoum,Khartoum,15.5007,32.5599,,,,,"Sun: 8am 10am",English|Arabic
-St. Augustine Parish Kisii,Kenya,Nyanza,Kisii,Diocese of Kisii,Hospital Road Kisii,-0.6817,34.7667,,,,"Sun: 7am 9am 11am",English|Kiswahili|Gusii
-Our Lady of Lourdes Kakamega,Kenya,Western,Kakamega,Diocese of Kakamega,Kakamega Town,0.2827,34.7519,,,,"Sun: 8am 10am",English|Kiswahili
-St. Patrick's Iten,Kenya,Rift Valley,Iten,Diocese of Eldoret,Iten Town,0.6750,35.5100,,,,"Sun: 7am 9am",English|Kiswahili
-Holy Cross Parish Malindi,Kenya,Coast,Malindi,Diocese of Malindi,-3.2138,40.1169,,,,"Sun: 7am 9am",English|Kiswahili
-Cathedral Basilica of the Holy Family Nairobi,Kenya,Nairobi,Nairobi,Archdiocese of Nairobi,Archbishop Makarios Dr,-1.2833,36.8167,,,,"Sun: 6am 7:30am 9am 11am 6pm",English|Kiswahili|Latin
-St. Mary's Subukia,Kenya,Rift Valley,Subukia,Diocese of Nakuru,-0.1833,36.1333,,,,"Sun: 8am 10am",English|Kiswahili
-Notre-Dame de Paris,France,Île-de-France,Paris,Diocese of Paris,6 Parvis Notre-Dame,48.8530,2.3499,+33142345610,info@notredamedeparis.fr,notredamedeparis.fr,"Daily Mass varies",French|Latin
-St. Peter's Basilica,Vatican,Vatican City,Vatican City,Holy See,Piazza San Pietro,41.9022,12.4539,+3906698884676,,vatican.va,"Daily: 8am 9am 10am 11am 12pm",Latin|Italian|Multiple
-St. Patrick's Cathedral New York,United States,New York,New York City,Archdiocese of New York,5th Ave & 50th St,40.7586,-73.9762,+12122978133,,saintpatrickscathedral.org,"Daily: 7am 8am 12:10pm 5:30pm",English
-Westminster Cathedral,United Kingdom,England,London,Diocese of Westminster,Ashley Place,51.4972,-0.1421,+442079983780,,westminstercathedral.org.uk,"Daily: 7am 8am 10:30am 12:30pm 5:30pm",English|Latin
-Sacred Heart Cathedral Kampala,Uganda,Central,Kampala,Archdiocese of Kampala,Nsambya Road,0.3136,32.5811,,,,"Sun: 7am 9am 11am",English|Luganda
-St. Paul's Cathedral Abuja,Nigeria,FCT,Abuja,Archdiocese of Abuja,Independence Ave,9.0579,7.4951,,,,"Sun: 7am 9am 11am 6pm",English|Igbo|Hausa
-St. Francis of Assisi Dar es Salaam,Tanzania,Dar es Salaam,Dar es Salaam,Archdiocese of Dar es Salaam,Msasani,-6.7924,39.2083,,,,"Sun: 7am 9am 11am",English|Kiswahili
-Our Lady of Peace Kigali,Rwanda,Kigali,Kigali,Archdiocese of Kigali,KN 4 Ave,-1.9441,30.0619,,,,"Sun: 7am 9am 11am",Kinyarwanda|French|English
-St. Teresa of Avila Manila,Philippines,NCR,Manila,Archdiocese of Manila,Gen. Luna St,14.5942,120.9770,,,,"Sun: 6am 7:30am 9am 11am 6pm",Filipino|English
-Our Lady of Guadalupe Mexico City,Mexico,CDMX,Mexico City,Archdiocese of Mexico City,Villa de Guadalupe,19.4850,-99.1172,,,,"Daily: 7am 8am 10am 12pm",Spanish
-St. Mary's Cathedral Sydney,Australia,New South Wales,Sydney,Archdiocese of Sydney,Cathedral St,-33.8732,151.2113,+61292200400,,sydneycatholic.org,"Daily: 7am 8am 12:30pm 5:30pm",English
-Cathedral of São Paulo,Brazil,São Paulo,São Paulo,Archdiocese of São Paulo,Praça da Sé,-23.5503,-46.6333,,,,"Sun: 7am 9am 11am 6pm",Portuguese
-St. Joseph Cathedral Hanoi,Vietnam,North,Hanoi,Archdiocese of Hanoi,40 Nha Chung,21.0278,105.8522,,,,"Daily: 6am 6pm",Vietnamese
+name,country,region,city,diocese,address,latitude,longitude,phone,email,website,mass_times,languages,source,verified
+Holy Family Basilica,Kenya,Nairobi,Nairobi,Archdiocese of Nairobi,Wabera Street Nairobi,-1.2833,36.8167,254202228959.0,info@holyfamilynairobi.org,holyfamilynairobi.org,Sun: 7am 9am 11am 6pm,English|Kiswahili,OSM + diocesan website (seed data — verify mass times at parish),seed-unverified
+St. Michael Cathedral Arusha,Tanzania,Northern,Arusha,Diocese of Arusha,-3.3869,36.683,,,,,Sun: 7am 9am,English|Kiswahili,OSM + diocesan website (seed data — verify mass times at parish),seed-unverified
+Our Lady of Usambara Lushoto,Tanzania,Northern,Lushoto,Diocese of Same,-4.7820,38.288,,,,,Sun: 8am,Kiswahili|German,OSM + diocesan website (seed data — verify mass times at parish),seed-unverified
+Notre Dame Parish Butare,Rwanda,Southern,Butare,Diocese of Butare,-2.5975,29.7394,,,,,Sun: 8am 10am,French|Kinyarwanda,OSM + diocesan website (seed data — verify mass times at parish),seed-unverified
+St. Augustine Parish Kisii,Kenya,Nyanza,Kisii,Diocese of Kisii,Hospital Road Kisii,-0.6817,34.7667,,,,Sun: 7am 9am 11am,English|Kiswahili|Gusii,OSM + diocesan website (seed data — verify mass times at parish),seed-unverified
+Our Lady of Lourdes Kakamega,Kenya,Western,Kakamega,Diocese of Kakamega,Kakamega Town,0.2827,34.7519,,,,Sun: 8am 10am,English|Kiswahili,OSM + diocesan website (seed data — verify mass times at parish),seed-unverified
+St. Patrick's Iten,Kenya,Rift Valley,Iten,Diocese of Eldoret,Iten Town,0.675,35.51,,,,Sun: 7am 9am,English|Kiswahili,OSM + diocesan website (seed data — verify mass times at parish),seed-unverified
+Holy Cross Parish Malindi,Kenya,Coast,Malindi,Diocese of Malindi,-3.2138,40.1169,,,,Sun: 7am 9am,English|Kiswahili,,OSM + diocesan website (seed data — verify mass times at parish),seed-unverified
+Cathedral Basilica of the Holy Family Nairobi,Kenya,Nairobi,Nairobi,Archdiocese of Nairobi,Archbishop Makarios Dr,-1.2833,36.8167,,,,Sun: 6am 7:30am 9am 11am 6pm,English|Kiswahili|Latin,OSM + diocesan website (seed data — verify mass times at parish),seed-unverified
+St. Mary's Subukia,Kenya,Rift Valley,Subukia,Diocese of Nakuru,-0.1833,36.1333,,,,Sun: 8am 10am,English|Kiswahili,,OSM + diocesan website (seed data — verify mass times at parish),seed-unverified
+Notre-Dame de Paris,France,Île-de-France,Paris,Diocese of Paris,6 Parvis Notre-Dame,48.853,2.3499,33142345610.0,info@notredamedeparis.fr,notredamedeparis.fr,Daily Mass varies,French|Latin,OSM + diocesan website (seed data — verify mass times at parish),seed-unverified
+St. Peter's Basilica,Vatican,Vatican City,Vatican City,Holy See,Piazza San Pietro,41.9022,12.4539,3906698884676.0,,vatican.va,Daily: 8am 9am 10am 11am 12pm,Latin|Italian|Multiple,OSM + diocesan website (seed data — verify mass times at parish),seed-unverified
+St. Patrick's Cathedral New York,United States,New York,New York City,Archdiocese of New York,5th Ave & 50th St,40.7586,-73.9762,12122978133.0,,saintpatrickscathedral.org,Daily: 7am 8am 12:10pm 5:30pm,English,OSM + diocesan website (seed data — verify mass times at parish),seed-unverified
+Westminster Cathedral,United Kingdom,England,London,Diocese of Westminster,Ashley Place,51.4972,-0.1421,442079983780.0,,westminstercathedral.org.uk,Daily: 7am 8am 10:30am 12:30pm 5:30pm,English|Latin,OSM + diocesan website (seed data — verify mass times at parish),seed-unverified
+Sacred Heart Cathedral Kampala,Uganda,Central,Kampala,Archdiocese of Kampala,Nsambya Road,0.3136,32.5811,,,,Sun: 7am 9am 11am,English|Luganda,OSM + diocesan website (seed data — verify mass times at parish),seed-unverified
+St. Paul's Cathedral Abuja,Nigeria,FCT,Abuja,Archdiocese of Abuja,Independence Ave,9.0579,7.4951,,,,Sun: 7am 9am 11am 6pm,English|Igbo|Hausa,OSM + diocesan website (seed data — verify mass times at parish),seed-unverified
+St. Francis of Assisi Dar es Salaam,Tanzania,Dar es Salaam,Dar es Salaam,Archdiocese of Dar es Salaam,Msasani,-6.7924,39.2083,,,,Sun: 7am 9am 11am,English|Kiswahili,OSM + diocesan website (seed data — verify mass times at parish),seed-unverified
+Our Lady of Peace Kigali,Rwanda,Kigali,Kigali,Archdiocese of Kigali,KN 4 Ave,-1.9441,30.0619,,,,Sun: 7am 9am 11am,Kinyarwanda|French|English,OSM + diocesan website (seed data — verify mass times at parish),seed-unverified
+St. Teresa of Avila Manila,Philippines,NCR,Manila,Archdiocese of Manila,Gen. Luna St,14.5942,120.977,,,,Sun: 6am 7:30am 9am 11am 6pm,Filipino|English,OSM + diocesan website (seed data — verify mass times at parish),seed-unverified
+Our Lady of Guadalupe Mexico City,Mexico,CDMX,Mexico City,Archdiocese of Mexico City,Villa de Guadalupe,19.485,-99.1172,,,,Daily: 7am 8am 10am 12pm,Spanish,OSM + diocesan website (seed data — verify mass times at parish),seed-unverified
+St. Mary's Cathedral Sydney,Australia,New South Wales,Sydney,Archdiocese of Sydney,Cathedral St,-33.8732,151.2113,61292200400.0,,sydneycatholic.org,Daily: 7am 8am 12:30pm 5:30pm,English,OSM + diocesan website (seed data — verify mass times at parish),seed-unverified
+Cathedral of São Paulo,Brazil,São Paulo,São Paulo,Archdiocese of São Paulo,Praça da Sé,-23.5503,-46.6333,,,,Sun: 7am 9am 11am 6pm,Portuguese,OSM + diocesan website (seed data — verify mass times at parish),seed-unverified
+St. Joseph Cathedral Hanoi,Vietnam,North,Hanoi,Archdiocese of Hanoi,40 Nha Chung,21.0278,105.8522,,,,Daily: 6am 6pm,Vietnamese,OSM + diocesan website (seed data — verify mass times at parish),seed-unverified

@@ -5,6 +5,15 @@ Diocese transparency, finance, and synodality.
 
 import streamlit as st
 
+# ── Mobile CSS ──────────────────────────────────────────────────────────────
+import sys as _sys
+_sys.path.insert(0, ".")
+try:
+    from services.mobile_ux import inject_mobile_css as _inj; _inj()
+except Exception:
+    pass
+
+
 # Guard plotly import
 try:
     import plotly.graph_objects as go
@@ -63,6 +72,19 @@ with col_qual:
 d = DIOCESES[diocese]
 
 st.divider()
+dq = d.get("data_quality", "DEMO")
+if dq == "EST":
+    st.caption(
+        "🟡 **Estimated indices** — FTI, PCI, JCI, and Synodality scores are computed "
+        "from regional aggregates and published proxies, not direct diocese reporting. "
+        "Treat as directional, not precise. Source: " + d.get("source", "see accountability_data.py")
+    )
+elif dq == "DEMO":
+    st.warning(
+        "🔴 **Illustrative only** — these indices are placeholders. "
+        "No source data has been verified for this entry.",
+        icon=None
+    )
 col1, col2, col3, col4 = st.columns(4)
 with col1: st.metric("Financial Transparency", f"{d['fti']:.1f}/10", "FTI")
 with col2: st.metric("Pastoral Health", f"{10-d['pci']:.1f}/10", "Inverse PCI")
@@ -131,3 +153,4 @@ with tab_finance:
         st.success("✅ Some budget information publicly available.")
     
     st.markdown(f"**FTI Score: {d['fti']:.1f}/10**")
+    st.caption(f"Source: {d.get('source', 'see accountability_data.py')} · Data quality: {d.get('data_quality','?')}")
