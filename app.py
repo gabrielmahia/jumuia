@@ -10,7 +10,7 @@ from services.roles import sidebar_role_badge as _role_badge
 from services.privacy import privacy_sidebar_widget as _privacy_widget
 
 st.set_page_config(
-    page_title="Catholic Parish Steward",
+    page_title="Jumuia — Parish Community Tools",
     page_icon="✝️",
     layout="wide",
     initial_sidebar_state="expanded",
