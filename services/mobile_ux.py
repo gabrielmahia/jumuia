@@ -107,6 +107,17 @@ html, body, [class*="css"] {
     overflow-x: auto !important;
 }
 
+/* ── Stack all columns vertically on mobile ─── */
+@media (max-width: 768px) {
+    [data-testid="column"] {
+        width: 100% !important;
+        flex: 1 1 100% !important;
+        min-width: 100% !important;
+    }
+    [data-testid="stPlotlyChart"] > div { width: 100% !important; }
+    iframe { width: 100% !important; max-width: 100% !important; }
+}
+
 /* ── Reduce motion for low-power devices ────── */
 @media (prefers-reduced-motion: reduce) {
     * { animation: none !important; transition: none !important; }
