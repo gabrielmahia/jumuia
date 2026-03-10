@@ -5,6 +5,15 @@ Global coordination of Catholic social action campaigns.
 
 import streamlit as st
 
+# ── Mobile CSS ──────────────────────────────────────────────────────────────
+import sys as _sys
+_sys.path.insert(0, ".")
+try:
+    from services.mobile_ux import inject_mobile_css as _inj; _inj()
+except Exception:
+    pass
+
+
 st.set_page_config(page_title="Justice Network", page_icon="⚖️", layout="wide")
 
 st.title("⚖️ Justice Network")

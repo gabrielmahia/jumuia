@@ -5,6 +5,15 @@ Real-time crisis signal indices for parishes and dioceses.
 
 import streamlit as st
 import sys
+
+# ── Mobile CSS ──────────────────────────────────────────────────────────────
+import sys as _sys
+_sys.path.insert(0, ".")
+try:
+    from services.mobile_ux import inject_mobile_css as _inj; _inj()
+except Exception:
+    pass
+
 sys.path.insert(0, ".")
 
 # Guard plotly import

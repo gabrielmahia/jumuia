@@ -5,6 +5,15 @@ Computed liturgical calendar + live Scripture via bible-api.com
 import streamlit as st
 import sys
 import os
+
+# ── Mobile CSS ──────────────────────────────────────────────────────────────
+import sys as _sys
+_sys.path.insert(0, ".")
+try:
+    from services.mobile_ux import inject_mobile_css as _inj; _inj()
+except Exception:
+    pass
+
 sys.path.insert(0, ".")
 
 st.set_page_config(page_title="Today's Liturgy — CNT", page_icon="📖", layout="wide")

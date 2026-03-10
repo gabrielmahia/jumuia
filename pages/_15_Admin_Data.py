@@ -1,6 +1,15 @@
 """Admin — Data Management: bulk import/export CSV for all modules."""
 
 import streamlit as st
+
+# ── Mobile CSS ──────────────────────────────────────────────────────────────
+import sys as _sys
+_sys.path.insert(0, ".")
+try:
+    from services.mobile_ux import inject_mobile_css as _inj; _inj()
+except Exception:
+    pass
+
 try:
     import pandas as pd
 except ImportError:
