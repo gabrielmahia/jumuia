@@ -169,7 +169,7 @@ def _generate(prompt: str, api_key: str, model: str, use_search: bool = True) ->
     cache_key = f"{model}:{hash(prompt)}" if not tools else None  # no cache for live searches
     now = time.time()
     if cache_key and cache_key in _mem_cache and now - _mem_cache[cache_key]["ts"] < 3600:
-        return _mem_cache[cache_key]["val"]
+        return _mem_cache[cache_key]["val"], False  # cached — grounded=False
 
     payload: dict = {
         "contents": [{"parts": [{"text": prompt}]}],

@@ -1,5 +1,8 @@
 try:
     from services.settings import get as _get_setting
+    _SCRIPTURE_TRANSLATION = _get_setting('scripture_translation') or 'RSVCE'
+except Exception:
+    _SCRIPTURE_TRANSLATION = 'RSVCE'
 
 # ── Mobile CSS ──────────────────────────────────────────────────────────────
 import sys as _sys
@@ -8,10 +11,6 @@ try:
     from services.mobile_ux import inject_mobile_css as _inj; _inj()
 except Exception:
     pass
-
-    _SCRIPTURE_TRANSLATION = _get_setting('scripture_translation') or 'RSVCE'
-except Exception:
-    _SCRIPTURE_TRANSLATION = 'RSVCE'
 
 """Daily Prayers — Complete Catholic Prayer Library
 Rosary (all 4 mysteries), essential prayers, multilingual."""
