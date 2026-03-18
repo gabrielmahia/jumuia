@@ -205,7 +205,7 @@ if readings:
         st.markdown("**Questions for personal reflection:**")
         for p in seasonal_prompts:
             st.markdown(f"- {p}")
-        st.caption("Enable AI features (ANTHROPIC_API_KEY) for personalised reflection questions.")
+        st.caption("Personalised reflection questions are coming soon.")
 
 else:
     # Weekday — no full text computed, but show references and season info

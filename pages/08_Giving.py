@@ -78,8 +78,7 @@ with tab_give:
     is_sandbox = MPESA_ENV == "sandbox"
     if is_sandbox:
         st.warning(
-            "**[SANDBOX MODE]** — No real transactions are processed. "
-            "Using Safaricom Daraja sandbox. Safe to test freely.",
+            "**M-Pesa Giving is being set up.** You can explore how it works — no real transactions are processed yet.",
             icon="🧪",
         )
     else:
@@ -146,7 +145,7 @@ with tab_give:
                 st.success(result["message"])
                 if is_sandbox:
                     st.info(
-                        "**Sandbox tip:** To simulate completion, log into "
+                        "**Test tip:** To simulate a completed payment, log into "
                         "developer.safaricom.co.ke → Simulate → STK Push callback.",
                         icon="💡",
                     )

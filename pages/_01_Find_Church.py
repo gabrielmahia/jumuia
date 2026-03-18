@@ -136,7 +136,7 @@ if "_church_results" in st.session_state:
                         else:
                             st.warning(
                                 f"⚠️ **{c.name}** could not be saved to Sheets. "
-                                "Check that **SHEETS_ENDPOINT** is set in your Streamlit secrets "
+                                "Parish directory sync is being set up. "
                                 "(Admin → Data Management → connect Google Sheets)."
                             )
                         st.rerun()
