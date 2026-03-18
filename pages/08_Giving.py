@@ -1,5 +1,6 @@
 """Parish Giving — M-Pesa (Kenya/East Africa) + international guidance"""
 import streamlit as st
+import urllib.request, json as _gj
 
 # ── Mobile CSS ──────────────────────────────────────────────────────────────
 import sys as _sys
@@ -33,6 +34,29 @@ except Exception as _mpesa_err:
     def live_activation_checklist(): return []
     MPESA_ENV = "sandbox"
     _MPESA_OK = False
+
+
+
+@st.cache_data(ttl=1800)
+def fetch_giving_rates():
+    """Live FX corridors for diaspora parish giving."""
+    try:
+        with urllib.request.urlopen(
+            "https://open.er-api.com/v6/latest/USD", timeout=6
+        ) as r:
+            d = _gj.loads(r.read())
+        rates = d["rates"]
+        kes = rates["KES"]
+        return {
+            "USD_KES": round(kes, 2),
+            "GBP_KES": round(kes / rates["GBP"], 2),
+            "EUR_KES": round(kes / rates["EUR"], 2),
+            "CAD_KES": round(kes / rates["CAD"], 2),
+            "updated": d.get("time_last_update_utc", "")[:16],
+            "live": True,
+        }
+    except Exception:
+        return {"live": False}
 
 st.set_page_config(page_title="Parish Giving — CNT", page_icon="🤝", layout="centered")
 
@@ -70,6 +94,18 @@ if loc.get("detected"):
 
 
 st.title("🤝 Parish Giving")
+# ── Live FX for diaspora giving ──────────────────────────────────────
+_gr = fetch_giving_rates()
+if _gr.get("live"):
+    _c1, _c2, _c3, _c4 = st.columns(4)
+    _c1.metric("USD → KES", f"{_gr['USD_KES']:.2f}")
+    _c2.metric("GBP → KES", f"{_gr['GBP_KES']:.2f}")
+    _c3.metric("EUR → KES", f"{_gr['EUR_KES']:.2f}")
+    _c4.metric("CAD → KES", f"{_gr['CAD_KES']:.2f}")
+    st.caption(
+        f"📡 Mid-market · open.er-api.com · {_gr['updated']} · "
+        "Provider will apply own rate + fee on top."
+    )
 
 tab_give, tab_funds = st.tabs(["💳 Give Now", "📊 Fund Transparency"])
 
