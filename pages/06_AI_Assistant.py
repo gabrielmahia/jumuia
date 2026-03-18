@@ -251,7 +251,7 @@ def _demo(msg):
     m = msg.lower()
     for keys, reply in _DEMO:
         if any(k in m for k in keys): return reply
-    return "The assistant is getting ready. You can find Mass times in the Parish Directory, or pray along with the Daily Prayers page while you wait."
+    return "The assistant is getting ready. In the meantime, you can find Mass times in the Parish Directory, or join the Daily Prayers page. ✝️"
 
 # ── Page ──────────────────────────────────────────────────────────────────────
 try:
@@ -274,9 +274,8 @@ if api_key:
         )
 else:
     st.info(
-        "✝️ **Demo mode** — the AI assistant is showing suggested answers. "
-        "Parish coordinators: add a `GOOGLE_API_KEY` to Streamlit Secrets to enable "
-        "the live multilingual assistant.",
+        "✝️ The parish assistant is warming up — showing suggested answers while we finalise setup. "
+        "Full multilingual responses will be available shortly.",
         icon=None
     )
 
@@ -374,7 +373,7 @@ with tab_chat:
                 reply = result
                 if was_grounded:
                     reply += "\n\n<small style='color:#9CA3AF;'>🔍 Live search used</small>"
-            elif result == "quota": reply = "The assistant is taking a short break and will be back later today. In the meantime, your priest or parish coordinator can help with any urgent questions."
+            elif result == "quota": reply = "The assistant is taking a short break. Please try again in a few minutes, or speak with your priest or parish coordinator for any urgent questions."
             else: reply = _demo(user_msg)
         else:
             reply = _demo(user_msg)
@@ -401,7 +400,7 @@ with tab_translate:
         if src_code == tgt_code:
             st.warning("Source and target language are the same.")
         elif not _live:
-            st.info("Translation is not available right now. Please try again shortly.", icon="✝️")
+            st.info("Translation is being set up — please try again in a few minutes. ✝️", icon=None)
         else:
             prompt = (f"Translate from {src_sel} to {tgt_sel}. Context: {ctx_sel}. "
                       "Preserve liturgical terms and saint names. Return ONLY the translated text.\n\nText:\n" + tr_text.strip())
@@ -412,9 +411,9 @@ with tab_translate:
                 st.markdown(f"> {result}")
                 st.download_button("Download", result, file_name=f"translation_{tgt_code}.txt")
             elif result == "quota":
-                st.info("Notes are not available right now. Please try again later today.", icon="✝️")
+                st.info("Translation is taking a short break — please try again in a few minutes. ✝️", icon=None)
             else:
-                st.info("Translation not available right now. Please try again shortly.")
+                st.info("Translation is taking a short break — please try again in a few minutes. ✝️", icon=None)
 
 # ── Homily Helper ─────────────────────────────────────────────────────────────
 with tab_homily:
@@ -432,7 +431,7 @@ with tab_homily:
 
     if st.button("Generate notes", type="primary", key="hom_btn") and gospel_ref.strip():
         if not _live:
-            st.info("Insights are not available right now. Please try again shortly.", icon="✝️")
+            st.info("Insights are being set up — please try again in a few minutes. ✝️", icon=None)
         else:
             prompt = (f"Catholic homily preparation assistant for priests/deacons.\n"
                       f"Reading: {gospel_ref}\nSeason: {season}\n"
@@ -448,9 +447,9 @@ with tab_homily:
                 st.caption("⚠️ Preparation aid only — does not replace personal prayer or the priest's own discernment.")
                 st.download_button("Download", result, file_name="homily_notes.txt")
             elif result == "quota":
-                st.warning("Daily quota reached — available again later today.")
+                st.info("The assistant is resting — please try again in a little while. ✝️", icon=None)
             else:
-                st.info("Notes not available right now. Please try again shortly.")
+                st.info("Homily notes are temporarily unavailable. Please try again shortly. ✝️", icon=None)
 
 # ── Parish Insights ───────────────────────────────────────────────────────────
 with tab_insights:
@@ -480,9 +479,9 @@ with tab_insights:
                 st.markdown(result)
                 st.download_button("Download", result, file_name="parish_insights.txt")
             elif result == "quota":
-                st.warning("Daily quota reached — available again later today.")
+                st.info("The assistant is resting — please try again in a little while. ✝️", icon=None)
             else:
-                st.info("Insights not available right now. Please try again shortly.")
+                st.info("Parish insights are temporarily unavailable. Please try again shortly. ✝️", icon=None)
 
 # ── Announcements & Crisis Composer ──────────────────────────────────────────
 with tab_comms:
@@ -593,7 +592,7 @@ with tab_comms:
             )
 
             if not _live:
-                st.info("Requires live AI connection. Try again shortly.")
+                st.info("This feature is being set up — please try again in a few minutes. ✝️", icon=None)
             else:
                 with st.spinner("Drafting…"):
                     ok, result, _ = _safe_gen(full_prompt, api_key, model)
@@ -611,9 +610,9 @@ with tab_comms:
                         "All parish communications require approval from the priest or coordinator."
                     )
                 elif result == "quota":
-                    st.warning("Daily quota reached — available again later today.")
+                    st.info("The assistant is resting — please try again in a little while. ✝️", icon=None)
                 else:
-                    st.info("Draft not available right now. Please try again shortly.")
+                    st.info("The draft assistant is temporarily unavailable. Please try again shortly. ✝️", icon=None)
 
 # ── Admin-only status (hidden unless ?admin=1 in URL) ─────────────────────────
 _params = st.query_params
