@@ -4,6 +4,35 @@ A complete spiritual OS for parishes worldwide.
 """
 
 import streamlit as st
+import urllib.request, json as _json
+
+@st.cache_data(ttl=1800)
+def fetch_mpesa_context():
+    """Live KES rate + simple M-Pesa reachability check."""
+    result = {"kes_rate": None, "mpesa_ok": False, "live": False}
+    try:
+        with urllib.request.urlopen(
+            "https://open.er-api.com/v6/latest/USD", timeout=5
+        ) as r:
+            d = _json.loads(r.read())
+        result["kes_rate"] = round(d["rates"]["KES"], 2)
+        result["updated"]  = d.get("time_last_update_utc", "")[:16]
+        result["live"] = True
+    except Exception:
+        pass
+    try:
+        # Ping Safaricom Daraja sandbox — confirms internet/API path is healthy
+        req = urllib.request.Request(
+            "https://sandbox.safaricom.co.ke",
+            headers={"User-Agent": "catholic-network-tools/1.0"},
+        )
+        urllib.request.urlopen(req, timeout=4)
+        result["mpesa_ok"] = True
+    except Exception:
+        result["mpesa_ok"] = False
+    return result
+
+
 from services.i18n import lang_selector
 from services.parish_identity import sidebar_widget as _parish_widget
 from services.roles import sidebar_role_badge as _role_badge
@@ -87,6 +116,13 @@ with st.sidebar:
 
 # ── Sidebar footer ────────────────────────────────────────────────────────────
 with st.sidebar:
+    # Live status badge
+    _ctx = fetch_mpesa_context()
+    if _ctx.get("live"):
+        _rate_str = f"1 USD = {_ctx['kes_rate']} KES"
+        _mpesa_str = "✅ M-Pesa reachable" if _ctx.get("mpesa_ok") else "⚠️ M-Pesa: check connection"
+        st.sidebar.caption(f"📡 {_rate_str}  ·  {_mpesa_str}")
+
     st.markdown("""
 <div style="margin-top:1rem;padding:0.75rem;background:rgba(201,168,76,0.08);
      border-radius:8px;border:1px solid rgba(201,168,76,0.2);text-align:center;">
