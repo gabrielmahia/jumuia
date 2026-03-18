@@ -260,15 +260,25 @@ except Exception:
     st.title("🤖 AI Parish Assistant")
 
 api_key = _get_key()
-if not api_key:
-    st.info("The AI assistant has not been set up for this parish yet. Contact your parish coordinator to activate it.", icon="✝️")
-    st.stop()
+_live = False
+model = None
 
-model = _discover_model(api_key)
-_live = bool(model)
-
-if not _live:
-    st.info("The assistant is responding with suggested answers while we restore full service. All other parish tools are working normally.", icon="✝️")
+if api_key:
+    model = _discover_model(api_key)
+    _live = bool(model)
+    if not _live:
+        st.warning(
+            "AI service temporarily unavailable — responding with suggested answers. "
+            "All other parish tools are working normally.",
+            icon="✝️"
+        )
+else:
+    st.info(
+        "✝️ **Demo mode** — the AI assistant is showing suggested answers. "
+        "Parish coordinators: add a `GOOGLE_API_KEY` to Streamlit Secrets to enable "
+        "the live multilingual assistant.",
+        icon=None
+    )
 
 tab_chat, tab_translate, tab_homily, tab_insights, tab_comms = st.tabs([
     # tabs intentionally kept simple
