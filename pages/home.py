@@ -1,5 +1,5 @@
 from services.i18n import t as _t, get_lang
-"""Catholic Parish Steward — Homepage"""
+"""Jumuia — Parish Community"""
 import streamlit as st
 
 # ── i18n: compute before render ───────────────────────────────────────────────
@@ -120,7 +120,7 @@ st.markdown(_hero_html, unsafe_allow_html=True)
 
 st.markdown(f"""
 <div class="cps-home-hero">
-  <div class="cps-home-title">Catholic Parish Steward</div>
+  <div class="cps-home-title">Jumuia — Parish Community</div>
   <div class="cps-home-sub">{_i18n_subtitle}</div>
   <div class="cps-home-verse">{_i18n_verse}</div>
 </div>
@@ -184,8 +184,8 @@ st.markdown("""
 
 st.write("")
 st.caption(
-    "Catholic Parish Steward · "
-    "[GitHub](https://github.com/gabrielmahia/catholic-network-tools) · "
+    "Jumuia — Parish Community · "
+    "[GitHub](https://github.com/gabrielmahia/jumuia) · "
     "Built on the AMECEA tradition of Small Christian Communities · "
     "Data: OpenStreetMap contributors"
 )
