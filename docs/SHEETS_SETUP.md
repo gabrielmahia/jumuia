@@ -20,7 +20,7 @@ Each `form_type` gets its own tab, auto-created on first submission:
 
 ### Step 1 — Create your Google Sheet
 1. Go to [sheets.google.com](https://sheets.google.com)
-2. Create a new spreadsheet: **"Catholic Parish Steward — Submissions"**
+2. Create a new spreadsheet: **"Jumuia — Parish Directory"**
 
 ### Step 2 — Deploy the Apps Script
 1. In your sheet: **Extensions → Apps Script**
