@@ -21,10 +21,27 @@ st.set_page_config(page_title="Find My Church", page_icon="🔍", layout="wide")
 st.title("🔍 Find My Local Church")
 st.markdown("Search by location, values, and accessibility. Powered by OpenStreetMap — real global data, no API key required.")
 
+
+# ── Quick-search popular cities ───────────────────────────────────────────────
+st.markdown("**Quick search — tap to search**")
+_qcols = st.columns(6)
+_cities = [
+    ("Nairobi", "Kenya"), ("Kampala", "Uganda"), ("Lagos", "Nigeria"),
+    ("Manila", "Philippines"), ("São Paulo", "Brazil"), ("Rome", "Italy"),
+]
+for _col, (_qcity, _qcountry) in zip(_qcols, _cities):
+    if _col.button(_qcity, key=f"qc_{_qcity}", use_container_width=True):
+        st.session_state["_qcity"]    = _qcity
+        st.session_state["_qcountry"] = _qcountry
+
+# Pre-fill from quick-search
+_prefill_city    = st.session_state.pop("_qcity",    "")
+_prefill_country = st.session_state.pop("_qcountry", "")
+
 col1, col2 = st.columns([1, 1])
 with col1:
-    city    = st.text_input("City", placeholder="Nairobi / Manila / São Paulo / Rome")
-    country = st.text_input("Country (optional, improves accuracy)", placeholder="Kenya / Philippines / Brazil")
+    city    = st.text_input("City", value=_prefill_city, placeholder="Nairobi / Manila / São Paulo / Rome")
+    country = st.text_input("Country (optional, improves accuracy)", value=_prefill_country, placeholder="Kenya / Philippines / Brazil")
     radius  = st.slider("Search radius (km)", 5, 80, 30)
 with col2:
     st.markdown("**Language preference**")
@@ -57,13 +74,32 @@ if search_btn:
         with st.spinner(f"Searching for Catholic churches in {city}... (OSM live data)"):
             try:
                 from gospelmap.church_search import search_by_city
-                results = search_by_city(city.strip(), country.strip() or None, limit=15)
+
+                @st.cache_data(ttl=86400, show_spinner=False)
+                def _cached_search(city, country):
+                    return search_by_city(city, country or None, limit=15)
+
+                results = _cached_search(city.strip(), country.strip() or None)
                 st.session_state["_church_results"] = results
                 st.session_state["_church_search_city"] = city.strip()
                 st.session_state["_church_search_country"] = country.strip()
             except Exception as e:
                 st.session_state.pop("_church_results", None)
-                st.warning("Search is not available right now. Please check your connection and try again.")
+                err_str = str(e)
+                if "timed out" in err_str or "timeout" in err_str.lower():
+                    st.warning(
+                        "**The OpenStreetMap server is taking too long to respond.** "
+                        "This usually resolves in a few seconds. "
+                        "Try again — we automatically retry multiple servers. "
+                        f"\n\nCity searched: **{city.strip()}**"
+                    )
+                else:
+                    st.warning(
+                        "**Church search unavailable right now.** "
+                        "OpenStreetMap data is free and community-maintained — servers can be slow at peak times. "
+                        "Try again in 10–30 seconds. Coverage is best for Nairobi, Mombasa, Kampala, Lagos, Manila, "
+                        "São Paulo, Rome, and most major cities."
+                    )
 
 # ── Render cached results (persists across reruns / save button clicks) ───────
 if "_church_results" in st.session_state:
