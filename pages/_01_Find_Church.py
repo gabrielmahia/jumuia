@@ -63,7 +63,7 @@ if search_btn:
                 st.session_state["_church_search_country"] = country.strip()
             except Exception as e:
                 st.session_state.pop("_church_results", None)
-                st.warning(f"Search is not available right now. Please check your connection and try again.")
+                st.warning("Search is not available right now. Please check your connection and try again.")
 
 # ── Render cached results (persists across reruns / save button clicks) ───────
 if "_church_results" in st.session_state:
@@ -72,7 +72,7 @@ if "_church_results" in st.session_state:
     _search_country = st.session_state.get("_church_search_country", country)
 
     if not churches:
-        st.warning(f"No churches found. Try a larger city or different spelling.")
+        st.warning("No churches found. Try a larger city or different spelling.")
         st.info("💡 OSM coverage varies by region. Major cities in East Africa, Philippines, Brazil, Europe have good coverage.")
     else:
         st.success(f"Found **{len(churches)} Catholic churches** near {_search_city}")

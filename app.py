@@ -4,7 +4,8 @@ A complete spiritual OS for parishes worldwide.
 """
 
 import streamlit as st
-import urllib.request, json as _json
+import urllib.request
+import json as _json
 
 @st.cache_data(ttl=1800)
 def fetch_mpesa_context():
