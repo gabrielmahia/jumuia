@@ -1,5 +1,5 @@
 """
-Magisterial Boundary Layer — Catholic Parish Steward
+Magisterial Boundary Layer — Jumuia — Parish Community
 =====================================================
 Spec §3: AI components must avoid doctrinal innovation, political endorsement,
 moral speculation; must defer controversial questions; must log doctrinal-sensitive
