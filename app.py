@@ -1,5 +1,5 @@
 """
-Catholic Parish Steward
+Jumuia — Parish Community
 A complete spiritual OS for parishes worldwide.
 """
 
