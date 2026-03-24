@@ -2,11 +2,11 @@
 
 **Decision support infrastructure for the global Catholic Church.**
 
-[![CI](https://github.com/gabrielmahia/catholic-network-tools/actions/workflows/ci.yml/badge.svg)](https://github.com/gabrielmahia/catholic-network-tools/actions/workflows/ci.yml)
+[![CI](https://github.com/gabrielmahia/jumuia/actions/workflows/ci.yml/badge.svg)](https://github.com/gabrielmahia/jumuia/actions/workflows/ci.yml)
 [![Live Data](https://img.shields.io/badge/Live%20Data-open.er-api.com%20%C2%B7%20Safaricom%20ping-00b4d8)](#catholic-network-tools)
 [![Tests](https://img.shields.io/badge/tests-56%20passing-brightgreen)](#testing)
 [![License: CC BY-NC-ND 4.0](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-lightgrey.svg)](LICENSE)
-[![Live](https://img.shields.io/badge/live-catholicparishsteward.streamlit.app-gold)](https://jumuia.streamlit.app)
+[![Live](https://img.shields.io/badge/live-jumuia.streamlit.app-gold)](https://jumuia.streamlit.app)
 
 **[→ Open the live platform](https://jumuia.streamlit.app)**
 
@@ -99,7 +99,7 @@ tests/
 ## Quick start
 
 ```bash
-git clone https://github.com/gabrielmahia/catholic-network-tools
+git clone https://github.com/gabrielmahia/jumuia
 cd catholic-network-tools
 pip install -r requirements.txt
 streamlit run home.py
