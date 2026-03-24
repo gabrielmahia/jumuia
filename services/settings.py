@@ -1,5 +1,5 @@
 """
-Settings Matrix — Catholic Parish Steward
+Settings Matrix — Jumuia — Parish Community
 ==========================================
 Centralised user/parish settings persisted in session state.
 Spec §5 Settings Matrix: Localisation, Accessibility, Notifications,
