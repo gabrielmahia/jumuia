@@ -1,3 +1,19 @@
+
+    /* Metric text — explicit colours for light + dark (Streamlit theme toggle) */
+    [data-testid="stMetricLabel"]  { color: #444444 !important; font-size: 0.8rem !important; }
+    [data-testid="stMetricValue"]  { color: #111111 !important; font-weight: 700 !important; }
+    [data-testid="stMetricDelta"]  { color: #333333 !important; }
+    @media (prefers-color-scheme: dark) {
+        [data-testid="stMetricLabel"] { color: #aaaaaa !important; }
+        [data-testid="stMetricValue"] { color: #f0f0f0 !important; }
+        [data-testid="stMetricDelta"] { color: #cccccc !important; }
+    }
+    [data-theme="dark"] [data-testid="stMetricLabel"],
+    .stApp[data-theme="dark"] [data-testid="stMetricLabel"] { color: #aaaaaa !important; }
+    [data-theme="dark"] [data-testid="stMetricValue"],
+    .stApp[data-theme="dark"] [data-testid="stMetricValue"] { color: #f0f0f0 !important; }
+    [data-theme="dark"] [data-testid="stMetricDelta"],
+    .stApp[data-theme="dark"] [data-testid="stMetricDelta"] { color: #cccccc !important; }
 """
 Mobile & Rural UX Layer — Catholic Network Tools
 Applies lightweight CSS + layout adjustments optimised for:
