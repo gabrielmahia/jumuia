@@ -11,7 +11,8 @@ import math
 
 OVERPASS_ENDPOINTS = [
     "https://overpass-api.de/api/interpreter",
-    "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+    "https://overpass.openstreetmap.fr/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter",
 ]
 NOMINATIM_URL = "https://nominatim.openstreetmap.org/search"
 
@@ -30,7 +31,7 @@ class Church:
     osm_id: Optional[str] = None
 
 
-def _overpass(query: str, timeout: int = 35) -> dict:
+def _overpass(query: str, timeout: int = 15) -> dict:
     for url in OVERPASS_ENDPOINTS:
         try:
             r = requests.post(url, data={"data": query}, timeout=timeout,
