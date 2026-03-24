@@ -1,5 +1,5 @@
 """
-Privacy & GDPR Compliance Module — Catholic Parish Steward
+Privacy & GDPR Compliance Module — Jumuia — Parish Community
 ==========================================================
 Implements:
 - Data minimisation
