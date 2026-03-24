@@ -12,7 +12,7 @@ except Exception:
     pass
 
 
-st.set_page_config(page_title="Set Up USSD | Parish Steward", page_icon="📱")
+st.set_page_config(page_title="Set Up USSD | Jumuia", page_icon="📱")
 
 st.title("📱 Bring *384*248724# to Your Parish")
 st.caption("A guide for parish administrators, diocesan offices, and pastoral coordinators")
