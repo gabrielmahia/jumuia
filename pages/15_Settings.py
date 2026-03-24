@@ -1,5 +1,5 @@
 """
-Settings — Catholic Parish Steward
+Settings — Jumuia — Parish Community
 Spec §5 Settings Matrix: full user/parish configuration.
 """
 import streamlit as st
