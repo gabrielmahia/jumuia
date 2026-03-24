@@ -141,7 +141,7 @@ def diagnose() -> dict:
             "title": "API key not configured",
             "detail": "No GEMINI_API_KEY or GOOGLE_API_KEY found in Streamlit secrets.",
             "fix_steps": [
-                "Go to catholicparishsteward.streamlit.app → ⋮ menu → Settings → Secrets",
+                "Go to jumuia.streamlit.app → ⋮ menu → Settings → Secrets",
                 "Add: GOOGLE_API_KEY = \"your-key-here\"",
                 "Save — the app restarts in ~1 minute",
                 "Get a free key at aistudio.google.com → Get API key",
@@ -222,7 +222,7 @@ def diagnose() -> dict:
 
 _DEMO = {
     "what are you": (
-        "I'm the Catholic Parish Steward AI assistant — here to help with Mass times, "
+        "I'm the Jumuia — Parish Community AI assistant — here to help with Mass times, "
         "sacraments, the liturgical calendar, and translating parish announcements into "
         "Kiswahili, Luganda, French, and more. For pastoral counseling, please speak with your priest."
     ),
@@ -241,7 +241,7 @@ _DEMO = {
         "Your parish coordinator can help you prepare for any sacrament."
     ),
     "hello|hi|jambo|habari": (
-        "Hello! I'm the Catholic Parish Steward assistant. "
+        "Hello! I'm the Jumuia — Parish Community assistant. "
         "I can help you find a church, answer questions about the liturgical calendar, "
         "or translate parish announcements. How can I help you today?"
     ),
