@@ -1,5 +1,6 @@
 """Smoke tests for live data functions — catholic-network-tools."""
-import sys, os
+import sys
+import os
 sys.path.insert(0, "/tmp/catholic-network-tools")
 import unittest.mock as mock
 

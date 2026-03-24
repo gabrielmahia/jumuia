@@ -1,6 +1,7 @@
 """Parish Giving — M-Pesa (Kenya/East Africa) + international guidance"""
 import streamlit as st
-import urllib.request, json as _gj
+import urllib.request
+import json as _gj
 
 # ── Mobile CSS ──────────────────────────────────────────────────────────────
 import sys as _sys

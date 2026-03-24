@@ -111,7 +111,7 @@ try:
                 "<div style='background:rgba(107,33,168,0.07);border-left:4px solid #6b21a8;"
                 "border-radius:0 8px 8px 0;padding:0.8rem 1.2rem;margin-bottom:1rem;'>"
                 + "<br>".join(_obs_parts)
-                + f"<div style='font-size:0.72rem;opacity:0.55;margin-top:0.4rem;'>"
+                + "<div style='font-size:0.72rem;opacity:0.55;margin-top:0.4rem;'>"
                 + f"Source: {_obs.source} · Change country in Settings</div></div>",
                 unsafe_allow_html=True,
             )

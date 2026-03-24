@@ -562,7 +562,7 @@ with tab_comms:
     )
 
     tmpl = ANNOUNCEMENT_TEMPLATES[template_name]
-    st.markdown(f"**Fill in the details below — the AI will draft from these:**")
+    st.markdown("**Fill in the details below — the AI will draft from these:**")
 
     field_values = {}
     for field in tmpl["fields"]:

@@ -358,7 +358,6 @@ def test_ussd_response_length():
 
 
 # ── Magisterial Boundary Layer tests ──────────────────────────────────────────
-import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def test_magisterial_classify_safe():
