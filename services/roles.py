@@ -1,5 +1,5 @@
 """
-Role-Based Access — Catholic Parish Steward
+Role-Based Access — Jumuia — Parish Community
 ============================================
 Spec §4: Design role-based architecture with server-side permission enforcement.
 
