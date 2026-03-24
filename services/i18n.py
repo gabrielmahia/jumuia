@@ -1,5 +1,5 @@
 """
-Internationalisation (i18n) — Catholic Parish Steward
+Internationalisation (i18n) — Jumuia — Parish Community
 ======================================================
 UI string translations for major Catholic-population languages.
 
