@@ -1,5 +1,5 @@
 """
-Parish Identity — Catholic Parish Steward
+Parish Identity — Jumuia — Parish Community
 ==========================================
 Lightweight parish context stored in session state.
 No login required. Coordinator enters name once per session.
