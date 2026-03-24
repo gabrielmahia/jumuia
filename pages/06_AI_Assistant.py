@@ -18,7 +18,7 @@ except Exception:
     pass
 
 
-st.set_page_config(page_title="Catholic Parish Steward", page_icon="✝️", layout="wide")
+st.set_page_config(page_title="Jumuia — Parish Community", page_icon="✝️", layout="wide")
 
 try:
     from services.theme import inject, hero, section_label
@@ -235,7 +235,7 @@ def _safe_gen(prompt, api_key, primary_model):
     return False, "quota", False  # all models exhausted
 
 _DEMO = [
-    (["what are you","who are you"], "I'm the Catholic Parish Steward assistant — here to help with Mass times, sacraments, the liturgical calendar, prayers, and parish questions in any language. For pastoral counseling, please speak with your priest or deacon."),
+    (["what are you","who are you"], "I'm the Jumuia — Parish Community assistant — here to help with Mass times, sacraments, the liturgical calendar, prayers, and parish questions in any language. For pastoral counseling, please speak with your priest or deacon."),
     (["mass","misa","messe","misa","mass time","when is mass"], "Mass times vary by parish. Use the Find a Church page to locate your nearest church and its schedule. Mass schedules vary widely by parish — use the Find a Church page to locate your nearest church and its times."),
     (["rosary","rozari","chapelet","rosário"], "The Rosary is prayed on five mysteries depending on the day: Joyful (Mon/Sat), Luminous (Thu), Sorrowful (Tue/Fri), Glorious (Wed/Sun). Visit the Daily Prayers page for the full guided Rosary."),
     (["sacr","bapti","confirm","euchar","reconcil","confession","anointing","marriage"], "The seven sacraments are Baptism, Confirmation, Eucharist, Reconciliation, Anointing of the Sick, Holy Orders, and Matrimony. Your parish coordinator can help you prepare for any sacrament."),
