@@ -61,7 +61,7 @@ if "confirmed_parishes" not in st.session_state:
 
 
 # ── OSM helpers ───────────────────────────────────────────────────────────────
-_UA = "CatholicParishSteward/2.0 (https://catholicparishsteward.streamlit.app)"
+_UA = "CatholicParishSteward/2.0 (https://jumuia.streamlit.app)"
 
 def _http_get(url: str, timeout=15) -> dict:
     req = urllib.request.Request(url, headers={"User-Agent": _UA})
