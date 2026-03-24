@@ -422,5 +422,30 @@ with tab5:
             "I firmly resolve, with the help of Thy grace,\nto sin no more and to avoid the near occasions of sin. Amen."
         )
 
+# ── Share today's readings ─────────────────────────────────────────────────────
+st.divider()
+st.markdown("**📤 Share today's readings**")
+_share_cols = st.columns([1, 1, 1])
+
+# Build a shareable text summary
+_today_str = __import__('datetime').date.today().strftime("%A, %B %-d")
+_share_text = (
+    f"Today's Catholic readings — {_today_str}\n"
+    "jumuia.streamlit.app\n\n"
+    "Daily readings, Rosary, prayers and parish tools — free, worldwide."
+)
+
+with _share_cols[0]:
+    # WhatsApp share link
+    import urllib.parse as _uparse
+    _wa_url = "https://wa.me/?text=" + _uparse.quote(_share_text)
+    st.link_button("💬 Share on WhatsApp", _wa_url, use_container_width=True)
+
+with _share_cols[1]:
+    st.code(_share_text, language=None)
+
+with _share_cols[2]:
+    st.link_button("🌐 Open Jumuia", "https://jumuia.streamlit.app", use_container_width=True)
+
 st.divider()
 st.caption("📿 Prayers sourced from traditional Catholic tradition | No copyright claimed on liturgical texts")
