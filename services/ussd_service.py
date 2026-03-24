@@ -58,7 +58,7 @@ def end(text: str) -> str:
 # MENU SCREENS (keep each under 160 chars for readability on small screens)
 # ─────────────────────────────────────────────
 
-MAIN_MENU = """Parish Steward
+MAIN_MENU = """Jumuia
 1. Find Parish
 2. Mass Times
 3. Give via M-Pesa
@@ -126,7 +126,7 @@ def _search_parish_ussd(city: str) -> str:
         return end("\n".join(lines[:4]))  # keep under 182 chars
     except Exception as e:
         logger.error("USSD parish search error: %s", e)
-        return end("Search unavailable.\nVisit catholicparishsteward.streamlit.app")
+        return end("Search unavailable.\nVisit jumuia.streamlit.app")
 
 
 # ─────────────────────────────────────────────
