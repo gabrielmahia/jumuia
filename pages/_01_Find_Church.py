@@ -127,8 +127,21 @@ if "_church_results" in st.session_state:
                     if c.distance_km:
                         st.metric("Distance", f"{c.distance_km:.1f} km")
                 with col3:
-                    gmaps = f"https://www.google.com/maps?q={c.latitude},{c.longitude}"
-                    st.markdown(f"[📍 Google Maps]({gmaps})")
+                    import urllib.parse as _up
+                    _lat, _lon = c.latitude, c.longitude
+                    gmaps  = f"https://www.google.com/maps?q={_lat},{_lon}"
+                    waze   = f"https://waze.com/ul?ll={_lat},{_lon}&navigate=yes"
+                    _wa_church_text = _up.quote(
+                        f"Catholic church in our area:\n{c.name}\n"
+                        f"Google Maps: https://www.google.com/maps?q={_lat},{_lon}\n"
+                        "Found via jumuia.streamlit.app"
+                    )
+                    _wa_church = f"https://wa.me/?text={_wa_church_text}"
+                    st.markdown(
+                        f"[📍 Maps]({gmaps}) &nbsp;·&nbsp; "
+                        f"[🚗 Waze]({waze}) &nbsp;·&nbsp; "
+                        f"[💬 Share]({_wa_church})"
+                    )
 
                 detail_cols = st.columns(3)
                 with detail_cols[0]:
