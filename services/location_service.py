@@ -73,7 +73,7 @@ def _fetch_location() -> dict:
         r = requests.get(
             "https://ip-api.com/json/",
             params={"fields": "status,country,countryCode,city,timezone,currency,proxy,hosting"},
-            timeout=5,
+            timeout=3,
         )
         data = r.json()
         if data.get("status") == "success":
