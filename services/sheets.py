@@ -1,5 +1,5 @@
 """
-Sheets persistence — Catholic Parish Steward
+Sheets persistence — Jumuia — Parish Community
 ============================================
 Thin wrapper around gospelmap.sheets_backend.
 Import _save() in any page that collects data.
