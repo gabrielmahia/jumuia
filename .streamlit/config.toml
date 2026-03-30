@@ -1,0 +1,8 @@
+[theme]
+base = "light"
+
+[client]
+toolbarMode = "minimal"
+
+[server]
+maxUploadSize = 10
