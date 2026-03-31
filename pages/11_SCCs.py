@@ -26,9 +26,9 @@ _require_role("catechist", "Small Christian Communities")
 
 # ── Data notice ───────────────────────────────────────────────────────────────
 st.caption(
-    "ℹ️ **Session only** — Meeting records are saved during this session. "
-    "For permanent records, set up the Google Sheets backend "
-    "(see parish coordinator or contact@aikungfu.dev)."
+    "ℹ️ **Sessihile open** — Meeting records are saved while the app is open. "
+    "To save records permanently across meetings, your parish Google Sheet must be connected. "
+    "Ask your parish coordinator or email contact@aikungfu.dev for help."
 )
 # ──────────────────────────────────────────────────────────────────────────────
 
