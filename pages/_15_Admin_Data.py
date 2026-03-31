@@ -50,9 +50,9 @@ with tab1:
     try:
         from services.sheets import is_live as _sheets_live
         if _sheets_live():
-            st.success("🟢 Google Sheets connected — exported data reflects your current session. Download from your sheet for full history.", icon=None)
+            st.success("🟢 Google Sheets connected — exported data reflects what you've entered today. Download from your sheet for full history.", icon=None)
         else:
-            st.info("📋 Showing records from this session. Connect Google Sheets (below) to accumulate records across sessions.")
+            st.info("📋 Showing records entered this visit. Connect Google Sheets (below) to save records permanently across visits.")
     except Exception:
         pass
 
@@ -140,7 +140,7 @@ with tab2:
                 if _saved_count:
                     st.success(f"✅ {len(records)} records imported · {_saved_count} saved to Sheets")
                 else:
-                    st.success(f"✅ {len(records)} records imported into {target_key} (session only)")
+                    st.success(f"✅ {len(records)} records imported into {target_key} (saved for this visit)")
         except Exception:
             st.error("The file could not be read. Please check that it is a valid CSV file and try again.")
 
@@ -171,7 +171,7 @@ with tab2:
 # ── DATA HYGIENE ───────────────────────────────────────────────────────────────
 with tab3:
     st.subheader("🗑️ Data Hygiene")
-    st.warning("These actions clear session data. Export first!")
+    st.warning("These actions clear all data entered this visit. Export first!")
 
     for key, (label, parent) in MODULES.items():
         if parent == "sacrament_records":
@@ -197,7 +197,7 @@ with tab3:
                     st.session_state.sacrament_records[key] = []
             else:
                 st.session_state[key] = []
-        st.success("All session data cleared.")
+        st.success("All records cleared for this visit.")
 
     st.divider()
     st.subheader("☁️ Persistence Options")
