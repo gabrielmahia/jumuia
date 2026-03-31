@@ -24,6 +24,14 @@ except ImportError:
 _require_role("catechist", "Small Christian Communities")
 
 
+# ── Data notice ───────────────────────────────────────────────────────────────
+st.caption(
+    "ℹ️ **Session only** — Meeting records are saved during this session. "
+    "For permanent records, set up the Google Sheets backend "
+    "(see parish coordinator or contact@aikungfu.dev)."
+)
+# ──────────────────────────────────────────────────────────────────────────────
+
 st.title("👥 Small Christian Communities (SCCs)")
 st.caption("The backbone of African Catholicism · Est. AMECEA 1973 · 45,000+ SCCs in Kenya alone")
 
