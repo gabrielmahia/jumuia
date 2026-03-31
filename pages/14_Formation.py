@@ -228,4 +228,4 @@ with tab4:
         st.dataframe(prog_df, use_container_width=True, hide_index=True)
 
 st.divider()
-st.caption("💾 Records are stored for this session. Connect Google Sheets in Admin → Data Management for persistence.")
+st.caption("💾 Records are saved while the app is open — connect Google Sheets to keep them permanently. Connect Google Sheets in Admin → Data Management for persistence.")
