@@ -193,7 +193,7 @@ def _role_upgrade_widget():
                 "- Go to **Admin & Data** in the sidebar to connect your Google Sheet and set up your PIN.\n\n"
                 "**If your parish already uses this app:**\n"
                 "- Ask your pastor, parish secretary, or the person who manages the parish Google Sheet.\n"
-                "- The PIN is configured in your parish's Streamlit secrets by whoever set up the app.\n\n"
+                "- The PIN is set by whoever manages your parish app (usually the parish secretary or coordinator).\n\n"
                 "**No coordinator in your parish yet?**\n"
                 "- Any non-empty PIN (4+ characters) works in demo mode until a PIN is officially configured."
             )
