@@ -202,19 +202,14 @@ with tab3:
     st.divider()
     st.subheader("☁️ Persistence Options")
     st.markdown("""
-**For production use, connect one of these backends:**
+**How to save your parish data permanently:**
 
-🔵 **Google Sheets** — free, collaborative, no server needed
-- Add `SHEETS_ENDPOINT` to Streamlit secrets (copy the Apps Script URL)
-- Already wired — see More Tools → Admin & Data
+🔵 **Google Sheets (Recommended)** — free, simple, no technical knowledge needed
+- Your parish records save automatically to a Google Sheet you own
+- See the setup guide: **More Tools → Set Up → Sheets Setup**
+- Already connected? Your data is saving automatically.
 
-🟢 **SQLite** — local file database, no external service
-- Use `sqlite3` (built into Python)
-- Store in `/data/parish.db`
-
-🟡 **Supabase** — free Postgres backend, REST API
-- Add `SUPABASE_URL` + `SUPABASE_KEY` to secrets
-
-🔴 **Firebase Firestore** — Google's document DB, realtime
-- Good for multi-parish sync
+🟡 **Need help setting this up?**
+- Contact your parish tech coordinator, or
+- Email contact@aikungfu.dev — the app developer can help
 """)
