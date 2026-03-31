@@ -97,8 +97,8 @@ if loc.get("detected"):
 # ── Environment notice ────────────────────────────────────────────────────────
 if MPESA_ENV == "sandbox":
     st.info(
-        "**Sandbox mode** — M-Pesa payments are simulated. "
-        "No real money moves. Contact your parish coordinator to activate live giving.",
+        "**Test mode** — Payments here are simulated and no real money moves. "
+        "To activate real M-Pesa giving for your parish, contact your parish coordinator.",
         icon="🔒"
     )
 elif _MPESA_OK:
