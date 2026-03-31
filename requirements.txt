@@ -1,8 +1,7 @@
-# Catholic Parish Steward — Dependencies
+# Jumuia — Parish Community · Dependencies
 streamlit>=1.55.0
 requests>=2.31.0
 pandas>=2.0.0
 plotly>=5.17.0
 python-dotenv>=1.0.0
-pytest>=8.0.0
-ruff>=0.4.0
+google-generativeai>=0.8.0
