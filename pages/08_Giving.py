@@ -94,6 +94,17 @@ if loc.get("detected"):
         st.session_state.mpesa_warning_shown = True
 
 
+# ── Environment notice ────────────────────────────────────────────────────────
+if MPESA_ENV == "sandbox":
+    st.info(
+        "**Sandbox mode** — M-Pesa payments are simulated. "
+        "No real money moves. Contact your parish coordinator to activate live giving.",
+        icon="🔒"
+    )
+elif _MPESA_OK:
+    st.success("Live giving is active.", icon="✅")
+# ──────────────────────────────────────────────────────────────────────────────
+
 st.title("🤝 Parish Giving")
 # ── Live FX for diaspora giving ──────────────────────────────────────
 _gr = fetch_giving_rates()
