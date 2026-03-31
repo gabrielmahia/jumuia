@@ -141,7 +141,7 @@ def diagnose() -> dict:
             "title": "API key not configured",
             "detail": "AI assistant is not yet configured for this parish.",
             "fix_steps": [
-                "Go to jumuia.streamlit.app → ⋮ menu → Settings → Secrets",
+                "Contact your parish tech coordinator or email contact@aikungfu.dev to enable the AI assistant",
                 "Add: GOOGLE_API_KEY = \"your-key-here\"",
                 "Save — the app restarts in ~1 minute",
                 "Get a free key at aistudio.google.com → Get API key",
