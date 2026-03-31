@@ -25,7 +25,7 @@ def fetch_mpesa_context():
         # Ping Safaricom Daraja sandbox — confirms internet/API path is healthy
         req = urllib.request.Request(
             "https://sandbox.safaricom.co.ke",
-            headers={"User-Agent": "catholic-network-tools/1.0"},
+            headers={"User-Agent": "jumuia/1.0"},
         )
         urllib.request.urlopen(req, timeout=4)
         result["mpesa_ok"] = True
