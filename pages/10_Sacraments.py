@@ -354,4 +354,4 @@ keys = ["baptism", "confirmation", "eucharist", "marriage",
 for col, label, key in zip(cols, labels, keys):
     col.metric(label, len(st.session_state.sacrament_records[key]))
 
-st.caption("💾 Records are stored for this session. Connect Google Sheets in Admin → Data Management for persistence.")
+st.caption("💾 Records are saved while the app is open — connect Google Sheets to keep them permanently. Connect Google Sheets in Admin → Data Management for persistence.")
