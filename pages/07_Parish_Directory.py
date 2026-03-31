@@ -624,7 +624,7 @@ with tab2:
             )
         else:
             st.info(
-                f"**{name}** submitted for this session. "
+                f"**{name}** saved for this visit. "
                 "To keep it permanently, connect Google Sheets "
                 "\u2014 see More Tools \u2192 Admin & Data.",
                 icon="\U0001f4be"
