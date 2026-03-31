@@ -139,7 +139,7 @@ def diagnose() -> dict:
         return {
             "status": "no_key",
             "title": "API key not configured",
-            "detail": "No GEMINI_API_KEY or GOOGLE_API_KEY found in Streamlit secrets.",
+            "detail": "AI assistant is not yet configured for this parish.",
             "fix_steps": [
                 "Go to jumuia.streamlit.app → ⋮ menu → Settings → Secrets",
                 "Add: GOOGLE_API_KEY = \"your-key-here\"",
