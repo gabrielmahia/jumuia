@@ -19,7 +19,7 @@ sys.path.insert(0, ".")
 st.set_page_config(page_title="Find My Church", page_icon="🔍", layout="wide")
 
 st.title("🔍 Find My Local Church")
-st.markdown("Search by location, values, and accessibility. Powered by OpenStreetMap — real global data, no API key required.")
+st.markdown("Search by location, values, and accessibility. Powered by OpenStreetMap — real global data, free to use.")
 
 
 # ── Quick-search popular cities ───────────────────────────────────────────────
