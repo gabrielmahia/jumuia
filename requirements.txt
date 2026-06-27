@@ -1,6 +1,11 @@
 # Jumuia — Parish Community · Dependencies
+# Streamlit Cloud (web app)
 streamlit>=1.55.0
 requests>=2.31.0
 pandas>=2.0.0
 plotly>=5.17.0
+
+# USSD / webhook (Cloud Run — requirements-webhook.txt also exists for separate deploy)
+fastapi>=0.111.0
+uvicorn>=0.29.0
 python-dotenv>=1.0.0
