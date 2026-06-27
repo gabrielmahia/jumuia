@@ -279,6 +279,33 @@ else:
         icon=None
     )
 
+
+# ── Admin diagnostic gate ─────────────────────────────────────────────────────
+# ?admin=true in URL → visible diagnostics for parish tech coordinator
+# Never shown to public users
+_is_admin_view = str(st.query_params.get("admin", "")).lower() == "true"
+if _is_admin_view:
+    st.warning("⚙️ Admin diagnostic mode — not visible to parishioners")
+    _has_key = bool(api_key)
+    try:
+        from services.sheets import is_configured as _sc; _sheets_ok = _sc()
+    except Exception: _sheets_ok = False
+    _dc1, _dc2 = st.columns(2)
+    with _dc1:
+        st.markdown("**AI status**")
+        st.code(
+            f"GOOGLE_API_KEY: {('set ✅' if _has_key else 'MISSING ❌')}\n"
+            f"Active model:   {model or 'none — check key'}\n"
+            f"Live:           {_live}\n"
+            f"SHEETS_ENDPOINT:{(' set ✅' if _sheets_ok else ' not set')}",
+            language="text"
+        )
+    with _dc2:
+        st.markdown("**Last error**")
+        _last_err = st.session_state.get("_ai_last_error", "None")
+        st.code(str(_last_err), language="text")
+    st.divider()
+
 tab_chat, tab_translate, tab_homily, tab_insights, tab_comms = st.tabs([
     # tabs intentionally kept simple
     "💬 Chat", "🌍 Translation", "📖 Homily Helper", "📊 Parish Insights", "📣 Announcements"
@@ -289,6 +316,8 @@ with tab_chat:
     st.markdown("**Ask your parish assistant**")
     st.caption("Mass times · Sacraments · Calendar · Ministries · For pastoral counseling, speak with your priest.")
 
+    if "_ai_last_error" not in st.session_state:
+        st.session_state["_ai_last_error"] = None
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = []
     if "chat_input_counter" not in st.session_state:
