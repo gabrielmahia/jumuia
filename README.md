@@ -1,10 +1,8 @@
--e # ✝️ Catholic Network Tools
+# ✝️ Jumuia — Parish Community
 
-**Decision support infrastructure for the global Catholic Church.**
+**Low-cost Catholic parish coordination for East Africa and the global diaspora.**
 
 [![CI](https://github.com/gabrielmahia/jumuia/actions/workflows/ci.yml/badge.svg)](https://github.com/gabrielmahia/jumuia/actions/workflows/ci.yml)
-[![Live Data](https://img.shields.io/badge/Live%20Data-open.er-api.com%20%C2%B7%20Safaricom%20ping-00b4d8)](#catholic-network-tools)
-[![Tests](https://img.shields.io/badge/tests-56%20passing-brightgreen)](#testing)
 [![License: CC BY-NC-ND 4.0](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-lightgrey.svg)](LICENSE)
 [![Live](https://img.shields.io/badge/live-jumuia.streamlit.app-gold)](https://jumuia.streamlit.app)
 
@@ -14,9 +12,22 @@
 
 ## What it is
 
-A unified platform serving parishioners, parish coordinators, catechists, priests, and diocesan administrators. Built for communities across East Africa and globally — including those with basic phones and limited internet connectivity.
+A unified platform for parishioners, parish coordinators, catechists, priests, and administrators.
+Built for communities across East Africa and globally — including those with basic phones
+and limited internet connectivity.
 
-The platform follows Catholic principles of **subsidiarity** (decisions at the lowest appropriate level) and **synodality** (coordination across levels with transparency). Privacy-first design: individuals control data visibility; coordinators see aggregated data voluntarily shared upward.
+Follows Catholic principles of **subsidiarity** (decisions at the lowest appropriate level)
+and **synodality** (coordination with transparency).
+
+---
+
+## Three public entry points
+
+| Entry | Who | What |
+|-------|-----|------|
+| 🗺️ **Find a Church** | Everyone | 40,000+ Catholic churches via OpenStreetMap |
+| 📖 **Daily Prayers** | Everyone | Rosary, Divine Mercy, Stations, Mass readings |
+| 🤖 **AI Assistant** | Everyone | 14 languages · liturgically aware · Gemini-powered |
 
 ---
 
@@ -24,138 +35,125 @@ The platform follows Catholic principles of **subsidiarity** (decisions at the l
 
 | Page | Role | What it does |
 |------|------|--------------|
-| 🏠 Home | All | Parish identity, SMS access number, language selector |
-| 🔍 Find a Church | Parishioners | OpenStreetMap search — any city globally, real-time |
-| 🙏 Daily Prayers | Parishioners | Rosary, Divine Mercy, Stations, liturgical readings |
-| 🤖 AI Assistant | All | Chat, translation (14 languages), homily prep, parish insights |
+| 🏠 Home | All | Simple public front door — three actions only |
+| 🗺️ Find a Church | Parishioners | OSM search + manual submission + community verification |
+| 📖 Daily Prayers | Parishioners | Rosary, Divine Mercy, Stations, liturgical calendar |
+| 🤖 AI Assistant | All | Chat + translation (14 languages) + homily prep |
 | ⛪ Sacraments | Coordinators | Baptism, Confirmation, Eucharist, Marriage, Anointing records |
-| 👥 Small Communities | Coordinators | SCC roster, meeting records, attendance tracking |
+| 👥 Small Communities | Coordinators | SCC roster, meeting records, attendance (Jumuia model) |
 | 📚 Catechists | Coordinators | Certification tracking, training records |
-| 🫶 Pastoral Care | Coordinators | Homebound visits, grief support, mentoring, new members |
-| 📖 Formation & RCIA | Coordinators | RCIA cohorts, formation tracks |
-| 💝 Parish Giving | All | Contribution tracking, campaign management |
-| 📅 Liturgy & Calendar | All | Liturgical engine: season, readings, fasting rules by country |
-| 🏥 Parish Health | Coordinators | Pastoral Crisis Index, health metrics |
-| ⚖️ Justice & Care | All | Social justice campaigns, advocacy coordination |
-| 🌍 Global Diaspora | All | Community connection across diaspora networks |
-| 🔍 Transparency | Diocese | Accountability dashboard |
-| ⚙️ Admin & Data | Admin | Export, governance, data management |
-| 📱 Set Up USSD | Admin | SMS/USSD configuration for basic phone access |
+| 🫶 Pastoral Care | Coordinators | Visitation, hospital, grief, care records |
+| 📘 Formation | Coordinators | RCIA stages, Faith Formation tracking |
+| 💰 Parish Giving | Coordinators | M-Pesa + manual giving records |
+| 📋 Liturgy | All | Liturgical calendar, Mass planner |
+| 📊 Parish Health | Admins | Sacramental and community metrics |
+| ⚖️ Justice & Care | All | Local outreach and community action |
+| 📋 Transparency | Admins | Parish accountability dashboard |
+| 🌏 Diaspora | All | Global Catholic community connections |
+| 📱 USSD Setup | Admins | Configure USSD access for feature-phone parishioners |
+| ⚙️ Settings | All | Accessibility, language, data preferences |
+| 📁 Admin & Data | Admins | Export, import, Google Sheets connection |
 
 ---
 
-## Technical highlights
-
-**Liturgical engine** — Correct Sunday cycle (A/B/C), season detection, colour, fasting and abstinence rules per episcopal conference (US, Kenya, Philippines, Nigeria, and others). Fixes the common bug of hardcoding Year A regardless of actual cycle.
-
-**AI assistant with real-time search grounding** — Gemini 2.0 Flash with Google Search grounding enabled. The model searches Google in real-time when questions need current information (current pope, today's readings, recent Vatican news). Falls back to Gemini 1.5 with dynamic retrieval threshold, then to demo responses. Maintains a `_current_catholic_facts()` context block so the model is always grounded in the actual present.
-
-**Role-based access** — Five roles (parishioner → coordinator → catechist → priest → diocese). Role gates use `require_role()` via `services/roles.py`. A fixed vulnerability: the original gates wrapped `st.stop()` in broad `except Exception` clauses, silently swallowing the stop signal. All 5 gated pages now use narrow `ImportError`-only guards.
-
-**Multilingual** — 14 languages: English, Kiswahili, French, Spanish, Portuguese, Luganda, Igbo, Tagalog, Polish, Italian, German, Arabic, Hindi, Swedish. AI translation covers all 14.
-
-**SMS / USSD** — Africa's Talking integration for basic phone access. Parish data synced; alert thresholds configurable per diocese.
-
-**Parish directory** — Dual-source: OpenStreetMap Overpass API (global, real-time) + community-verified local database. 3-tier deduplication: OSM element ID → coordinate rounding (±11m) → name+address prefix.
-
----
-
-## Architecture
+## Infrastructure
 
 ```
-pages/                    ← 17 Streamlit pages (named to control sidebar order)
-  home.py
-  _01_Find_Church.py      ← OSM Overpass + Nominatim, 3-tier dedup
-  06_AI_Assistant.py      ← Gemini + Google Search grounding, 14 languages
-  07_Parish_Directory.py
-  10_Sacraments.py        ← Role-gated (coordinator+)
-  _00_Liturgy.py          ← Liturgical engine UI
-  ...
+Streamlit Cloud (web app — free tier)
+  ↕  Google Sheets (data persistence — Apps Script)
+  ↕  Gemini (AI — free tier + fallback cascade)
+  ↕  OpenStreetMap (maps — free, open)
 
-services/
-  ai_service.py           ← Gemini API, model discovery, quota cascade
-  lectionary.py           ← Sunday cycle (A/B/C), mass readings
-  liturgical_engine.py    ← Season, colour, fasting by episcopal conference
-  roles.py                ← Role definitions and enforcement
-  privacy.py              ← Privacy-first data visibility controls
-  i18n.py                 ← 14-language translation strings
-  sheets.py               ← Google Sheets sync
-  magisterial.py          ← Query classification, sensitive topic logging
-  ...
-
-gospelmap/
-  church_search.py        ← Overpass API multi-strategy search with failover
-  lectionary.py
-
-tests/
-  test_services.py        ← 56 tests: liturgy, lectionary, AI, roles, privacy
-
-.github/
-  workflows/ci.yml        ← Ruff lint + pytest on push/PR
+Google Cloud Run (USSD webhook — free tier)
+  ↕  Africa's Talking (USSD/SMS — pay per use)
+  ↕  Shared data via Google Sheets
 ```
+
+**Cost target: $0–10/month** until real parish usage validates scaling.
 
 ---
 
-## Quick start
+## USSD Access (Africa's Talking)
+
+Feature-phone parishioners in rural Kenya can dial your registered shortcode:
+
+```
+*XXX#
+1. Find Parish
+2. Mass Times
+3. Give via M-Pesa
+4. Today's Reading
+5. Emergency Contacts
+```
+
+USSD webhook deploys to Cloud Run separately from the Streamlit app.
+See `docs/CLOUD_RUN_DEPLOY.md` for instructions.
+
+---
+
+## Configuration (Streamlit Secrets)
+
+Add to `.streamlit/secrets.toml` (local) or Streamlit Cloud → Settings → Secrets:
+
+```toml
+GOOGLE_API_KEY = "AIza..."              # Gemini AI
+SHEETS_ENDPOINT = "https://script..."   # Google Sheets Apps Script URL
+AFRICASTALKING_USERNAME = "sandbox"     # Africa's Talking
+AFRICASTALKING_API_KEY = "atsk_..."
+```
+
+See `.env.example` for all variables.
+See `docs/SHEETS_SETUP.md` for Google Sheets setup.
+See `docs/CLOUD_RUN_DEPLOY.md` for USSD deployment.
+
+---
+
+## Admin Diagnostics
+
+To see AI/Sheets status without exposing it to the public:
+
+`https://jumuia.streamlit.app/AI_Assistant?admin=true`
+
+Shows: API key status, active model, SHEETS_ENDPOINT configured, last error.
+
+---
+
+## Running locally
 
 ```bash
 git clone https://github.com/gabrielmahia/jumuia
-cd catholic-network-tools
+cd jumuia
+cp .env.example .env   # fill in GOOGLE_API_KEY + SHEETS_ENDPOINT
 pip install -r requirements.txt
-streamlit run home.py
+streamlit run app.py
 ```
 
-The app runs at `http://localhost:8501`. AI features require a `GOOGLE_API_KEY` (Gemini) in Streamlit secrets or environment.
-
-**Streamlit secrets (`.streamlit/secrets.toml`):**
-```toml
-GOOGLE_API_KEY = "your-gemini-key"
-GOOGLE_SHEETS_KEY = "your-sheets-key"  # optional
-AFRICAS_TALKING_KEY = "your-at-key"    # optional, for SMS
-```
-
----
-
-## Testing
+## Tests
 
 ```bash
 pytest tests/ -v
-# 56 tests: liturgical cycle, lectionary readings, AI language coverage,
-#           role enforcement, privacy controls, magisterial classification
+ruff check app.py pages/ services/
 ```
 
 ---
 
-## Governance
+## Architectural lineage
 
-- **License:** CC BY-NC-ND 4.0 — study and fork permitted; commercial use and redistribution of modified versions require written permission
-- **Security:** See [SECURITY.md](SECURITY.md) — report via email, not public issues
-- **Contributing:** See [CONTRIBUTING.md](CONTRIBUTING.md)
-- **IP policy:** See [docs/architecture/IP_POLICY.md](docs/architecture/IP_POLICY.md)
-- **Contact:** contact@aikungfu.dev
+```
+GospelMap (2024–2025)
+  ↓  prototype: church finder, justice network, accountability
+Catholic Network Tools (2025)
+  ↓  full platform: liturgy, AI, sacraments, SCCs, USSD
+Jumuia (2025–present)
+  ↓  production: AMECEA SCC model + USSD + M-Pesa + diaspora
+```
+
+Named after the AMECEA tradition of Small Christian Communities (SCCs).
 
 ---
 
-*Built with subsidiarity and synodality as design principles.*
-*Serving 1.3 billion Catholics — one parish at a time.*
----
+## License
 
-## Portfolio
-
-Part of a suite of civic and community tools built by [Gabriel Mahia](https://github.com/gabrielmahia):
-
-| App | What it does |
-|-----|-------------|
-| [🌊 Mafuriko](https://floodwatch-kenya.streamlit.app) | Flood risk & policy enforcement tracker — Kenya |
-| [💧 WapiMaji](https://wapimaji.streamlit.app) | Water stress & drought intelligence — 47 counties |
-| [🏛️ Macho ya Wananchi](https://macho-ya-wananchi.streamlit.app) | MP voting records, CDF spending, bill tracker |
-| [🌾 JuaMazao](https://juamazao.streamlit.app) | Live food price intelligence for smallholders |
-| [🏦 ChaguaSacco](https://chaguasacco.streamlit.app) | Compare Kenya SACCOs on dividends & loan rates |
-| [🛡️ Hesabu](https://hesabu.streamlit.app) | County budget absorption tracker |
-| [🗺️ Hifadhi](https://hifadhi.streamlit.app) | Riparian encroachment & Water Act compliance map |
-| [💰 Hela](https://helaismoney.streamlit.app) | Chama management for the 21st century |
-| [💸 Peleka](https://tumapesa.streamlit.app) | True cost remittance comparison — diaspora to Kenya |
-| [📊 Msimamo](https://easystocktrader.streamlit.app) | Macro risk & trade intelligence terminal |
-| [🦁 Dagoretti](https://dagoretti-high-school-community-app.streamlit.app) | Alumni atlas & community hub for Dagoretti High |
-| [⛪ Jumuia](https://jumuia.streamlit.app) | Catholic parish tools — church finder, pastoral care |
-
+**CC BY-NC-ND 4.0** — Non-commercial. No derivatives. Attribution required.  
+Contact: contact@aikungfu.dev  
+© 2026 Gabriel Mahia / MNG ONLINE LLC
