@@ -1,0 +1,29 @@
+# Jumuia — USSD Webhook (Cloud Run)
+# Deploys ONLY the Africa's Talking USSD endpoint.
+# Separate from the Streamlit app to minimise cold-start latency.
+#
+# Deploy:
+#   gcloud run deploy jumuia-ussd \
+#     --source . \
+#     --dockerfile Dockerfile.ussd \
+#     --region africa-south1 \
+#     --allow-unauthenticated \
+#     --set-env-vars AFRICASTALKING_API_KEY=xxx,AFRICASTALKING_USERNAME=xxx,SHEETS_ENDPOINT=xxx
+#
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Only copy what the USSD webhook needs
+COPY requirements-webhook.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY webhook_ussd.py .
+COPY services/ services/
+COPY gospelmap/ gospelmap/
+
+ENV PORT=8080
+EXPOSE 8080
+
+# Africa's Talking requires <5s response — keep worker count low, no timeout
+CMD ["uvicorn", "webhook_ussd:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1"]
