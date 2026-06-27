@@ -19,6 +19,12 @@ import urllib.request
 import json
 import time
 from datetime import date
+try:
+    from services.sheets import _save as _sheets_save, is_configured as _sheets_live, persistence_badge as _pb
+except Exception:
+    def _sheets_save(t, d): return False
+    def _sheets_live(): return False
+    def _pb(): pass
 
 st.set_page_config(page_title="Parish Directory", page_icon="🗺️", layout="wide")
 
