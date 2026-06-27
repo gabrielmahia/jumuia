@@ -1,0 +1,27 @@
+Jumuia — Parish Community
+Copyright (c) 2024-2026 Gabriel Mahia / MNG ONLINE LLC. All rights reserved.
+
+Architectural lineage:
+  - GospelMap (2024–2025) — prototype: church finder, justice network, accountability
+  - Catholic Network Tools (2025) — full platform identity
+  - Jumuia (2025–present) — production release: parish coordination + USSD + M-Pesa
+
+Named after the AMECEA tradition of Small Christian Communities (SCCs / Jumuia):
+  the church as a network of local, accountable communities.
+
+License: Creative Commons Attribution–NonCommercial–NoDerivatives 4.0 (CC BY-NC-ND 4.0)
+
+Third-party services used:
+  - OpenStreetMap / Nominatim / Overpass API — Map data © OpenStreetMap contributors
+  - Google Gemini — AI completions (Google LLC Terms of Service)
+  - Africa's Talking — USSD + SMS gateway
+  - Safaricom M-Pesa Daraja — Mobile payments
+  - Streamlit Cloud — App hosting
+
+Catholic data sources:
+  - Daily readings: publicly available Catholic lectionary
+  - Catechism references: Catechism of the Catholic Church (public domain)
+  - Magisterial documents: Vatican.va (public domain)
+
+AMECEA refers to the Association of Member Episcopal Conferences of Eastern Africa.
+No affiliation with or endorsement by the AMECEA Secretariat is implied.
