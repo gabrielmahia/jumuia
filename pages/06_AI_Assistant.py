@@ -306,7 +306,23 @@ if _is_admin_view:
         st.code(str(_last_err), language="text")
     st.divider()
 
-tab_chat, tab_translate, tab_homily, tab_insights, tab_comms = st.tabs([
+
+    # ── Sonnet 5 upgrade path (2026-06-30) ───────────────────────────────────
+    _anthropic_key = st.secrets.get("ANTHROPIC_API_KEY", "")
+    _use_sonnet5 = False
+    if _anthropic_key:
+        _use_sonnet5 = st.sidebar.checkbox(
+            "Use Claude Sonnet 5 (premium)",
+            value=False,
+            help=(
+                "Sonnet 5 (released June 30, 2026) provides deeper responses on "
+                "complex faith questions, grief support, and legal rights. "
+                "Requires ANTHROPIC_API_KEY in Streamlit secrets."
+            )
+        )
+    
+
+    tab_chat, tab_translate, tab_homily, tab_insights, tab_comms = st.tabs([
     # tabs intentionally kept simple
     "💬 Chat", "🌍 Translation", "📖 Homily Helper", "📊 Parish Insights", "📣 Announcements"
 ])
