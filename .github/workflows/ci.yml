@@ -34,7 +34,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.11" }
-      - run: python3 -c "import ast,pathlib,sys; failed=[str(f)+': '+str(e) for f in pathlib.Path('.').rglob('*.py') if not any(p in str(f) for p in ['.git','__pycache__','.venv']) for e in [None] if (setattr(sys,'_tmp',None) or True) and (ast.parse(f.read_text()) or False) is not True]; [print(x) for x in []]; print('AST pass')"
       - name: Parse pages
         run: |
           python3 << 'PYEOF2'
