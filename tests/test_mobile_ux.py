@@ -38,11 +38,12 @@ def test_mobile_ux_imports_and_exposes_its_api(monkeypatch):
         assert hasattr(mod, name)
 
 
-def test_css_is_one_well_formed_style_block_including_the_dark_mode_metric_rules(monkeypatch):
+def test_css_is_one_well_formed_style_block_without_forced_metric_colours(monkeypatch):
     mod, _ = _load_with_fake_streamlit(monkeypatch)
     css = mod.MOBILE_CSS.strip()
     assert css.startswith("<style>") and css.endswith("</style>") and css.count("<style>") == 1 and css.count("</style>") == 1
-    assert "prefers-color-scheme: dark" in css and "stMetricLabel" in css and "#aaaaaa" in css
+    # Forcing metric colours made metrics near-invisible in a dark Streamlit theme on a light OS (seen in a rendered preview).
+    assert "prefers-color-scheme: dark" not in css and "#111111" not in css and "#f0f0f0" not in css
 
 
 def test_inject_mobile_css_writes_the_css_as_html(monkeypatch):
