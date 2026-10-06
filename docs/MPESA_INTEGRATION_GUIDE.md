@@ -3,11 +3,14 @@
 
 ---
 
-## Current Status: SANDBOX ACTIVE
+## Current Status: DEMO (not used for real giving)
 
-The full Daraja API integration is implemented. Sandbox works immediately with
-credentials from developer.safaricom.co.ke. Live giving requires Safaricom
-business registration approval.
+The Daraja integration code exists (`services/mpesa_service.py`) and is written for the Safaricom **sandbox**. Two things to know before relying on it:
+
+- **No M-Pesa callback is deployed.** The handler is `webhook_app.py` (`POST /webhook/mpesa/callback`), but the only deployed Cloud Run service (`cnt-ussd`, built from `Dockerfile.ussd`) does not include it. On 2026-10-05 that service exposed only `GET /health`, `GET /` and `POST /ussd`, so payment results are not received anywhere.
+- **Live giving** would additionally need Safaricom business registration approval.
+
+To get sandbox credentials and verify the Daraja side independently of this app, follow the [sandbox setup guide](https://github.com/gabrielmahia/mpesa-python/blob/main/docs/SANDBOX_SETUP.md).
 
 ---
 
