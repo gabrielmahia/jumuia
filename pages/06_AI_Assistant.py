@@ -101,10 +101,7 @@ def _get_json(path, api_key, timeout=15):
 def _discover_model(api_key: str):
     """List /v1beta/models and return best available generateContent model."""
     PREFERRED = [
-        "gemini-2.0-flash", "gemini-2.0-flash-lite",
-        "gemini-1.5-flash", "gemini-1.5-flash-8b",
-        "gemini-1.5-flash-latest", "gemini-2.0-flash-exp",
-        "gemini-1.0-pro", "gemini-pro",
+        "gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.1-flash-lite",
     ]
     try:
         data = _get_json("/v1beta/models", api_key)
@@ -124,14 +121,14 @@ _mem_cache: dict = {}
 
 def _search_tool_for(model: str) -> list:
     """Return the correct Google Search grounding tool block for a given model.
-    - gemini-2.0-*: uses the new {google_search: {}} format
+    - gemini-2.x / 3.x: uses the {google_search: {}} format
     - gemini-1.5-*: uses google_search_retrieval with dynamic mode
     - others / unknown: no tool (safe fallback)
     Search grounding lets the model query Google in real-time when it needs
     current information — current pope, today's readings, recent Vatican news, etc.
     Cached responses skip grounding (ttl=3600) so we don't burn quota on repeats.
     """
-    if model.startswith("gemini-2."):
+    if model.startswith(("gemini-2.", "gemini-3.")):
         return [{"google_search": {}}]
     if model.startswith("gemini-1.5"):
         return [{"google_search_retrieval": {
@@ -194,9 +191,9 @@ def _safe_gen(prompt, api_key, primary_model):
     3. Next model in fallback list (on 429 quota exhaustion)
     """
     FALLBACKS = [
-        "gemini-1.5-flash-8b",
-        "gemini-1.5-flash",
-        "gemini-2.0-flash-lite",
+        "gemini-3.1-flash-lite",
+        "gemini-3.5-flash-lite",
+        "gemini-3.5-flash",
     ]
     candidates = [primary_model] + [m for m in FALLBACKS if m != primary_model]
     for model in candidates:

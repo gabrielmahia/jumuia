@@ -27,11 +27,10 @@ SUPPORTED_LANGUAGES = {
     "ar": "Arabic",   "sv": "Svenska",
 }
 
-_MODELS = [
-    ("gemini-1.5-flash",    "v1beta"),
-    ("gemini-1.5-flash",    "v1"),
-    ("gemini-2.0-flash",    "v1beta"),
-    ("gemini-1.5-flash-8b", "v1beta"),
+_MODELS = [  # the 1.5 and 2.0 models previously listed were shut down by Google
+    ("gemini-3.5-flash-lite", "v1beta"),
+    ("gemini-3.5-flash",      "v1beta"),
+    ("gemini-3.1-flash-lite", "v1beta"),
 ]
 
 class QuotaExceededError(Exception): pass
@@ -149,7 +148,7 @@ def diagnose() -> dict:
         }
 
     # Try a minimal call
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key={key}"
     body = json.dumps({"contents":[{"parts":[{"text":"hi"}]}]}).encode()
     req = urllib.request.Request(url, data=body, headers={"Content-Type":"application/json"}, method="POST")
     try:
