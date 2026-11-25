@@ -71,7 +71,7 @@ with col4:
 
 st.divider()
 st.caption(
-    "© Catholic Network Tools — CC BY-NC-ND 4.0 | "
+    "© Catholic Network Tools — PolyForm Noncommercial 1.0.0 | "
     "contact@aikungfu.dev | "
     "[Security Policy](SECURITY.md)"
 )
