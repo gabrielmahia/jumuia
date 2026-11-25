@@ -29,7 +29,7 @@ SUPPORTED_LANGUAGES = {
 
 _MODELS = [  # the 1.5 and 2.0 models previously listed were shut down by Google
     ("gemini-3.5-flash-lite", "v1beta"),
-    ("gemini-3.5-flash",      "v1beta"),
+    ("gemini-3.8-flash",      "v1beta"),
     ("gemini-3.1-flash-lite", "v1beta"),
 ]
 
