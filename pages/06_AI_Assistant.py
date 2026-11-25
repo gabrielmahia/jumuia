@@ -101,7 +101,7 @@ def _get_json(path, api_key, timeout=15):
 def _discover_model(api_key: str):
     """List /v1beta/models and return best available generateContent model."""
     PREFERRED = [
-        "gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.1-flash-lite",
+        "gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-3.1-flash-lite",
     ]
     try:
         data = _get_json("/v1beta/models", api_key)
@@ -193,7 +193,7 @@ def _safe_gen(prompt, api_key, primary_model):
     FALLBACKS = [
         "gemini-3.1-flash-lite",
         "gemini-3.5-flash-lite",
-        "gemini-3.5-flash",
+        "gemini-3.8-flash",
     ]
     candidates = [primary_model] + [m for m in FALLBACKS if m != primary_model]
     for model in candidates:
