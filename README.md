@@ -3,7 +3,7 @@
 **Low-cost Catholic parish coordination for East Africa and the global diaspora.**
 
 [![CI](https://github.com/gabrielmahia/jumuia/actions/workflows/ci.yml/badge.svg)](https://github.com/gabrielmahia/jumuia/actions/workflows/ci.yml)
-[![License: CC BY-NC-ND 4.0](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-lightgrey.svg)](LICENSE)
+[![License: PolyForm Noncommercial](https://img.shields.io/badge/License-PolyForm%20Noncommercial%201.0.0-blue.svg)](LICENSE)
 [![Live](https://img.shields.io/badge/live-jumuia.streamlit.app-gold)](https://jumuia.streamlit.app)
 
 **[→ Open the live platform](https://jumuia.streamlit.app)**
@@ -154,6 +154,6 @@ Named after the AMECEA tradition of Small Christian Communities (SCCs).
 
 ## License
 
-**CC BY-NC-ND 4.0** — Non-commercial. No derivatives. Attribution required.  
+**PolyForm Noncommercial 1.0.0** — free for personal, research, educational, nonprofit and government use, including modifying it for those purposes. Commercial use needs a separate licence: contact@aikungfu.dev.
 Contact: contact@aikungfu.dev  
 © 2026 Gabriel Mahia / MNG ONLINE LLC

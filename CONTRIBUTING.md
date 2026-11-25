@@ -1,6 +1,6 @@
 # Contributing to Catholic Network Tools
 
-This project uses CC BY-NC-ND 4.0. Direct code contributions via PR are not
+This project uses PolyForm Noncommercial 1.0.0. Direct code contributions via PR are not
 currently accepted.
 
 **To report bugs or suggest improvements:** Open an Issue on GitHub.
